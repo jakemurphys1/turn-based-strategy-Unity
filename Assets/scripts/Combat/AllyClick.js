@@ -1,18 +1,17 @@
 ﻿var main: GameObject;
 var index: int = 0;
-var actionPanel: GameObject;
-var actionButton: GameObject;
 var animator: Animator;
 var Run: float;
 var vert:int;
 var hor:int;
 var itself:GameObject;
+var menu:GameObject;
+var menuPosition = Vector2(0,0);
 
 function Start(){
 	main = GameObject.Find("Main");
+	menu = GameObject.Find("Canvas/MenuB");
 	animator = GetComponent.<Animator>();
-	actionPanel = GameObject.Find("Actions");
-	actionButton = GameObject.Find("PanelButtons");
 }
 
 
@@ -33,35 +32,47 @@ function OnMouseDown(){
 		}
 
 
-		if(vert<4){
+		if(vert<4 && spaceTaken(hor,vert + 1)){
 			curGrid[hor][vert+1].GetComponent("SpaceClick").readyMove=true;
 		}
-		if(vert>0){
+		if(vert>0 && spaceTaken(hor,vert - 1)){
 			curGrid[hor][vert-1].GetComponent("SpaceClick").readyMove=true;
 		}
-		if(hor>0){
+		if(hor>0 && spaceTaken(hor-1,vert)){
 			curGrid[hor-1][vert].GetComponent("SpaceClick").readyMove=true;
 		}
-		if(hor<4){
+		if(hor<4 && spaceTaken(hor+1,vert)){
 			curGrid[hor+1][vert].GetComponent("SpaceClick").readyMove=true;
 		}
-	
-		//set values
-		main.GetComponent.<Main>().descriptionPanel.SetActive(true);
-		main.GetComponent.<Main>().actionPanel.SetActive(true);
-		main.GetComponent.<Main>().AttackValue.GetComponent.<UnityEngine.UI.Text>().text = active.attack + "";
 
-		//create buttons
-		var button = Instantiate(actionButton);
-		button.transform.SetParent(actionPanel.transform,false);
-		button.GetComponentInChildren(UI.Text).text = "Attack";
-		button.GetComponent.<ActionButton>().idName = "Attack";
+
+		//show menu
+		var mousePos = Input.mousePosition;
+		menu.GetComponent("Menu").setMenu(mousePos.x,mousePos.y,active.actions);
+
 	}else{
 		main.GetComponent("Main").clickGroup(index);
 	}
 	
 }
 
+function spaceTaken(hor, vert){
+	var mainGroups = main.GetComponent("Main").groups;
+	var activeGroup = main.GetComponent("Main").activeGroup;
+	var curObject1 = mainGroups[activeGroup].slot1Object;
+	var curObject2 = mainGroups[activeGroup].slot2Object;
+	var curObject3 = mainGroups[activeGroup].slot3Object;
+
+	if ((curObject1.GetComponent("AllyClick").vert == vert && curObject1.GetComponent("AllyClick").hor == hor) || (curObject2.GetComponent("AllyClick").vert == vert && curObject2.GetComponent("AllyClick").hor == hor) || (curObject3.GetComponent("AllyClick").vert == vert  && curObject3.GetComponent("AllyClick").hor == hor)){
+		return false;
+	}else{
+		return true;
+	}
+
+
+}
+
 function FixedUpdate(){
 	animator.SetFloat("Run",Run);
 }
+ 

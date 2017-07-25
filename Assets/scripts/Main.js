@@ -21,9 +21,11 @@ var entrance1: GameObject;
 var curCamera: GameObject;
 var moveGrid: GameObject;
 var curGrid = new Array();
+var floatText: GameObject;
 
 
 function Start () {
+//GetComponent("floatingTextController").Initialize();
 	tempStart();
 }
 
@@ -37,8 +39,11 @@ function tempStart(){
 	createGroup(0,1,2);
 	checkBattle(ship);
 	curGrid = ship.GetComponent("locations").allspaces;
+	activeGroup=0;
 }
 
+
+//unit creation
 function createUnit(name){
 	units[indexNum]= new Soldier(indexNum);
 	indexNum+=1;
@@ -47,7 +52,6 @@ function createUnit(name){
 	Eunits[EindexNum]= new Vampire(EindexNum);
 	EindexNum+=1;
 }
-
 function createGroup(slot1:int,slot2:int,slot3:int){
 	groups[groupIndex]= new Group(slot1,slot2,slot3,ship);
 	circle = Instantiate(Resources.Load("GroupCircle", GameObject));
@@ -61,7 +65,6 @@ function createGroup(slot1:int,slot2:int,slot3:int){
 	unit1.transform.SetParent(Terrain.transform,false);
 	unit1.GetComponent("AllyClick").index=slot1;
 	unit1.GetComponent("AllyClick").vert=1;
-	Debug.Log("vert" + unit1.GetComponent("AllyClick").vert);
 	unit1.GetComponent("AllyClick").hor=0;
 	groups[groupIndex].slot1Object = unit1;
 
@@ -88,7 +91,6 @@ function createGroup(slot1:int,slot2:int,slot3:int){
 
 	groupIndex+=1;
 }
-
 function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:String,location:GameObject){
 	Egroups[EgroupIndex]= new EGroup(EindexNum,EindexNum+1,EindexNum+2,EindexNum+3,EindexNum+4,location);
 
@@ -98,7 +100,9 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 	unit1.transform.position=entrance1.GetComponent.<locations>().space14.transform.position;
 	unit1.transform.position.y=1;
 	unit1.transform.SetParent(Terrain.transform,false);
+	unit1.GetComponent("EnemyClick").eindex = EindexNum-1;
 	Egroups[EgroupIndex].slot1Object = unit1;
+	Eunits[EindexNum-1].body = unit1;
 	
 
 	if(slot2!=""){
@@ -108,7 +112,9 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			unit2.transform.position=entrance1.GetComponent.<locations>().space24.transform.position;
 			unit2.transform.position.y=1;
 			unit2.transform.SetParent(Terrain.transform,false);
+			unit2.GetComponent("EnemyClick").eindex = EindexNum-1;
 			Egroups[EgroupIndex].slot2Object = unit2;
+			Eunits[EindexNum-1].body = unit2;
 	}
 	if(slot3!=""){
 			createEUnit(slot2);
@@ -117,12 +123,13 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			unit3.transform.position=entrance1.GetComponent.<locations>().space34.transform.position;
 			unit3.transform.position.y=1;
 			unit3.transform.SetParent(Terrain.transform,false);
+			unit3.GetComponent("EnemyClick").eindex = EindexNum-1;
 			Egroups[EgroupIndex].slot3Object = unit3;
+			Eunits[EindexNum-1].body = unit3;
 	}
 
 	EgroupIndex+=1;
 }
-
 class Group{
 	var location:GameObject;
 	var slot1: int;
@@ -163,7 +170,6 @@ class EGroup{
 
 	}
 }
-
 class Soldier{
    var type:String="Soldier";
    var maxhealth:int=30;
@@ -173,9 +179,14 @@ class Soldier{
    var vert: int;
    var hor:int;
    var group:int = -1;
+   var actions= new Array();
 
    function Soldier(indexNum:int){
    	   this.index = indexNum;
+	   this.actions[0] = "Normal";
+	   this.actions[1] = "Piercing";
+	   this.actions[2] = "Grounding";
+	   this.actions[3] = "Titan";
    }
  }
 class Vampire{
@@ -187,24 +198,20 @@ class Vampire{
    var vert: int;
    var hor:int;
    var group:int = -1;
+   var body:GameObject;
 
    function Vampire(indexNum:int){
    	   this.index = indexNum;
    }
  }
-
- function enemyClick(eindex){
-	var enemy = Eunits[eindex];
-	GetComponent.<Main>().descriptionPanel.SetActive(true);
-	GetComponent.<Main>().AttackValue.GetComponent.<UnityEngine.UI.Text>().text = enemy.attack + "";
- }
-
  function clickGroup(index){
   if(inCombat==false){
 	activeGroup = units[index].group;
 	groups[activeGroup].circle.SetActive(true);
   }
  }
+
+
 
  function moveGroup(slot1:Vector3, slot2:Vector3,slot3:Vector3,locIndex:int,location:GameObject){
 			var curObject1 = groups[activeGroup].slot1Object;
@@ -228,18 +235,18 @@ class Vampire{
 					//rotate the right way
 					_direction1 = (slot1 - startPosition1).normalized;
 					_lookRotation1 = Quaternion.LookRotation(_direction1);
-					startDirection1 = curObject1.transform.rotation;
-					curObject1.transform.rotation=_lookRotation1;
+					startDirection1 = curObject1.transform.GetChild(0).transform.rotation;
+					curObject1.transform.GetChild(0).transform.rotation=_lookRotation1;
 
 					_direction2 = (slot2 - startPosition2).normalized;
 					_lookRotation2 = Quaternion.LookRotation(_direction2);
-					startDirection2= curObject2.transform.rotation;
-					curObject2.transform.rotation=_lookRotation2;
+					startDirection2= curObject2.transform.GetChild(0).transform.rotation;
+					curObject2.transform.GetChild(0).transform.rotation=_lookRotation2;
 
 					_direction3 = (slot3 - startPosition3).normalized;
 					_lookRotation3 = Quaternion.LookRotation(_direction3);
-					startDirection3 = curObject3.transform.rotation;
-					curObject3.transform.rotation=_lookRotation3;
+					startDirection3 = curObject3.transform.GetChild(0).transform.rotation;
+					curObject3.transform.GetChild(0).transform.rotation=_lookRotation3;
 
 					var t = 0.0;
 					 while (t < 1.0)
@@ -253,9 +260,9 @@ class Vampire{
 					 }
 					 curCircle.transform.position.y=1;
 					 curCircle.SetActive(false);
-					 curObject1.transform.rotation=startDirection1;
-					 curObject2.transform.rotation=startDirection2;
-					 curObject3.transform.rotation=startDirection3;
+					 curObject1.transform.GetChild(0).transform.rotation=startDirection1;
+					 curObject2.transform.GetChild(0).transform.rotation=startDirection2;
+					 curObject3.transform.GetChild(0).transform.rotation=startDirection3;
 					 curObject1.GetComponent("AllyClick").Run=-0.2;
 					 curObject2.GetComponent("AllyClick").Run=-0.2;
 					 curObject3.GetComponent("AllyClick").Run=-0.2;
@@ -269,7 +276,6 @@ class Vampire{
 					 groups[activeGroup].location = location;
 
 					checkBattle(location);
-
  }
 
  function checkBattle(location:GameObject){
@@ -296,9 +302,5 @@ function startBattle(location){
 		curCamera.transform.position = Vector3.Lerp(startPosition,endPosition,t);
 		yield;
 	}
-
-
-
-
 }
  

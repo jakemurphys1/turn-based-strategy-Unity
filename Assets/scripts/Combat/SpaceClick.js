@@ -2,9 +2,11 @@
 var vert : int;
 var hor : int;
 var main: GameObject;
+var menu:GameObject;
 
 function Start(){
 	main = GameObject.Find("Main");
+	menu = GameObject.Find("Canvas/MenuB");
 }
 
 function Update()
@@ -66,21 +68,26 @@ function Update()
 		 var _direction = (spacePosition - unitPosition).normalized;
 		var _lookRotation = Quaternion.LookRotation(_direction);
 		 selectedUnit.transform.rotation=_lookRotation;
+		 selectedUnit.GetComponent("AllyClick").Run=.1;
+
+		 		 //hide menu
+		 menu.GetComponent("Menu").hideAll();
 
 		var t = 0.0;
 		 while (t < 1.0)
 		 {
-			 t += 0.05;
+			 t += 0.02;
 			 selectedUnit.transform.position = Vector3.Lerp(startPosition,endPosition,t);
 			 yield;
 		 }
 
 		 //reset active to null
-
-		Debug.Log(unitPosition + " " + spacePosition);
+		 selectedUnit.GetComponent("AllyClick").Run=0;
 		
 		 var index = selectedUnit.GetComponent("AllyClick").index;
 		 var activeScript = GameObject.Find("Main").GetComponent("Main").units[index];
+
+
 
 		 activeScript.vert=vert;
 		activeScript.hor=hor;
