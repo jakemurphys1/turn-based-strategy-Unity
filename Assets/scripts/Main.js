@@ -22,17 +22,22 @@ var curCamera: GameObject;
 var moveGrid: GameObject;
 var curGrid = new Array();
 var floatText: GameObject;
+var curAction: String;
+var statBox:GameObject;
 
 
 function Start () {
-//GetComponent("floatingTextController").Initialize();
 	tempStart();
 }
 
 function tempStart(){
-	createUnit("Soldier");
-	createUnit("Soldier");
-	createUnit("Soldier");
+	createUnit("Archer");
+	createUnit("Archer");
+	createUnit("Archer");
+
+	units[0].actionsActive["Piercing"]=true;
+	units[0].actionsActive["Titan"]=true;
+	units[0].actionsActive["Immobolize"]=true;
 
 	entrance1 = ship;
 	createEGroup("Vampire","Vampire","Vampire","Vampire","Vampire",entrance1);
@@ -45,7 +50,7 @@ function tempStart(){
 
 //unit creation
 function createUnit(name){
-	units[indexNum]= new Soldier(indexNum);
+	units[indexNum]= new Archer(indexNum);
 	indexNum+=1;
 }
  function createEUnit(name){
@@ -60,7 +65,7 @@ function createGroup(slot1:int,slot2:int,slot3:int){
 
 
 	units[slot1].group = groupIndex;
-	unit1 = Instantiate(Resources.Load("allies3D/Soldier", GameObject));
+	unit1 = Instantiate(Resources.Load("allies3D/Archer", GameObject));
 	unit1.transform.position=ship.GetComponent.<locations>().space10.transform.position;
 	unit1.transform.SetParent(Terrain.transform,false);
 	unit1.GetComponent("AllyClick").index=slot1;
@@ -69,7 +74,7 @@ function createGroup(slot1:int,slot2:int,slot3:int){
 	groups[groupIndex].slot1Object = unit1;
 
 	units[slot2].group = groupIndex;
-	unit2 = Instantiate(Resources.Load("allies3D/Soldier", GameObject));
+	unit2 = Instantiate(Resources.Load("allies3D/Archer", GameObject));
 	unit2.transform.position=ship.GetComponent.<locations>().space20.transform.position;
 	unit2.transform.SetParent(Terrain.transform,false);
 	unit2.GetComponent("AllyClick").index=slot2;
@@ -79,7 +84,7 @@ function createGroup(slot1:int,slot2:int,slot3:int){
 	
 
 	units[slot3].group = groupIndex;
-	unit3 = Instantiate(Resources.Load("allies3D/Soldier", GameObject));
+	unit3 = Instantiate(Resources.Load("allies3D/Archer", GameObject));
 	unit3.transform.position=ship.GetComponent.<locations>().space30.transform.position;
 	unit3.transform.SetParent(Terrain.transform,false);
 	unit3.GetComponent("AllyClick").index=slot3;
@@ -170,23 +175,32 @@ class EGroup{
 
 	}
 }
-class Soldier{
-   var type:String="Soldier";
+class Archer{
+   var type:String="Archer";
    var maxhealth:int=30;
    var health:int=30;
    var attack:int=10;
+   var defense:int=10;
+   var resistance:int=5;
+   var accuracy:int=3;
    var index:int;
    var vert: int;
    var hor:int;
    var group:int = -1;
    var actions= new Array();
+   var actionImages = new Array();
+   var actionsActive = {};
+   var level: int = 6;
+   var hasMoved: boolean=false;
+   var didAction: boolean=false;
 
-   function Soldier(indexNum:int){
+   function Archer(indexNum:int){
    	   this.index = indexNum;
 	   this.actions[0] = "Normal";
 	   this.actions[1] = "Piercing";
-	   this.actions[2] = "Grounding";
+	   this.actions[2] = "Immobolize";
 	   this.actions[3] = "Titan";
+	   this.actionsActive["Normal"]=true;
    }
  }
 class Vampire{

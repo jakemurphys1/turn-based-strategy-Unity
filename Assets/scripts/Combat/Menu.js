@@ -1,51 +1,83 @@
-﻿var option1L: GameObject;
-var option1R: GameObject;
-var option2L: GameObject;
-var option2R: GameObject;
-var option3L: GameObject;
-var option3R: GameObject;
+﻿var option1: GameObject;
+var option2: GameObject;
+var option3: GameObject;
+var option4: GameObject;
+var option5: GameObject;
+var option6: GameObject;
 var optionIndex:int;
+var main: GameObject;
 
 
-function setMenu(x,y,actions){
-Debug.Log(actions);
+function setMenu(x,y,actions,type,actionsActive){
 	transform.position.x = x+ 50;
 	transform.position.y = y;
 
 	hideAll();
 
-	option1L.GetComponent("Image").enabled=true;
-	option1L.GetComponent("MenuButton").textBox.GetComponent("Text").enabled = true;
-	option1L.GetComponent("MenuButton").textBox.GetComponent("Text").text=actions[0];
+	option1.GetComponent("Image").enabled=true;
+	option1.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = true;
+
+	main.GetComponent("Main").curAction = actions[0];
+	
+	
+	
+
+	option1.GetComponent("MenuButton").textBox.GetComponent("Text").text=actions[0];
+	option1.GetComponent("MenuButton").imageBox.GetComponent("Image").sprite = Resources.Load("Icons/" + type + "/" + actions[0], typeof(Sprite));
 	if(actions.length>1){
-		option1R.GetComponent("MenuButton").textBox.GetComponent("Text").text=actions[1];
+		option2.GetComponent("MenuButton").textBox.GetComponent("Text").text=actions[1];
+		option2.GetComponent("MenuButton").imageBox.GetComponent("Image").sprite = Resources.Load("Icons/" + type + "/" + actions[1], typeof(Sprite));
+		if(actionsActive[actions[1]]==true){
+			option2.GetComponent("Image").enabled=true;
+			option2.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = true;
+		}
 	}
 	if(actions.length>2){
-		option2L.GetComponent("MenuButton").textBox.GetComponent("Text").text=actions[2];
+		option3.GetComponent("MenuButton").textBox.GetComponent("Text").text=actions[2];
+		option3.GetComponent("MenuButton").imageBox.GetComponent("Image").sprite = Resources.Load("Icons/" + type + "/" + actions[2], typeof(Sprite));
+		if(actionsActive[actions[2]]==true){
+			option3.GetComponent("Image").enabled=true;
+			option3.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = true;
+		}
 	}
 	if(actions.length>3){
-		option2R.GetComponent("MenuButton").textBox.GetComponent("Text").text=actions[3];
+		option4.GetComponent("MenuButton").textBox.GetComponent("Text").text=actions[3];
+		option4.GetComponent("MenuButton").imageBox.GetComponent("Image").sprite = Resources.Load("Icons/" + type + "/" + actions[3], typeof(Sprite));
+		if(actionsActive[actions[3]]==true){
+			option4.GetComponent("Image").enabled=true;
+			option4.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = true;
+		}
 	}
 	if(actions.length>4){
-		option3L.GetComponent("MenuButton").textBox.GetComponent("Text").text=actions[4];
+		option5.GetComponent("MenuButton").textBox.GetComponent("Text").text=actions[4];
+		option5.GetComponent("MenuButton").imageBox.GetComponent("Image").sprite = Resources.Load("Icons/" + type + "/" + actions[4], typeof(Sprite));
+		if(actionsActive[actions[4]]==true){
+			option5.GetComponent("Image").enabled=true;
+			option5.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = true;
+		}
 	}
 	if(actions.length>5){
-		option3R.GetComponent("MenuButton").textBox.GetComponent("Text").text=actions[5];
+		option6.GetComponent("MenuButton").textBox.GetComponent("Text").text=actions[5];
+		option6.GetComponent("MenuButton").imageBox.GetComponent("Image").sprite = Resources.Load("Icons/" + type + "/" + actions[5], typeof(Sprite));
+		if(actionsActive[actions[5]]==true){
+			option6.GetComponent("Image").enabled=true;
+			option6.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = true;
+		}
 	}
 }
 
 function hideAll(){
-	option1L.GetComponent("Image").enabled=false;
-	option2L.GetComponent("Image").enabled=false;
-	option3L.GetComponent("Image").enabled=false;
-	option1R.GetComponent("Image").enabled=false;
-	option2R.GetComponent("Image").enabled=false;
-	option3R.GetComponent("Image").enabled=false;
+	option1.GetComponent("Image").enabled=false;
+	option2.GetComponent("Image").enabled=false;
+	option3.GetComponent("Image").enabled=false;
+	option4.GetComponent("Image").enabled=false;
+	option5.GetComponent("Image").enabled=false;
+	option6.GetComponent("Image").enabled=false;
 
-	option1L.GetComponent("MenuButton").textBox.GetComponent("Text").enabled = false;
-	option2L.GetComponent("MenuButton").textBox.GetComponent("Text").enabled = false;
-	option3L.GetComponent("MenuButton").textBox.GetComponent("Text").enabled = false;
-	option1R.GetComponent("MenuButton").textBox.GetComponent("Text").enabled = false;
-	option2R.GetComponent("MenuButton").textBox.GetComponent("Text").enabled = false;
-	option3R.GetComponent("MenuButton").textBox.GetComponent("Text").enabled = false;
+	option1.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = false;
+	option2.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = false;
+	option3.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = false;
+	option4.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = false;
+	option5.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = false;
+	option6.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = false;
 }

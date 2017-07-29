@@ -7,15 +7,26 @@ var hor:int;
 var itself:GameObject;
 var menu:GameObject;
 var menuPosition = Vector2(0,0);
+var curcamera: Camera;
+var clickState:String = "single";
+var lastClickTime:float;
+var catchTime: float = 0.25f;
+var statsBox:GameObject;
 
 function Start(){
 	main = GameObject.Find("Main");
+	statsBox = GameObject.Find("stats");
 	menu = GameObject.Find("Canvas/MenuB");
 	animator = GetComponent.<Animator>();
 }
 
 
 function OnMouseDown(){
+if(clickState=="double"){
+		zoomin();
+	}
+
+
 	if(main.GetComponent("Main").inCombat){
 		var active = main.GetComponent("Main").units[index];
 		main.GetComponent("Main").selectedUnit = itself;
@@ -48,7 +59,8 @@ function OnMouseDown(){
 
 		//show menu
 		var mousePos = Input.mousePosition;
-		menu.GetComponent("Menu").setMenu(mousePos.x,mousePos.y,active.actions);
+		statsBox.GetComponent("stats").updateText(active.health,active.maxhealth,active.attack,active.defense,active.resistance,active.accuracy);
+		menu.GetComponent("Menu").setMenu(mousePos.x,mousePos.y,active.actions,active.type,active.actionsActive);
 
 	}else{
 		main.GetComponent("Main").clickGroup(index);
@@ -74,5 +86,29 @@ function spaceTaken(hor, vert){
 
 function FixedUpdate(){
 	animator.SetFloat("Run",Run);
+}
+
+function Update(){
+	//checkdoubleclicking
+	if(Input.GetButtonDown("Fire1"))
+		{
+			if(Time.time - lastClickTime < catchTime)
+			{
+				//double click
+				clickState="double";
+			}
+			else
+			{
+				//normal click
+				clickState="single";
+			}
+			lastClickTime = Time.time;
+		}
+}
+
+function zoomin(){
+
+	curcamera.enabled=true;
+	menu.GetComponent("Menu").hideAll();
 }
  

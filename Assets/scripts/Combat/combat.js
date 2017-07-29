@@ -1,7 +1,6 @@
 ﻿ 
  
  function damageEnemy(enemyNum,amount){
- Debug.Log("hi");
  var Eunits = GetComponent("Main").Eunits;
 
 	Eunits[enemyNum].health-=amount;

@@ -43,8 +43,15 @@ function Update()
 
  function moveActive(){
 	var thisposition = transform.position;
+	
 
 	if(readyMove==true){
+		var selectedUnit = main.GetComponent("Main").selectedUnit;
+		var curIndex = selectedUnit.GetComponent("AllyClick").index;
+		if(main.GetComponent("Main").units[curIndex].hasMoved==true){
+			return;
+		}
+
 		//reset all other spaces
 		var objects = GameObject.FindGameObjectsWithTag("Space");
 		for(var i = 0;i<objects.length;i++){
@@ -56,7 +63,6 @@ function Update()
 		main.GetComponent.<Main>().actionPanel.SetActive(false);
 
 		//move active
-		var selectedUnit = main.GetComponent("Main").selectedUnit;
 		var startPosition = selectedUnit.transform.position;
 		var endPosition = new Vector3(transform.position.x,selectedUnit.transform.position.y,transform.position.z);
 		selectedUnit.GetComponent("AllyClick").vert=vert;
@@ -69,6 +75,7 @@ function Update()
 		var _lookRotation = Quaternion.LookRotation(_direction);
 		 selectedUnit.transform.rotation=_lookRotation;
 		 selectedUnit.GetComponent("AllyClick").Run=.1;
+		 main.GetComponent("Main").units[curIndex].hasMoved=true;
 
 		 		 //hide menu
 		 menu.GetComponent("Menu").hideAll();

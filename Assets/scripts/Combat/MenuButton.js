@@ -4,17 +4,21 @@ var menu: GameObject;
 var onButton: Sprite;
 var offButton: Sprite;
 var textBox:GameObject;
+var imageBox: GameObject;
+var main:GameObject;
+
+function Start(){
+	main = menu.GetComponent("Menu").main;
+}
 
 function clickit(){
-	menu.GetComponent("Menu").optionIndex = index;
-	if(on){
-		gameObject.GetComponent("Image").sprite  = offButton;
+	main.GetComponent("Main").curAction = textBox.GetComponent("Text").text;
+}
 
-		on = false;
-	}else{
+function Update(){
+	if(textBox.GetComponent("Text").text==main.GetComponent("Main").curAction){
 		gameObject.GetComponent("Image").sprite  = onButton;
-		
-		on = true;
+	}else{
+		gameObject.GetComponent("Image").sprite  = offButton;
 	}
-	
 }
