@@ -3,7 +3,6 @@ var rotation;
   function Start()
   {
        rotation = transform.rotation;
-	   positon = transform.position;
   }
   function Update()
   {

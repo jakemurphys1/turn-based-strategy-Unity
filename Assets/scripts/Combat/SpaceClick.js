@@ -43,30 +43,39 @@ function Update()
 
  function moveActive(){
 	var thisposition = transform.position;
-	
-
 	if(readyMove==true){
 		var selectedUnit = main.GetComponent("Main").selectedUnit;
 		var curIndex = selectedUnit.GetComponent("AllyClick").index;
+		var ally = main.GetComponent("Main").units[curIndex];
+
+		//knight energy
+		if(ally.type=="Knight"){
+			if(!ally.actionsActive["FreeMove"]){
+				if(ally.energy<10){
+					main.GetComponent("combat").wordPopup(ally,"Low Energy");
+					return;
+				}else{
+					ally.energy-=10;
+					main.GetComponent("combat").setEnergyBar(ally);
+				}
+			}
+		}
+		
 		if(main.GetComponent("Main").units[curIndex].hasMoved==true){
-			return;
+			if((main.GetComponent("Main").units[curIndex].actionsActive["Dash"] && main.GetComponent("Main").units[curIndex].didAction==false)){
+				main.GetComponent("Main").units[curIndex].didAction=true;
+				main.GetComponent("combat").wordPopup(main.GetComponent("Main").units[curIndex],"Dash");
+			}else{
+				return;
+			}
+			
 		}
 
-		//reset all other spaces
-		var objects = GameObject.FindGameObjectsWithTag("Space");
-		for(var i = 0;i<objects.length;i++){
-			objects[i].GetComponent.<SpaceClick>().readyMove=false;
-		}
-
-		//remove panels
-		main.GetComponent.<Main>().descriptionPanel.SetActive(false);
-		main.GetComponent.<Main>().actionPanel.SetActive(false);
+		resetSpaces();
 
 		//move active
 		var startPosition = selectedUnit.transform.position;
 		var endPosition = new Vector3(transform.position.x,selectedUnit.transform.position.y,transform.position.z);
-		selectedUnit.GetComponent("AllyClick").vert=vert;
-		selectedUnit.GetComponent("AllyClick").hor=hor;
 
 		//rotation
 		 unitPosition = selectedUnit.transform.position;
@@ -74,8 +83,10 @@ function Update()
 		 var _direction = (spacePosition - unitPosition).normalized;
 		var _lookRotation = Quaternion.LookRotation(_direction);
 		 selectedUnit.transform.rotation=_lookRotation;
-		 selectedUnit.GetComponent("AllyClick").Run=.1;
+		 selectedUnit.GetComponent("AllyClick").Run=1;
 		 main.GetComponent("Main").units[curIndex].hasMoved=true;
+		 main.GetComponent("Main").units[curIndex].vert=vert;
+		 main.GetComponent("Main").units[curIndex].hor=hor;
 
 		 		 //hide menu
 		 menu.GetComponent("Menu").hideAll();
@@ -102,3 +113,13 @@ function Update()
 	}
 	
  }
+
+ function resetSpaces(){
+		//reset all other spaces
+		var objects = GameObject.FindGameObjectsWithTag("Space");
+		for(var i = 0;i<objects.length;i++){
+			objects[i].GetComponent.<SpaceClick>().readyMove=false;
+		}
+ }
+
+ 
