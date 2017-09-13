@@ -34,16 +34,22 @@ function enemyturn(){
 			main.GetComponent("combat").damageEnemy(eslots[p],pDamage);
 		}
 	}
-
 	
 	//enemy attack
 	enemyAttack();
 	
 	enemyMove();
 	
-	
 	//enemy attack2
 	enemyAttack();
+
+	for(i=0;i<eslots.length;i++){
+		if(eslots[i].doubleAttack>1 && eslots[i].didAction==false){
+			eslots[i].hasMoved=false;
+			enemyMove();
+			enemyAttack();
+		}
+	}
 
 	//reduce ailments
 	for(var k =0;k<eslots.length;k++){
@@ -87,8 +93,6 @@ function enemyturn(){
 			slots[q].poison-=1;
 		}
 	}
-	
-	
 }
 
 function DisablePass(){
@@ -108,7 +112,7 @@ function enemyMove(){
 			eslots[j].sleep-=1;
 			continue;
 		}
-		if(eslots[j].hasMoved || eslots[j].didAction){
+		if(eslots[j].hasMoved){
 			continue;
 		}
 		if(eslots[j].moveType=="Agressive"){
@@ -143,7 +147,7 @@ function enemyAttack(){
 					continue;
 				}
 			}
-			if(eslots[n].charge>-1){
+			if(eslots[n].maxcharge>-1){
 				if(eslots[n].charge<eslots[n].maxcharge){
 					charge(eslots[n]);
 					continue;
@@ -163,6 +167,9 @@ function enemyAttack(){
 			if(eslots[n].attackType=="FireAttack"){
 				FireAttack(eslots[n]);
 			}
+			if(eslots[n].attackType=="LightningAttack"){
+				LightningAttack(eslots[n]);
+			}
 		}
 	}
 }
@@ -171,10 +178,6 @@ function enemyAttack(){
 
 //Attacks
 function closeAttack(enemy,eslots,slots){
-		if(enemy.blind>0 || enemy.sleep>0){
-			enemy.didAction=true;
-			return;
-		}
 		var waittime=0;
 		if(enemy.body.GetComponent("EnemyClick").Run>0){
 			waittime=1;
@@ -223,18 +226,14 @@ function closeAttack(enemy,eslots,slots){
 function IceAttack(enemy,eslots,slots){
 	var attackThis = isTwoAway(enemy.hor,enemy.vert,slots);
 
-	if(enemy.silenced>0 || enemy.sleep>0){
-			enemy.didAction=true;
-			return;
-		}
+	if(attackThis==-1){
+		return;
+	}
 	
-	if(enemy.charge<2 || attackThis==-1){
-		charge(enemy);
-	} else{
-	var ally = slots[attackThis];
-	enemy.didAction=true;
-	enemy.hasMoved=true;
-		enemy.charge-=2;
+		var ally = slots[attackThis];
+		enemy.didAction=true;
+		enemy.hasMoved=true;
+		enemy.charge-=enemy.maxcharge;
 		enemy.body.GetComponent("EnemyClick").chargeText.GetComponent("Text").text=enemy.charge.ToString();
 		enemy.body.GetComponent("EnemyClick").attack =1;
 		lookAt(enemy,slots[attackThis]);
@@ -256,13 +255,156 @@ function IceAttack(enemy,eslots,slots){
 		 main.GetComponent("combat").damageAlly(slots[attackThis].index,10,enemy,0);
 		 item.SetActive(false);
 		 item.transform.position=startPosition;
-		
-		enemy.body.GetComponent("EnemyClick").attack =0;
-		
-		
-	}
+
+		 magic = Resources.Load("effects/Frozen", GameObject);
+		frozen = Instantiate(magic);
+		frozen.transform.position = ally.body.transform.position;
+		enemy.body.GetComponent("EnemyClick").attack =0;	
+		yield WaitForSeconds(1);
+		Destroy(frozen);
+		counter(enemy,slots[attackThis]);
 }
 function SpitterAttack(enemy,eslots,slots){
+	var options = new Array();
+	for(var i = 0;i<slots.length;i++){
+		if((slots[i].hor)==enemy.hor || (slots[i].vert)==enemy.vert){
+			options.push(slots[i]);
+		}
+	}
+	if(options.length==0){
+		return;
+	}
+	enemy.didAction=true;
+	enemy.hasMoved=true;
+
+	var waittime=0;
+	if(enemy.body.GetComponent("EnemyClick").Run>0){
+		waittime=1;
+	}
+	var target = lowestDefense(options,enemy.defenseType);
+	lookAt(enemy,target);
+
+	yield WaitForSeconds(waittime);
+	lookAt(enemy,target);
+	enemy.body.GetComponent("EnemyClick").attack =1;
+	var damage = enemy.attack-main.GetComponent("combat").getdefense(target,enemy.defenseType);
+
+	
+	if(enemy.type=="Spitter"){
+		magic = Resources.Load("effects/Tar", GameObject);
+		main.GetComponent("sounds").playSound("spit");
+	}
+	if(enemy.type=="GreenOoze"){
+		magic = Resources.Load("effects/Poison", GameObject);
+		main.GetComponent("sounds").playSound("shootFire");
+	}
+	if(enemy.type=="BrownOoze"){
+		magic = Resources.Load("effects/Brown", GameObject);
+		main.GetComponent("sounds").playSound("shootFire");
+	}
+	if(enemy.type=="BlueOoze"){
+		magic = Resources.Load("effects/Ice", GameObject);
+		enemy.charge-=1;
+		enemy.body.GetComponent("EnemyClick").chargeText.GetComponent("Text").text=enemy.charge.ToString();
+		main.GetComponent("sounds").playSound("shootFire");
+	}
+	if(enemy.type=="RedOoze"){
+		magic = Resources.Load("effects/FireMagic", GameObject);
+		main.GetComponent("sounds").playSound("shootFire");
+		enemy.charge+=1;
+		enemy.body.GetComponent("EnemyClick").chargeText.GetComponent("Text").text=enemy.charge.ToString();
+		damage= damage * enemy.charge;
+	}
+	main.GetComponent("combat").damageAlly(target.index,damage,enemy,1);
+	yield WaitForSeconds(0.5);
+	instance = Instantiate(magic);
+	instance.transform.position = enemy.body.transform.position;
+	shootObject(instance,target);
+	enemy.body.GetComponent("EnemyClick").attack =0;
+	
+	yield WaitForSeconds(0.5);
+	
+	if(enemy.type=="Spitter"){
+		doAilment(target,"Enfeebled");
+	}
+	if(enemy.type=="GreenOoze"){
+		doAilment(target,"Poison");
+	}
+	if(enemy.type=="BlueOoze"){
+		if(!spaceFilled(target.hor,target.vert-1)){
+			moveInstant(target,target.hor,target.vert-1);
+			main.GetComponent("sounds").playSound("gust");
+		}
+	}
+
+	counter(enemy,target);
+}
+function FireAttack(enemy){
+	enemy.didAction=true;
+	enemy.hasMoved=true;
+	enemy.charge-=enemy.maxcharge;
+	enemy.body.GetComponent("EnemyClick").chargeText.GetComponent("Text").text=enemy.charge.ToString();
+
+	var waittime=0;
+	if(enemy.body.GetComponent("EnemyClick").Run>0){
+		waittime=1;
+	}
+	var target = lowestDefense(slots,enemy.defenseType);
+	lookAt(enemy,target);
+
+	yield WaitForSeconds(waittime);
+	lookAt(enemy,target);
+	enemy.body.GetComponent("EnemyClick").attack =1;
+	var damage = enemy.attack-main.GetComponent("combat").getdefense(target,enemy.defenseType);
+	main.GetComponent("combat").damageAlly(target.index,damage,enemy,1);
+
+	yield WaitForSeconds(0.5);
+
+	main.GetComponent("sounds").playSound("shootFire");
+	magic = Resources.Load("effects/FireBall", GameObject);
+	instance = Instantiate(magic);
+	instance.transform.position = enemy.body.transform.position;
+	shootObject(instance,target);
+	enemy.body.GetComponent("EnemyClick").attack =0;
+	yield WaitForSeconds(0.5);
+	magic = Resources.Load("effects/Fire", GameObject);
+	instance = Instantiate(magic);
+	instance.transform.position = target.body.transform.position;
+	instance.transform.position.y+=10;
+	counter(enemy,target);
+}
+function LightningAttack(enemy){
+	enemy.didAction=true;
+	enemy.hasMoved=true;
+	enemy.charge-=enemy.maxcharge;
+	enemy.body.GetComponent("EnemyClick").chargeText.GetComponent("Text").text=enemy.charge.ToString();
+
+	var waittime=0;
+	if(enemy.body.GetComponent("EnemyClick").Run>0){
+		waittime=1;
+	}
+	var target = lowestDefense(slots,enemy.defenseType);
+	lookAt(enemy,target);
+
+	yield WaitForSeconds(waittime);
+	lookAt(enemy,target);
+	enemy.body.GetComponent("EnemyClick").attack =1;
+	var damage = enemy.attack-main.GetComponent("combat").getdefense(target,enemy.defenseType);
+	main.GetComponent("combat").damageAlly(target.index,damage,enemy,1);
+
+	yield WaitForSeconds(0.5);
+
+	main.GetComponent("sounds").playSound("explosion");
+	magic = Resources.Load("effects/Lightning", GameObject);
+	instance = Instantiate(magic);
+	instance.transform.position = target.body.transform.position;
+	instance.transform.position.y+=50;
+	enemy.body.GetComponent("EnemyClick").attack =0;
+	yield WaitForSeconds(0.5);
+	Destroy(instance);
+	counter(enemy,target);
+}
+function BlueOozeAttack(enemy){
 	var options = new Array();
 	for(var i = 0;i<slots.length;i++){
 		if((slots[i].hor)==enemy.hor || (slots[i].vert)==enemy.vert){
@@ -317,39 +459,6 @@ function SpitterAttack(enemy,eslots,slots){
 	}
 
 	counter(enemy,target);
-}
-function FireAttack(enemy){
-	enemy.didAction=true;
-	enemy.hasMoved=true;
-	enemy.charge-=enemy.maxcharge;
-	enemy.body.GetComponent("EnemyClick").chargeText.GetComponent("Text").text=enemy.charge.ToString();
-
-	var waittime=0;
-	if(enemy.body.GetComponent("EnemyClick").Run>0){
-		waittime=1;
-	}
-	var target = lowestDefense(slots,enemy.defenseType);
-	lookAt(enemy,target);
-
-	yield WaitForSeconds(waittime);
-	lookAt(enemy,target);
-	enemy.body.GetComponent("EnemyClick").attack =1;
-	var damage = enemy.attack-main.GetComponent("combat").getdefense(target,enemy.defenseType);
-	main.GetComponent("combat").damageAlly(target.index,damage,enemy,1);
-
-	yield WaitForSeconds(0.5);
-
-	main.GetComponent("sounds").playSound("shootFire");
-	magic = Resources.Load("effects/FireBall", GameObject);
-	instance = Instantiate(magic);
-	instance.transform.position = enemy.body.transform.position;
-	shootObject(instance,target);
-	enemy.body.GetComponent("EnemyClick").attack =0;
-	yield WaitForSeconds(0.5);
-	magic = Resources.Load("effects/Fire", GameObject);
-	instance = Instantiate(magic);
-	instance.transform.position = target.body.transform.position;
-	instance.transform.position.y+=10;
 }
 
 //moves
@@ -549,6 +658,7 @@ function randomMove(enemy){
 
 //other stuff
 function counter(enemy,ally){
+	
 	if(ally.actionsActive["Counter"]){
 		if(enemy.hor == ally.hor){
 			if((enemy.vert==ally.vert+1)||(enemy.vert==ally.vert-1)){
@@ -565,7 +675,9 @@ function counter(enemy,ally){
 function move(body,x,z){
 	body.GetComponent("EnemyClick").Run =1;
 	var startPosition = body.transform.position;
-	var endPosition = Vector3(body.transform.position.x + x,1, body.transform.position.z + z);
+	var enemyindex = body.GetComponent("EnemyClick").eindex;
+	var enemy = main.GetComponent("Main").Eunits[enemyindex];
+	var endPosition = Vector3(body.transform.position.x + x,enemy.height, body.transform.position.z + z);
 	var t = 0.0;
 		 while (t < 1.0)
 		 {
@@ -575,6 +687,23 @@ function move(body,x,z){
 		 }
 	body.GetComponent("EnemyClick").Run =0;
  }
+ function moveInstant(ally,hor,vert){
+	ally.vert = vert;
+	ally.hor = hor;
+	var space = spaces[vert][hor];
+	
+	//move active
+		var startPosition = ally.body.transform.position;
+		var endPosition = new Vector3(space.transform.position.x,ally.body.transform.position.y,space.transform.position.z);
+		var t = 0.0;
+		 while (t < 1.0)
+		 {
+			 t += 0.05;
+			 ally.body.transform.position = Vector3.Lerp(startPosition,endPosition,t);
+			 yield;
+		 }
+ }
+
  function lookAt(enemy,ally){
 	var body = enemy.body;
 	var abody = ally.body;
@@ -616,7 +745,15 @@ function isTwoAway(hor,vert,slots){
 }
 function charge(enemy){
 	enemy.didAction=true;
+	yield WaitForSeconds(0.1);
+	var waittime=0;
+	if(enemy.body.GetComponent("EnemyClick").Run>0){
+		waittime=1;
+	}
+	yield WaitForSeconds(waittime);
+	
 	enemy.charge+=1;
+	enemy.body.GetComponent("EnemyClick").animator.SetInteger("Run",0);
 	enemy.body.GetComponent("EnemyClick").animator.SetInteger("special",1);
 	magic = Resources.Load("effects/Charge", GameObject);
 	instance = Instantiate(magic);

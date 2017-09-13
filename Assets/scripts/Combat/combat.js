@@ -117,9 +117,10 @@
 	popupText = Resources.Load("Prefabs/WordText", GameObject);
 	var instance = Instantiate(popupText);
 	instance.transform.position = unit.body.transform.position;
-	instance.transform.position.y+=11;
-	instance.transform.position.z-=wordPopupAlter-1;
-	wordPopupAlter+=3;
+	instance.transform.position.y+=12-unit.height;
+	instance.transform.position.x+=2;
+	instance.transform.position.z-=wordPopupAlter+1;
+	wordPopupAlter+=2;
 	var childtext = instance.transform.GetChild(0);
 	childtext.GetComponent("Text").text=word;
 	yield WaitForSeconds(2);
@@ -356,6 +357,10 @@
 	var damage:int;
 	if(thisUnit.type == "Archer"){
 		shootarrow(thisUnit,curEnemy);
+			var intercept = interceptArrow();
+			if(intercept!=-1){
+				return;
+			}
 		yield WaitForSeconds(2);
 		if(curAction=="Normal"){
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
@@ -418,6 +423,10 @@
 			return;
 		}
 		shootarrow(thisUnit,curEnemy);
+		intercept = interceptArrow();
+			if(intercept!=-1){
+				return;
+			}
 		yield WaitForSeconds(2);
 		if(curAction=="Normal"){
 
@@ -470,11 +479,16 @@
 		if(thisUnit.vert != curEnemy.vert && thisUnit.hor !=curEnemy.hor){
 			return;
 		}
+		
 		var curElement = "None";
 		if(thisUnit.actionsActive["Elemental"]){
 			curElement=thisUnit.element;
 		}
 			shootarrow(thisUnit,curEnemy);
+			intercept = interceptArrow();
+			if(intercept!=-1){
+				return;
+			}
 			yield WaitForSeconds(2);
 		
 		if(curAction=="Normal"){
@@ -787,6 +801,9 @@
 		menu.GetComponent("Menu").hideAll();
 	}
 	if(thisUnit.type == "Mage"){
+		if(checkSilencer(eslots)){
+			return;
+		}
 		if(curAction=="Fire"){
 			if(isDiagonal(curEnemy,thisUnit) || isTwoAway(curEnemy,thisUnit)){
 				magicAttack(thisUnit,curEnemy);
@@ -897,6 +914,9 @@
 		}	
 	}
 	if(thisUnit.type == "Wizard"){
+		if(checkSilencer(eslots)){
+			return;
+		}
 		if(curAction=="Gust"){
 			if(thisUnit.charge<1){
 				wordPopup(thisUnit,"Not Enough Charge");
@@ -966,6 +986,9 @@
 		}	
 	}
 	if(thisUnit.type == "Sorcerer"){
+		if(checkSilencer(eslots)){
+			return;
+		}
 		if(curAction=="Blizzard"){
 			if(thisUnit.energy<30){
 				wordPopup(thisUnit,"Not Enough Energy");
@@ -1095,6 +1118,17 @@
 	lookAt(enemy,ally);
 	yield WaitForSeconds(2);
 	ally.body.GetComponent("AllyClick").attack=0;
+	var intercept = interceptArrow();
+	if(intercept!=-1){
+		intercept.body.GetComponent("EnemyClick").animator.SetInteger("special",1);
+		yield WaitForSeconds(0.5);
+		GetComponent("sounds").playSound("protect");
+		yield WaitForSeconds(1);
+		intercept.body.GetComponent("EnemyClick").animator.SetInteger("special",0);
+		wordPopup(intercept,"Caught Arrow");
+		ally.didAction=true;
+		return;
+	}
 	var arrow = ally.body.GetComponent("AllyClick").arrow;
 	GetComponent("sounds").playSound("arrow");
 	arrow.SetActive(true);
@@ -1421,4 +1455,23 @@
 			return true;
 		}
 	}
+ }
+
+ function interceptArrow(){
+	var eslots = pass.GetComponent("pass").eslots;
+	for(var i =0;i<eslots.length;i++){
+		if(eslots[i].type=="Magnet"){
+			return eslots[i];
+		}
+	}
+	return -1;
+ }
+ function checkSilencer(eslots){
+ 	 for(var i = 0;i<eslots.length;i++){
+	 	 if(eslots[i].type =="Silencer"){
+			wordPopup(eslots[i],"Prevents Magic");
+		 	return true;
+		 }
+	 }
+	 return false;
  }

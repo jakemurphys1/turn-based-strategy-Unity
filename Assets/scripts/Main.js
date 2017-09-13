@@ -34,14 +34,14 @@ function Start () {
 }
 
 function tempStart(){
-	createUnit("Templar");
-	createUnit("Knight");
+	createUnit("Thief");
 	createUnit("Sorcerer");
+	createUnit("Mage");
 	
 	
-	units[0].actionsActive["GrapplingHook"]=true;
+	units[0].actionsActive["FirstBlow"]=true;
+	units[0].actionsActive["BackStab"]=true;
 	units[0].actionsActive["Flying"]=true;
-	units[0].actionsActive["Move"]=true;
 	units[0].actionsActive["Reach"]=true;
 	units[0].actionsActive["Cleanse"]=true;
 	units[0].actionsActive["Double Vigor"]=true;
@@ -62,7 +62,7 @@ function tempStart(){
 	units[2].actionsActive["Surge"]=true;
 
 	createEGroup("Goblin","Goblin","Goblin","Goblin","Goblin",entrance1, 1000);
-	createEGroup("FireElemental","","","Goblin","Goblin",ship, 1000);
+	createEGroup("Silencer","Goblin","","Goblin","Goblin",ship, 1000);
 
 	createGroup(0,1,2);
 	checkBattle(ship);
@@ -134,7 +134,8 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 	Eunits[EindexNum-1].group = EgroupIndex;
 	unit1 = Instantiate(Resources.Load("enemy3D/" + Eunits[EindexNum-1].type, GameObject));
 	unit1.transform.position=location.GetComponent.<locations>().space14.transform.position;
-	unit1.transform.position.y=1;
+		unit1.transform.position.y=Eunits[EindexNum-1].height;
+	
 	unit1.transform.SetParent(Terrain.transform,false);
 	unit1.GetComponent("EnemyClick").eindex = EindexNum-1;
 	Egroups[EgroupIndex].slot1Object = unit1;
@@ -252,6 +253,7 @@ class Ally{
    var alive: boolean=true;
    var experience: int = 0;
    var protectedBy:int = -1;
+   var height:int=1;
 
    function Ally(indexNum:int,type:String){
 		if(type=="Archer"){
@@ -671,10 +673,13 @@ class Enemy{
    var attackType:String;
    var moveType:String;
    var defenseType:String = "defense";
+   var doubleAttack:int=1;
    var body:GameObject;
    var hasMoved: boolean=false;
    var didAction: boolean=false;
    var alive: boolean=true;
+   var height:int=1;
+
 
    function Enemy(curindexNum:int,type:String,level:int){
 
@@ -706,7 +711,7 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
-		}
+		}//done
 		if(type=="Spitter"){
 			if (level == 1) {
              this.attack = 15;
@@ -735,7 +740,7 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
-		};
+		};//done
 		if(type=="BrownOoze"){
 			if (level == 1) {
              this.attack = 15;
@@ -765,7 +770,7 @@ class Enemy{
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
 			 this.defenseType="resistance";
-		};
+		};//done
 		if(type=="RedOoze"){
 			if (level == 1) {
              this.attack = 15;
@@ -789,13 +794,14 @@ class Enemy{
 			 }
 			 this.defense = 10;
 			 this.resistance = 10;
-			 this.attackType="RedOozeAttack";
+			 this.attackType="SpitterAttack";
 			 this.moveType="Scroll";
 			 this.elemental["Fire"]=0.5;
 			 this.elemental["Ice"]=2;
 			 this.elemental["Lightning"]=1;
 			 this.defenseType="resistance";
-		};
+			 this.charge=0;
+		};//done
 		if(type=="BlueOoze"){
 			if (level == 1) {
              this.attack = 15;
@@ -819,13 +825,15 @@ class Enemy{
 			 }
 			 this.defense = 10;
 			 this.resistance = 10;
-			 this.attackType="BlueOozeAttack";
+			 this.attackType="SpitterAttack";
 			 this.moveType="Scroll";
 			 this.elemental["Fire"]=2;
 			 this.elemental["Ice"]=0.5;
 			 this.elemental["Lightning"]=1;
 			 this.defenseType="resistance";
-		};
+			 this.charge=0;
+			 this.maxcharge=1;
+		};//done
 		if(type=="GreenOoze"){
 			if (level == 1) {
              this.attack = 15;
@@ -855,7 +863,7 @@ class Enemy{
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
 			 this.defenseType="resistance";
-		};
+		};//done
 		if(type=="Gremlin"){
 			if (level == 1) {
              this.attack = 40;
@@ -880,11 +888,12 @@ class Enemy{
 			 this.defense = 0;
 			this.resistance = 0;
 			this.attackType="CloseAttack";
-			 this.moveType="agressive";
+			 this.moveType="Agressive";
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
-		};
+			 this.doubleAttack=2;
+		};//done
 		if(type=="Warrior"){
 			if (level == 1) {
              this.attack = 40;
@@ -942,7 +951,7 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=2;
-		};
+		};//done
 		if(type=="Vacuum"){
 			if (level == 1) {
              this.attack = 20;
@@ -1000,7 +1009,7 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=2;
-		};
+		};//done
 		if(type=="FireElemental"){
 			if (level == 1) {
              this.attack = 20;
@@ -1032,7 +1041,7 @@ class Enemy{
 			 this.defenseType="resistance";
 			 this.charge=0;
 			 this.maxcharge=1;
-		}
+		};//done
 		if(type=="LightningElemental"){
 			if (level == 1) {
              this.attack = 100;
@@ -1062,7 +1071,9 @@ class Enemy{
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=0.5;
 			 this.defenseType="resistance";
-		};
+			 this.charge=0;
+			 this.maxcharge=2;
+		};//done
 		if(type=="IceElemental"){
 			if (level == 1) {
              this.attack = 70;
@@ -1092,7 +1103,9 @@ class Enemy{
 			 this.elemental["Ice"]=0.5;
 			 this.elemental["Lightning"]=1;
 			 this.defenseType="resistance";
-		};
+			 this.charge=0;
+			 this.maxcharge=2;
+		};//done
 		if(type=="Werewolf"){
 			if (level == 1) {
              this.attack = 40;
@@ -1122,7 +1135,7 @@ class Enemy{
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
 		};
-		if(type=="Sounddepressor"){
+		if(type=="Silencer"){
 			if (level == 1) {
              this.attack = 40;
              this.health = 50;
@@ -1150,6 +1163,7 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=2;
+			 this.height=10;
 		};
 		if(type=="Vampire"){
 			if (level == 1) {
@@ -1208,6 +1222,7 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=2;
+			 this.charge=0;
 		};
 		if(type=="Beekeeper"){
 			if (level == 1) {
@@ -1237,6 +1252,8 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
+			 this.charge=0;
+			 this.maxcharge=1;
 		};
 		if(type=="Bee"){
 			if (level == 1) {
@@ -1295,7 +1312,8 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
-		};
+			 this.height=10;
+		};//done
 		if(type=="Spider"){
 			if (level == 1) {
              this.attack = 0;
@@ -1354,6 +1372,8 @@ class Enemy{
 			 this.elemental["Ice"]=2;
 			 this.elemental["Lightning"]=1;
 			 this.defenseType="resistance";
+			 this.charge=0;
+			 this.maxcharge=2;
 		};
 		if(type=="Necromancer"){
 			 if (level == 1) {
@@ -1383,6 +1403,8 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
+			 this.charge=0;
+			 this.maxcharge=1;
 		};
 		if(type=="Zombie"){
 			if (level == 1) {
@@ -1442,6 +1464,8 @@ class Enemy{
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=2;
 			 this.defenseType="resistance";
+			 this.charge=0;
+			 this.maxcharge=2;
 		};
 		if(type=="Frostwraith"){
 			if (level == 1) {
@@ -1472,6 +1496,8 @@ class Enemy{
 			 this.elemental["Ice"]=0.5;
 			 this.elemental["Lightning"]=1;
 			 this.defenseType="resistance";
+			 this.charge=0;
+			 this.maxcharge=2;
 		};
 		if(type=="Assassin"){
 			if (level == 1) {
@@ -1530,6 +1556,8 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
+			 this.charge=0;
+			 this.maxcharge=2;
 		};
 		if(type=="Golem"){
 			if (level == 1) {
@@ -1589,6 +1617,8 @@ class Enemy{
 			 this.elemental["Ice"]=0.5;
 			 this.elemental["Lightning"]=1;
 			 this.defenseType="resistance";
+			 this.charge=0;
+			 this.maxcharge=3;
 		};
 		if(type=="Angel"){
 			if (level == 1) {
@@ -1618,6 +1648,8 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
+			 this.charge=0;
+			 this.maxcharge=3;
 		};
 		if(type=="Djinn"){
 			if (level == 1) {
@@ -1676,6 +1708,8 @@ class Enemy{
 			 this.elemental["Fire"]=0.5;
 			 this.elemental["Ice"]=2;
 			 this.elemental["Lightning"]=1;
+			 this.charge=0;
+			 this.maxcharge=3;
 		};
 		if(type=="ESoldier"){
 			if (level == 1) {
@@ -1823,6 +1857,8 @@ class Enemy{
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
 			 this.defenseType="resistance";
+			 this.charge=0;
+			 this.maxcharge=2;
 		};
 		if(type=="EGuard"){
 			if (level == 1) {

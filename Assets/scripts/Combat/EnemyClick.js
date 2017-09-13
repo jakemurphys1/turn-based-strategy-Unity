@@ -102,7 +102,7 @@ function moveTo(space){
 	enemy.hor = space.GetComponent("SpaceClick").hor;
 	enemy.vert = space.GetComponent("SpaceClick").vert;
 		var startPosition = transform.position;
-		var endPosition = new Vector3(space.transform.position.x,transform.position.y,space.transform.position.z);
+		var endPosition = new Vector3(space.transform.position.x,enemy.height,space.transform.position.z);
 
 		//rotation
 		 unitPosition = transform.position;
