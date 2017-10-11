@@ -48,6 +48,16 @@ function Update()
 		var curIndex = selectedUnit.GetComponent("AllyClick").index;
 		var ally = main.GetComponent("Main").units[curIndex];
 
+		//Soldier
+		if(main.GetComponent("Main").units[curIndex].hasMoved==true){
+			if((main.GetComponent("Main").units[curIndex].actionsActive["Dash"] && main.GetComponent("Main").units[curIndex].didAction==false)){
+				main.GetComponent("Main").units[curIndex].didAction=true;
+				main.GetComponent("combat").wordPopup(main.GetComponent("Main").units[curIndex],"Dash");
+			}else{
+				return;
+			}
+		}
+
 		//knight energy
 		if(ally.type=="Knight"){
 			if(!ally.actionsActive["FreeMove"]){
@@ -61,15 +71,7 @@ function Update()
 			}
 		}
 		
-		if(main.GetComponent("Main").units[curIndex].hasMoved==true){
-			if((main.GetComponent("Main").units[curIndex].actionsActive["Dash"] && main.GetComponent("Main").units[curIndex].didAction==false)){
-				main.GetComponent("Main").units[curIndex].didAction=true;
-				main.GetComponent("combat").wordPopup(main.GetComponent("Main").units[curIndex],"Dash");
-			}else{
-				return;
-			}
-			
-		}
+
 
 		resetSpaces();
 

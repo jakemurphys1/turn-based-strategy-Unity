@@ -147,6 +147,7 @@
 	 }else{
 		var eindex = body.GetComponent("EnemyClick").eindex;
 		var eslots = pass.GetComponent("pass").eslots;
+		var group = eslots[0].group;
 		for (var j =0;j<eslots.length;j++){
 			if(eslots[j].index==eindex){
 				pass.GetComponent("pass").eslots.splice(j,1);
@@ -157,7 +158,7 @@
 		yield WaitForSeconds(3);
 		Destroy(body);
 		if(pass.GetComponent("pass").eslots.length==0){
-			winBattle();
+			winBattle(group);
 		}
 	 }
  }
@@ -190,10 +191,13 @@
 			curCamera.transform.position = Vector3.Lerp(startPosition,endPosition,t);
 			yield;
 		}
+		GetComponent("Main").moveGrid.SetActive(true);
 	}
  }
 
- function winBattle(){
+ function winBattle(groupNum){
+	var Egroup = GetComponent("Main").Egroups[groupNum];
+	Egroup.location = null;
 	menu.GetComponent("Menu").hideAll();
 	resetSpaces();
 	if(GetComponent("Main").inCombat==true){
@@ -202,14 +206,14 @@
 		 var slots = pass.GetComponent("pass").slots;
 		 var spaces = pass.GetComponent("pass").spaces;
 		 var experience = pass.GetComponent("pass").experience;
+		 var group = GetComponent("Main").groups[slots[0].group];
+		 var slotPosition = [group.slot1,group.slot2,group.slot3];
 		for(var i =0;i<slots.length;i++){
 			//level up
 			slots[i].experience+=experience;
-
-
 			//move back to original space
 			slots[i].vert=0;
-			slots[i].hor = (i+1);
+			GetComponent("Main").units[slotPosition[i]].hor = (i+1);
 			var x =slots[i].hor;
 			var y =slots[i].vert;
 			slots[i].body.GetComponent("AllyClick").moveTo(spaces[y][x]);
@@ -221,18 +225,21 @@
 		 //zoom camera
 		var t = 0.0;
 		var startPosition = curCamera.transform.position;
-		var endPosition = Vector3(curCamera.transform.position.x,100,curCamera.transform.position.z);
+		var endPosition = Vector3(curCamera.transform.position.x,150,curCamera.transform.position.z);
 		while (t < 1.0)
 		{
 			t += 0.05;
 			curCamera.transform.position = Vector3.Lerp(startPosition,endPosition,t);
 			yield;
 		}
+		yield WaitForSeconds(1);
+		GetComponent("Main").moveGrid.SetActive(true);
 		levelup();
 	}	
  }
  
  function levelup(){
+	GetComponent("Main").moveGrid.SetActive(false);
 	victoryScreen.SetActive(false);
 	var unit = findlevelup();
 	if(unit!=false){
@@ -240,12 +247,14 @@
 		unit.level+=1;
 		unit.body.GetComponent("AllyClick").curcamera.enabled=true;
 		victoryScreen.SetActive(true);
-		var newability = unit.abilities[unit.level];
+		var newability = unit.abilities[unit.level-1];
 		victoryScreen.GetComponent("victoryScreen").curname.GetComponent("Text").text = newability;
 		victoryScreen.GetComponent("victoryScreen").sentence.GetComponent("Text").text = "Your " + unit.type + " gained a level and learned:";
 		victoryScreen.GetComponent("victoryScreen").Description1.GetComponent("Text").text = unit.actionDes1[newability];
 		victoryScreen.GetComponent("victoryScreen").Description2.GetComponent("Text").text = unit.actionDes2[newability];
 		unit.actionsActive[newability]=true;
+	}else{
+		GetComponent("Main").moveGrid.SetActive(true);
 	}
  }
 
@@ -731,10 +740,8 @@
 				}else{
 					//Go right
 					if(curEnemy.hor==(thisUnit.hor+1)){
-						Debug.Log("go right");
 						alterHor=1;
 					}else{
-						Debug.Log("go left");
 						alterHor=-1;
 					}
 				}
@@ -744,7 +751,6 @@
 					var testHor = sendHor + alterHor;
 					if(testVert<=4 && testVert>=0 && testHor<=4 && testHor>=0){
 						if(spaceEmpty(testHor,testVert,slots,eslots)){
-							Debug.Log("count");
 							sendVert+=alterVert;
 							sendHor+=alterHor;
 						}else{
@@ -1394,6 +1400,7 @@
 	var _direction = (enemybody - allybody).normalized;
 	var _lookRotation = Quaternion.LookRotation(_direction);
 	abody.transform.rotation=_lookRotation;
+	abody.transform.rotation.x=0;
  }
 
  function isAdjacent(enemy,ally){

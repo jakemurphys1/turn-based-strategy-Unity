@@ -7,6 +7,10 @@ var curDisabled=false;
 var self:GameObject;
 
 function enemyturn(){
+	if(main.GetComponent("Main").inCombat==false){
+		worldturn();
+		return;
+	}
 	DisablePass();
 	//reset allies
 	for(var i =0;i<slots.length;i++){
@@ -32,6 +36,9 @@ function enemyturn(){
 				pDamage=eslots[p].health-1;
 			}
 			main.GetComponent("combat").damageEnemy(eslots[p],pDamage);
+		}
+		if(eslots[p].type == "Werewolf"){
+			heal(eslots[p],10);
 		}
 	}
 	
@@ -94,6 +101,160 @@ function enemyturn(){
 		}
 	}
 }
+function worldturn(){
+	var groups = main.GetComponent("Main").groups;
+	var Egroups = main.GetComponent("Main").Egroups;
+
+	for(var i = 0;i<groups.length;i++){
+		groups[i].hasMoved=false;
+	}
+
+	//move enemies
+	for(i = 0;i<Egroups.length;i++){
+		if(!Egroups[i].location){
+			continue;
+		}
+
+		var location = Egroups[i].location;
+		var rand = Random.Range(1,3);
+		
+		var moveLocation = location.GetComponent("locations").enemyMove1;
+		if(rand>1){
+			moveLocation = location.GetComponent("locations").enemyMove2;
+		}
+		if(moveLocation){
+			var isFilled = false;
+			for(j = 0;j<Egroups.length;j++){
+				if(Egroups[j].location == moveLocation){
+					isFilled=true;
+				}
+			}
+			if(isFilled==false){
+				moveEnemies(Egroups[i], moveLocation);
+			}
+		}
+	}
+	main.GetComponent("Special").Pass();
+	yield WaitForSeconds(1);
+	main.GetComponent("Main").checkBattle(location);
+}
+
+function moveEnemies(Egroup, location:GameObject){
+			if(main.GetComponent("Main").inCombat){
+ 				return;
+			}
+			Egroup.location = location;
+			var slot1 = location.GetComponent("locations").space04.transform.position;
+			var slot2= location.GetComponent("locations").space14.transform.position;
+			var slot3 = location.GetComponent("locations").space24.transform.position;
+			var slot4 = location.GetComponent("locations").space34.transform.position;
+			var slot5 = location.GetComponent("locations").space44.transform.position;
+
+			slot1.y=1;
+			slot2.y=1;
+			slot3.y=1;
+			slot4.y=1;
+			slot5.y=1;
+
+			var curObject1 = Egroup.slot1Object;
+			var curObject2 = Egroup.slot2Object;
+			var curObject3 = Egroup.slot3Object;
+			var curObject4 = Egroup.slot4Object;
+			var curObject5 = Egroup.slot5Object;
+			
+			if(curObject1){
+				curObject1.GetComponent("EnemyClick").Run=1;
+
+				var startPosition1 = curObject1.transform.position;
+
+				_direction1 = (slot1 - startPosition1).normalized;
+				_lookRotation1 = Quaternion.LookRotation(_direction1);
+				startDirection1 = curObject1.transform.rotation;
+				curObject1.transform.rotation=_lookRotation1;
+			}
+			if(curObject2){
+				curObject2.GetComponent("EnemyClick").Run=1;
+				var startPosition2 = curObject2.transform.position;
+
+				_direction2 = (slot2 - startPosition2).normalized;
+					_lookRotation2 = Quaternion.LookRotation(_direction2);
+					startDirection2= curObject2.transform.rotation;
+					curObject2.transform.rotation=_lookRotation2;
+			}
+			if(curObject3){
+				curObject3.GetComponent("EnemyClick").Run=1;
+				var startPosition3 = curObject3.transform.position;
+
+				_direction3 = (slot3 - startPosition3).normalized;
+					_lookRotation3 = Quaternion.LookRotation(_direction3);
+					startDirection3 = curObject3.transform.rotation;
+					curObject3.transform.rotation=_lookRotation3;
+			}
+			if(curObject4){
+				curObject4.GetComponent("EnemyClick").Run=1;
+				var startPosition4 = curObject4.transform.position;
+
+				_direction4 = (slot4 - startPosition4).normalized;
+					_lookRotation4 = Quaternion.LookRotation(_direction4);
+					startDirection4 = curObject4.transform.rotation;
+					curObject4.transform.rotation=_lookRotation4;
+			}
+			if(curObject5){
+				curObject5.GetComponent("EnemyClick").Run=1;
+				var startPosition5 = curObject5.transform.position;
+
+				_direction5 = (slot5 - startPosition5).normalized;
+					_lookRotation5 = Quaternion.LookRotation(_direction5);
+					startDirection5 = curObject3.transform.rotation;
+					curObject5.transform.rotation=_lookRotation5;
+			}
+
+					var t = 0.0;
+					 while (t < 1.0)
+					 {
+						 t += 0.03;
+						 if(curObject1){
+							curObject1.transform.position = Vector3.Lerp(startPosition1,slot1,t);
+						 }
+						 if(curObject2){
+							curObject2.transform.position = Vector3.Lerp(startPosition2,slot2,t);
+						 }
+						 if(curObject3){
+							curObject3.transform.position = Vector3.Lerp(startPosition3,slot3,t);
+						 }
+						 if(curObject4){
+							curObject4.transform.position = Vector3.Lerp(startPosition4,slot4,t);
+						 }
+						 if(curObject5){
+							curObject5.transform.position = Vector3.Lerp(startPosition5,slot5,t);
+						 }
+						 yield;
+					 }
+
+					 if(curObject1){
+						curObject1.transform.rotation=startDirection1;
+						curObject1.GetComponent("EnemyClick").Run=0;
+					 }
+					 if(curObject2){
+						curObject2.transform.rotation=startDirection2;
+						curObject2.GetComponent("EnemyClick").Run=0;
+					 }
+					 if(curObject3){
+						curObject3.transform.rotation=startDirection3;
+						curObject3.GetComponent("EnemyClick").Run=0;
+					 } 
+					 if(curObject4){
+						curObject4.transform.rotation=startDirection4;
+						curObject4.GetComponent("EnemyClick").Run=0;
+					 }
+					 if(curObject5){
+						curObject5.transform.rotation=startDirection5;
+						curObject5.GetComponent("EnemyClick").Run=0;
+					 } 
+
+					 
+					 
+ }
 
 function DisablePass(){
 	self.GetComponent("Button").enabled=false;
@@ -170,6 +331,9 @@ function enemyAttack(){
 			if(eslots[n].attackType=="LightningAttack"){
 				LightningAttack(eslots[n]);
 			}
+			if(eslots[n].attackType=="NecromancerAttack"){
+				NecromancerAttack(eslots[n]);
+			}
 		}
 	}
 }
@@ -185,6 +349,10 @@ function closeAttack(enemy,eslots,slots){
 		var reverseX=0;
 		var reverseY = 0;
 		var attackThis = isAdjacent(enemy.hor,enemy.vert,slots);
+		var isSpecial=false;
+		if(enemy.type=="Warrior" && enemy.hasMoved==false){
+			isSpecial=true;
+		}
 		if(attackThis!=-1){
 			enemy.hasMoved=true;
 			enemy.didAction=true;
@@ -211,14 +379,27 @@ function closeAttack(enemy,eslots,slots){
 					move(enemy.body,0,-4);
 				}
 			}
-			enemy.body.GetComponent("EnemyClick").attack =1;
 			var damage = enemy.attack-main.GetComponent("combat").getdefense(slots[attackThis],"defense");
+			if(isSpecial){
+				enemy.body.GetComponent("EnemyClick").animator.SetInteger("special",1);
+				damage=damage*2;
+			}else{
+				enemy.body.GetComponent("EnemyClick").attack =1;
+			}
+			
+			
 			main.GetComponent("combat").damageAlly(slots[attackThis].index,damage,enemy,1);
 			yield WaitForSeconds(1);
+			if(isSpecial){
+				main.GetComponent("combat").wordPopup(slots[attackThis],"Double Damage");
+			}
 			enemy.body.GetComponent("EnemyClick").attack =0;
+			enemy.body.GetComponent("EnemyClick").animator.SetInteger("special",0);
 			main.GetComponent("sounds").playSound("hit");
 			yield WaitForSeconds(0.5);
-			
+			if(enemy.type=="Vampire"){
+				heal(enemy,damage);
+			}
 			move(enemy.body,reverseX,reverseY);
 			counter(enemy,slots[attackThis]);
 		}
@@ -459,6 +640,30 @@ function BlueOozeAttack(enemy){
 	}
 
 	counter(enemy,target);
+}
+function NecromancerAttack(enemy){
+	if(enemy.didAction || enemy.silenced>0 || eslots.length>=5){
+		return;
+	}
+	var curhor;
+	var curvert;
+	if(!spaceFilled(enemy.hor,enemy.vert-1)){
+		curhor = enemy.hor;
+		curvert = enemy.vert-1;
+	} else if(!spaceFilled(enemy.hor+1,enemy.vert)){
+		curhor = enemy.hor+1;
+		curvert = enemy.vert;
+	} else if(!spaceFilled(enemy.hor-1,enemy.vert)){
+		curhor = enemy.hor-1;
+		curvert = enemy.vert;
+	}else if(!spaceFilled(enemy.hor,enemy.vert+1)){
+		curhor = enemy.hor;
+		curvert = enemy.vert+1;
+	}
+		enemy.charge-=1;
+		enemy.body.GetComponent("EnemyClick").chargeText.GetComponent("Text").text=enemy.charge.ToString();
+		summon(enemy,curhor,curvert,"Zombie");
+	
 }
 
 //moves
@@ -744,6 +949,9 @@ function isTwoAway(hor,vert,slots){
 	return target;
 }
 function charge(enemy){
+	if(enemy.didAction){
+		return;
+	}
 	enemy.didAction=true;
 	yield WaitForSeconds(0.1);
 	var waittime=0;
@@ -897,3 +1105,53 @@ function shootObject(instance,target){
 	 main.GetComponent("combat").wordPopup(target,type);
 	 main.GetComponent("sounds").playSound("poison");
  }
+ function heal(enemy,amount){
+	enemy.health+=amount;
+	if(enemy.health>enemy.maxhealth){
+		enemy.health=enemy.maxhealth;
+	}
+
+	var healthbar = enemy.body.GetComponent("EnemyClick").healthbar;
+	var health = enemy.health + 0.0f;
+	var maxhealth = enemy.maxhealth + 0.0f;
+	var percentage= health/maxhealth;
+	var newlength = 0.15 * percentage;
+	healthbar.transform.localScale = Vector3(newlength,0.2,0.02);
+	var damage = amount.ToString();
+	popupText = Resources.Load("Prefabs/HealText", GameObject);
+	var instance = Instantiate(popupText);
+	instance.transform.position = enemy.body.transform.position;
+	instance.transform.position.y+=10;
+	var childtext = instance.transform.GetChild(0);
+	childtext.GetComponent("Text").text=damage;
+	yield WaitForSeconds(1);
+	Destroy(instance);
+}
+function summon(enemy,hor,vert,type){
+	var space = main.GetComponent("Main").Egroups[enemy.group].location.GetComponent("locations").allspaces[vert][hor];
+	enemy.body.GetComponent("EnemyClick").attack =1;
+	enemy.didAction=true;
+	magic = Resources.Load("effects/Summon", GameObject);
+	instance = Instantiate(magic);
+	instance.transform.position = space.transform.position;
+	instance.transform.position.y+=10;
+	yield WaitForSeconds(1);
+	enemy.body.GetComponent("EnemyClick").attack =0;
+	main.GetComponent("Main").createEUnit(type);
+	EindexNum=main.GetComponent("Main").EindexNum;
+	main.GetComponent("Main").Eunits[EindexNum-1].group = enemy.group;
+	unit = Instantiate(Resources.Load("enemy3D/" + type, GameObject));
+	
+	unit.transform.position=space.transform.position;
+	unit.transform.position.y=main.GetComponent("Main").Eunits[EindexNum-1].height;
+	
+	unit.transform.SetParent(main.GetComponent("Main").Terrain.transform,false);
+	unit.GetComponent("EnemyClick").eindex = EindexNum-1;
+	main.GetComponent("Main").Eunits[EindexNum-1].body = unit;
+	main.GetComponent("Main").Eunits[EindexNum-1].hor = hor;
+	main.GetComponent("Main").Eunits[EindexNum-1].vert = vert;
+	eslots.push(main.GetComponent("Main").Eunits[EindexNum-1]);
+
+	yield WaitForSeconds(2);
+	Destroy(instance);
+}

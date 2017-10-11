@@ -25,6 +25,7 @@ function Start(){
 }
 
 function OnMouseDown(){
+	
 	var active = main.GetComponent("Main").Eunits[eindex];
 	statsBox.SetActive(true);
 	statsBox.GetComponent("stats").updateText(active,active.health,active.maxhealth,active.attack,active.defense,active.resistance,active.accuracy,active.type,active.evasion, active.passiveActions);

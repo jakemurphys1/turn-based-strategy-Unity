@@ -35,11 +35,6 @@ function Start(){
 
 
 function OnMouseDown(){
-	if(clickState=="double"){
-		
-		}
-
-
 	if(main.GetComponent("Main").inCombat){
 		var active = main.GetComponent("Main").units[index];
 		main.GetComponent("Main").activeIndex = index;
@@ -49,6 +44,8 @@ function OnMouseDown(){
 		hor = active.hor;
 		transform.gameObject.tag = "Active";
 
+		Debug.Log(vert);
+		Debug.Log(hor);
 		//highlight spaces
 		//[y(0 at left)][x(0 at bottom)]
 		for(var i = 0;i<5;i++){
@@ -84,8 +81,6 @@ function OnMouseDown(){
 		menu.GetComponent("Menu").setMenu(mousePos.x,mousePos.y,active.actions,active.type,active.actionsActive,active);
 		statsBox.SetActive(true);
 		statsBox.GetComponent("stats").updateText(active,active.health,active.maxhealth,active.attack,active.defense,active.resistance,active.accuracy,active.type,active.evasion, active.passiveActions);
-		
-
 	}else{
 		main.GetComponent("Main").clickGroup(index);
 	}	
@@ -104,8 +99,12 @@ function OnRightClick(){
          if (hitPoint.collider == this.GetComponent.<Collider>())
          {
              // Add code for the right click event
-			 
-				main.GetComponent("combat").unitActionOnAlly(index);
+				if(main.GetComponent("Main").inCombat){
+					main.GetComponent("combat").unitActionOnAlly(index);
+				}else{
+					switchUnits();
+				}
+				
 				
          }
      }
@@ -188,6 +187,7 @@ function Update(){
      {
          OnRightClick();
      }
+	  transform.rotation = Quaternion.Euler(0, transform.eulerAngles.y,transform.eulerAngles.z);
 }
 
 function zoomin(){
@@ -218,4 +218,75 @@ function zoomin(){
 		 if(main.GetComponent("Main").inCombat==false){
 			transform.Rotate(new Vector3(0,180,0));
 		 }
+}
+
+function switchUnits(){
+	var group1 = main.GetComponent("Main").groups[main.GetComponent("Main").units[index].group];
+	var group2 = main.GetComponent("Main").groups[main.GetComponent("Main").activeGroup];
+
+	var groupScreen = main.GetComponent("Main").groupScreen;
+	main.GetComponent("Main").groupScreen.SetActive(true);
+	if(group1==group2){
+		groupScreen.transform.GetChild(1).gameObject.SetActive(false);
+	}else{
+		groupScreen.transform.GetChild(1).gameObject.SetActive(true);
+	}
+	var objects = GameObject.FindGameObjectsWithTag("barrackPic");
+	for(var i =0;i<objects.length;i++){
+		objects[i].transform.parent.gameObject.GetComponent("Image").color=Color.white;
+		Destroy(objects[i]);
+	}
+
+	
+	var curslots = new Array();
+	curslots[0] = group1.slot1;
+	curslots[1]=group1.slot2;
+	curslots[2]=group1.slot3;
+
+	var curslots2 = new Array();
+	curslots2[0] = group2.slot1;
+	curslots2[1]=group2.slot2;
+	curslots2[2]=group2.slot3;
+
+	for(i = 0;i<curslots.length;i++){
+		
+		if(curslots[i]!=-1){
+			var unitInfo = main.GetComponent("Main").units[curslots[i]];
+			if(unitInfo.alive){
+				var unit = Instantiate(Resources.Load("alliesPics/" + unitInfo.type + "_prefab"));
+				unit.transform.position.x=0;
+				unit.transform.position.y=5;
+				unit.transform.SetParent(main.GetComponent("Main").groupScreen.transform.GetChild(0).transform.GetChild(i),false);
+				groupScreen.transform.GetChild(0).transform.GetChild(0).GetComponent("Switch").location = main.GetComponent("Main").groups[unitInfo.group].location;
+				groupScreen.transform.GetChild(0).transform.GetChild(1).GetComponent("Switch").location = main.GetComponent("Main").groups[unitInfo.group].location;
+				groupScreen.transform.GetChild(0).transform.GetChild(2).GetComponent("Switch").location = main.GetComponent("Main").groups[unitInfo.group].location;
+
+				unit.GetComponent("barrackpicbutton").locationType="Switch";
+				unit.GetComponent("barrackpic").index=unitInfo.index;
+				var level = unit.GetComponent("barrackpic").levelText;
+					level.GetComponent("Text").text=unitInfo.level.ToString();
+			}
+			
+		}
+		if(curslots2[i]==-1){
+			continue;
+		}
+
+		var unitInfo2 = main.GetComponent("Main").units[curslots2[i]];
+
+		if(unitInfo2.alive){
+			var unit2 = Instantiate(Resources.Load("alliesPics/" + unitInfo2.type + "_prefab"));
+			unit2.transform.position.x=0;
+			unit2.transform.position.y=5;
+			unit2.transform.SetParent(main.GetComponent("Main").groupScreen.transform.GetChild(1).transform.GetChild(i),false);
+			groupScreen.transform.GetChild(1).transform.GetChild(0).GetComponent("Switch").location = main.GetComponent("Main").groups[unitInfo2.group].location;
+			groupScreen.transform.GetChild(1).transform.GetChild(1).GetComponent("Switch").location = main.GetComponent("Main").groups[unitInfo2.group].location;
+			groupScreen.transform.GetChild(1).transform.GetChild(2).GetComponent("Switch").location = main.GetComponent("Main").groups[unitInfo2.group].location;
+			unit2.GetComponent("barrackpicbutton").locationType="Switch";
+			unit2.GetComponent("barrackpic").index=unitInfo2.index;
+			level = unit2.GetComponent("barrackpic").levelText;
+			level.GetComponent("Text").text=unitInfo2.level.ToString();
+		}
+		
+	}
 }

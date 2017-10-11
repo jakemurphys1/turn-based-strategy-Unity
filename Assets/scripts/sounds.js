@@ -18,6 +18,7 @@ var protect:AudioClip;
 var heal:AudioClip;
 var vigor:AudioClip;
 var spit:AudioClip;
+var summon:AudioClip;
 
 function playSound(name){
 	var audio: AudioSource = GetComponent.<AudioSource>();
@@ -61,6 +62,8 @@ function playSound(name){
 		audio.clip = vigor;
 	}else if(name =="spit"){
 		audio.clip = spit;
+	}else if(name =="summon"){
+		audio.clip = summon;
 	}
 	
 	audio.Play();

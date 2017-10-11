@@ -1,2 +1,2 @@
 ﻿var isfilled:boolean=false;
-var index:int=-1;
+var index:float=-1;
