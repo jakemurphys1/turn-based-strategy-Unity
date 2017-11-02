@@ -43,9 +43,6 @@ function OnMouseDown(){
 		vert = active.vert;
 		hor = active.hor;
 		transform.gameObject.tag = "Active";
-
-		Debug.Log(vert);
-		Debug.Log(hor);
 		//highlight spaces
 		//[y(0 at left)][x(0 at bottom)]
 		for(var i = 0;i<5;i++){

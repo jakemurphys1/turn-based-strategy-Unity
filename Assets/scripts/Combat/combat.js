@@ -781,7 +781,7 @@
 				thisUnit.body.GetComponent("Thief").turnVisible();
 				GetComponent("combat").wordPopup(thisUnit,"Visible");
 			}
-		
+			steal(thisUnit,curEnemy);
 			if(thisUnit.actionsActive["FirstBlow"]){
 				if(curEnemy.health==curEnemy.maxhealth){
 					curEnemy.blind=2;
@@ -1343,6 +1343,92 @@
 	yield WaitForSeconds(1);
 	Destroy(instance);
 	Destroy(instance2);
+}
+
+//Thief
+function steal(ally,enemy){
+	var health = enemy.health;
+	var maxhealth = enemy.maxhealth;
+	var healthCheck = Random.Range(1,maxhealth);
+
+	if(healthCheck<health){
+		wordPopup(ally,"Failed To Steal");
+		return;
+	}
+
+	var randnum = Random.Range(1,17);
+	var item;
+	var amount = 0;
+	switch(randnum){
+		case 1:
+			item = "Flowers";
+			amount=2;
+			break;
+		case 2:
+			item = "Mushrooms";
+			amount=2;
+			break;
+		case 3:
+			item = "Honey";
+			amount=2;
+			break;
+		case 4:
+			item = "Roots";
+			amount=2;
+			break;
+		case 5:
+			item = "Powder";
+			amount=2;
+			break;
+		case 6:
+			item = "Sap";
+			amount=2;
+			break;
+		case 7:
+			item = "Extract";
+			amount=2;
+			break;
+		case 8:
+			item = "Berries";
+			amount=2;
+			break;
+		case 9:
+			item = "Herbs";
+			amount=2;
+			break;
+		case 10:
+			item = "Essence";
+			amount=2;
+			break;
+		case 11:
+			item = "Revive Potion";
+			amount=1;
+			break;
+		case 12:
+			item = "Recover Potion";
+			amount=1;
+			break;
+		case 13:
+			item = "Defense Potion";
+			amount=1;
+			break;
+		case 14:
+			item = "Resistance Potion";
+			amount=1;
+			break;
+		case 15:
+			item = "Attack Potion";
+			amount=1;
+			break;
+		case 16:
+			item = "Health Potion";
+			amount=1;
+			break;
+	}
+
+
+	GetComponent("Main").increaseItems(item,amount);
+	wordPopup(ally,"Stole " + item);
 }
 
 

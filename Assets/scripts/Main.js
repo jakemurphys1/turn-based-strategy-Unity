@@ -36,11 +36,14 @@ var switchImage:GameObject;
 var items = {};
 var messageBox: GameObject;
 var messages = new Array();
+var givePotions: GameObject;
+var bigBox:GameObject;
+var bigMessage:GameObject;
 
 
 function Start () {
 
-	createUnit("Archer");
+	createUnit("Thief");
 	createUnit("Soldier");
 	createUnit("Guard");
 
@@ -52,19 +55,24 @@ function Start () {
 	//createEGroup("Goblin","Goblin","Goblin","Goblin","Goblin",entrance1, 1000);
 	//tempStart();
 
-	items["Flower"]=0;
-	items["Mushroom"]=0;
-	items["Honey"]=0;
-	items["Roots"]=0;
-	items["Powder"]=0;
-	items["Sap"]=0;
-	items["Extract"]=0;
-	items["Berries"]=0;
-	items["Herbs"]=0;
-	items["Essence"]=0;
-
-	yield WaitForSeconds(2);
-	quickMessage("It Works");
+	items["Flowers"]=10;
+	items["Mushrooms"]=10;
+	items["Honey"]=10;
+	items["Roots"]=10;
+	items["Powder"]=10;
+	items["Sap"]=10;
+	items["Extract"]=10;
+	items["Berries"]=10;
+	items["Herbs"]=10;
+	items["Essence"]=10;
+	items["Revive Potion"]=1;
+	items["Recover Potion"]=1;
+	items["Defense Potion"]=2;
+	items["Resistance Potion"]=2;
+	items["Attack Potion"]=1;
+	items["Health Potion"]=2;
+	items["Accuracy Potion"]=1;
+	items["Evasion Potion"]=2;
 }
 
 function tempStart(){
@@ -76,7 +84,6 @@ function tempStart(){
 	units[0].actionsActive["Reach"]=true;
 	units[0].actionsActive["Cleanse"]=true;
 	units[0].actionsActive["Double Vigor"]=true;
-	units[0].attack=1000;
 
 	units[1].actionsActive["Protect"]=true;
 	units[1].actionsActive["Sweep"]=true;
@@ -116,6 +123,7 @@ function createGroup(slot1:int,slot2:int,slot3:int){
 	circle = Instantiate(Resources.Load("GroupCircle", GameObject));
 	groups[groupIndex].circle = circle;
 	circle.transform.position=ship.GetComponent.<locations>().space20.transform.position;
+	circle.transform.GetChild(0).GetComponent("UsePotions").groupIndex=groupIndex;
 
 	units[slot1].group = groupIndex;
 	unit1 = Instantiate(Resources.Load("allies3D/" + units[slot1].type, GameObject));
@@ -154,6 +162,7 @@ function createGroup(slot1:int,slot2:int,slot3:int){
 	
 
 	groups[groupIndex].location = ship;
+	groups[groupIndex].index = groupIndex;
 
 	groupIndex+=1;
 }
@@ -236,6 +245,7 @@ class Group{
 	var slot3Object: GameObject;
 	var circle:GameObject;
 	var hasMoved: boolean=false;
+	var index:int;
 
 	function Group(slot1:int,slot2:int,slot3:int,location:GameObject){
 		this.location=location;
@@ -310,6 +320,13 @@ class Ally{
    var experience: int = 0;
    var protectedBy:int = -1;
    var height:int=1;
+
+   var attackBoost: boolean=false;
+   var defenseBoost: boolean=false;
+   var resistanceBoost: boolean=false;
+   var healthBoost: boolean=false;
+   var evasionBoost: boolean=false;
+   var accuracyBoost: boolean=false;
 
    function Ally(indexNum:int,type:String){
 		if(type=="Archer"){
@@ -2083,7 +2100,6 @@ class Enemy{
  }
 
 function startBattle(location,groupNum,EgroupNum){
-	Debug.Log(location);
 	moveGrid.SetActive(false);
 	location.GetComponent("locations").Grid.SetActive(true);
 	inCombat=true;
@@ -2119,7 +2135,6 @@ function startBattle(location,groupNum,EgroupNum){
 		}
 		if(units[j].type=="Knight"){
 			units[j].energy=100;
-			Debug.Log(units[j].type);
 			GetComponent("combat").setEnergyBar(units[j]);
 		}
 		if(units[j].type=="Guard"){
@@ -2184,10 +2199,24 @@ function Update(){
 	quickMessage("Recieved " + amount  + " " + item);
  }
 
+ var qmNum=0;
  function quickMessage(message){
+	
 	messages.push(message);
 	popupText = Resources.Load("Prefabs/MessageText", GameObject);
 	var instance = Instantiate(popupText);
 	instance.GetComponent("Text").text = message;
 	instance.transform.SetParent(messageBox.transform, false);
+	instance.transform.position.y-=(30*qmNum);
+	qmNum+=1;
+	yield WaitForSeconds(2);
+	qmNum-=1;
+	Destroy(instance);
+ }
+ function makeBigMessage(message){
+	bigBox.SetActive(true);
+	bigMessage.GetComponent("Text").text=message;
+ }
+ function closeBigBox(){
+	bigBox.SetActive(false);
  }

@@ -5,10 +5,21 @@ var menu: GameObject;
 var slot1: GameObject;
 var slot2: GameObject;
 var slot3: GameObject;
+var barracks: GameObject;
+var makePotions:GameObject;
+var potionInfo:GameObject;
+var statsBox:GameObject;
+var replicateBox:GameObject;
+var usePotionsBox:GameObject;
 
 
 
 function gotobarracks(){
+barracks.SetActive(true);
+makePotions.SetActive(false);
+potionInfo.SetActive(false);
+statsBox.SetActive(true);
+usePotionsBox.SetActive(false);
 var addX = 0;
 var addY = 0;
 	gameObjects =  GameObject.FindGameObjectsWithTag ("barrackPic");
@@ -57,4 +68,9 @@ function Exit(){
 	slot3.GetComponent("slots").index = -1;
 	slot3.GetComponent("slots").isfilled = false;
 	menu.SetActive(false);
+}
+
+function ExitReplicate(){
+	potionInfo.SetActive(true);
+	replicateBox.SetActive(false);
 }
