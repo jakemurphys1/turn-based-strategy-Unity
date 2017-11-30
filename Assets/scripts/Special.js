@@ -9,8 +9,8 @@ var Entrances = new Array();
 
 function Start () {
 	MakeEnemies();
-
 	if(Entrance1){
+		Debug.Log("check");
 		Entrances.push(Entrance1);
 	}
 	if(Entrance2){
@@ -31,22 +31,15 @@ function Start () {
 }
 
 function Pass(){
-	
+	GetComponent("special_" + GetComponent("Main").curname).Pass(Entrances);
 }
 
 function MakeEnemies(){
-	var locations = GameObject.FindGameObjectsWithTag("location");
-	var count = 0;
-	var backupCount=0;
-	while(count<15 && backupCount<200){
-		var location = locations[Random.Range(0,locations.length)];
-		if(location.GetComponent("locations").locIndex>0 && isEmpty(location)){
-			placeEnemies(location,count);
-			count+=1;
-		}
-		backupCount+=1;
-	}
-	
+	GetComponent("special_" + GetComponent("Main").curname).MakeEnemies();
+}
+
+function groupPass(Egroup){
+	GetComponent("special_" + GetComponent("Main").curname).groupPass(Egroup);
 }
 
 function isEmpty(location){
@@ -61,51 +54,6 @@ function isEmpty(location){
 }
 
 function placeEnemies(location, count){
-	switch(count){
-		case 1:
-			GetComponent("Main").createEGroup("","Goblin","Goblin","Goblin","",location, 300);
-			break;
-		case 2:
-			GetComponent("Main").createEGroup("","Goblin","Magnet","","",location, 400);
-			break;
-		case 3:
-			GetComponent("Main").createEGroup("","Goblin","Goblin","Goblin","",location, 300);
-			break;
-		case 4:
-			GetComponent("Main").createEGroup("","Bat","","","",location, 200);
-			break;
-		case 5:
-			GetComponent("Main").createEGroup("","Silencer","Magnet","","",location, 400);
-			break;
-		case 6:
-			GetComponent("Main").createEGroup("","","Clunker","","",location, 200);
-			break;
-		case 7:
-			GetComponent("Main").createEGroup("","Bat","Bat","","",location, 400);
-			break;
-		case 8:
-			GetComponent("Main").createEGroup("","Goblin","","","",location, 100);
-			break;
-		case 9:
-			GetComponent("Main").createEGroup("","Goblin","Goblin","Goblin","Goblin",location, 400);
-			break;
-		case 10:
-			GetComponent("Main").createEGroup("","FireElemental","","","",location, 200);
-			break;
-		case 11:
-			GetComponent("Main").createEGroup("","FireElemental","FireElemental","","",location, 400);
-			break;
-		case 12:
-			GetComponent("Main").createEGroup("","FireElemental","LightningElemental","FireElemental","",location, 600);
-			break;
-		case 13:
-			GetComponent("Main").createEGroup("","IceElemental","IceElemental","","",location, 400);
-			break;
-		case 14:
-			GetComponent("Main").createEGroup("","Bat","Bat","Bat","",location, 500);
-			break;
-		case 15:
-			GetComponent("Main").createEGroup("","IceElemental","FireElemental","LightningElemental","",location, 700);
-			break;
-	}
+	GetComponent("special_" + GetComponent("Main").curname).placeEnemies(location,count);
+
 }

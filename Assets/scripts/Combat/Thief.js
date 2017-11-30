@@ -6,6 +6,7 @@ function Start () {
 }
 
 function turnInvisible () {
+	Debug.Log("check");
 	invisible.SetActive(true);
 }
 function turnVisible () {

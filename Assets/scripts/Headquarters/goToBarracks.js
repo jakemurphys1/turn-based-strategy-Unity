@@ -10,7 +10,6 @@ var makePotions:GameObject;
 var potionInfo:GameObject;
 var statsBox:GameObject;
 var replicateBox:GameObject;
-var usePotionsBox:GameObject;
 
 
 
@@ -19,7 +18,6 @@ barracks.SetActive(true);
 makePotions.SetActive(false);
 potionInfo.SetActive(false);
 statsBox.SetActive(true);
-usePotionsBox.SetActive(false);
 var addX = 0;
 var addY = 0;
 	gameObjects =  GameObject.FindGameObjectsWithTag ("barrackPic");
@@ -52,7 +50,24 @@ var addY = 0;
 
 				var level = unit.GetComponent("barrackpic").levelText;
 				level.GetComponent("Text").text=units[i].level.ToString();
-
+				if(units[i].enroute>0 || units[i].healing>0 || units[i].alive==false){
+					var items = main.GetComponent("Main").items;
+					var potionText = unit.GetComponent("barrackpicbutton").potionText;
+					var potionBox =unit.GetComponent("barrackpicbutton").potion;
+					if(units[i].enroute>0 && items["Teleport Potion"]>0){
+						potionBox.SetActive(true);
+						potionText.GetComponent("Text").text="Teleport";
+					}
+					if(units[i].healing>0 && items["Recover Potion"]>0){
+						potionBox.SetActive(true);
+						potionText.GetComponent("Text").text="Recover";
+					}
+					if(units[i].alive==false && items["Revive Potion"]>0){
+						potionBox.SetActive(true);
+						potionText.GetComponent("Text").text="Revive";
+					}
+					unit.GetComponent("Image").color = new Color32(150,150,150,100);
+				}
 		}
 	}
 }
@@ -74,3 +89,4 @@ function ExitReplicate(){
 	potionInfo.SetActive(true);
 	replicateBox.SetActive(false);
 }
+

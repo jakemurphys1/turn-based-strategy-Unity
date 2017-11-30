@@ -13,6 +13,9 @@ var staticslot:GameObject;
 var backgroundHighlight:GameObject;
 var locationType:String;
 var isOver:boolean=false;
+var potion:GameObject;
+var potionText:GameObject;
+
 
 function Start(){
 	main = GameObject.Find("Main");
@@ -25,11 +28,12 @@ function Start(){
 }
 
 function clickit(){
+	var unitnum = parent.GetComponent("barrackpic").index;
+	var unit = main.GetComponent("Main").units[unitnum];
 	if(clickState=="single"){
-		var unitnum = parent.GetComponent("barrackpic").index;
-		var unit = main.GetComponent("Main").units[unitnum];
 		statBox.SetActive(true);
 		statBox.GetComponent("SetStats").UpdateStats(unit);
+		main.GetComponent("Main").healButton.GetComponent("Heal").activeIndex=unitnum;
 		if(locationType=="Switch"){
 			var objects = GameObject.FindGameObjectsWithTag("Switch");
 			for(var i = 0;i<objects.length;i++){
@@ -43,6 +47,19 @@ function clickit(){
 		
 	}else{
 		if(inslot==false){
+				if(unit.enroute>0){
+					main.GetComponent("Main").makeBigMessage("This Unit is still reforming after it's escape. It will be ready in " + unit.enroute + " turns");
+					return;
+				}
+				if(unit.healing>0){
+					main.GetComponent("Main").makeBigMessage("This Unit is still healing. It will be ready in " + unit.healing + " turns");
+					return;
+				}
+				if(unit.alive==false){
+					main.GetComponent("Main").makeBigMessage("This Unit is dead. Make a 'Revive Potion' to bring it back.");
+					return;
+				}
+				
 				var curslot = slot1;
 				inslot=true;
 				if(slot1.GetComponent.<slots>().isfilled){
@@ -119,9 +136,11 @@ function makeSwitch(){
 	var unitnum = parent.GetComponent("barrackpic").index;
 	var unit2 = main.GetComponent("Main").units[unitnum];
 
-	if(main.GetComponent("Main").switchNum==unitnum){
+	if(main.GetComponent("Main").switchNum==unitnum || main.GetComponent("Main").switchNum==-1 || main.GetComponent("Main").switchImage==null){
 		return;
 	}
+	main.GetComponent("Main").switchNum=-1;
+	main.GetComponent("Main").switchImage=null;
 
 	var objects = GameObject.FindGameObjectsWithTag("Switch");
 	for(var i = 0;i<objects.length;i++){
@@ -198,9 +217,28 @@ function makeSwitch(){
 			 unit2.body.transform.position = Vector3.Lerp(startPosition2,endPosition2,t);
 			 yield;
 		 }
+}
 
-
-
+function potionClick(){
+	var unitnum = parent.GetComponent("barrackpic").index;
+	var unit = main.GetComponent("Main").units[unitnum];
+	var items = main.GetComponent("Main").items;
+	if(potionText.GetComponent("Text").text=="Teleport"){
+		unit.enroute = 0;
+		items["Teleport Potion"]-=1;
+		main.GetComponent("Main").barrackButton.GetComponent("goToBarracks").gotobarracks();
+	}
+	if(potionText.GetComponent("Text").text=="Recover"){
+		unit.healing = 0;
+		items["Recover Potion"]-=1;
+		main.GetComponent("Main").barrackButton.GetComponent("goToBarracks").gotobarracks();
+	}
+	if(potionText.GetComponent("Text").text=="Revive"){
+		unit.alive = true;
+		unit.health = unit.maxhealth;
+		items["Revive Potion"]-=1;
+		main.GetComponent("Main").barrackButton.GetComponent("goToBarracks").gotobarracks();
+	}
 }
 
  

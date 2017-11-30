@@ -1,8 +1,6 @@
 ﻿var units = new Array();
 var Eunits = new Array();
-var descriptionPanel: GameObject;
-var actionPanel: GameObject;
-var AttackValue: GameObject;
+var curname: String;
 var slots = new Array();
 var eslots = new Array();
 var groups = new Array();
@@ -14,9 +12,6 @@ var EgroupIndex:int=0;
 var activeIndex:int=0;
 var test: int = 12;
 var ship: GameObject;
-var entrance1: GameObject;
-var entrance2: GameObject;
-var entrance3: GameObject;
 var inCombat:boolean = false;
 var Terrain:GameObject;
 var activeGroup:int=-1;
@@ -39,19 +34,39 @@ var messages = new Array();
 var givePotions: GameObject;
 var bigBox:GameObject;
 var bigMessage:GameObject;
+var barrackButton:GameObject;
+var healButton:GameObject;
+var gameover: GameObject;
+var ArcherPic: Sprite;
+var ClericPic: Sprite;
+var GuardPic: Sprite;
+var KnightPic: Sprite;
+var MagePic: Sprite;
+var RougePic: Sprite;
+var SoldierPic: Sprite;
+var SorcererPic: Sprite;
+var TemplarPic: Sprite;
+var ThiefPic: Sprite;
+var WizardPic: Sprite;
+
 
 
 function Start () {
 
-	createUnit("Thief");
-	createUnit("Soldier");
-	createUnit("Guard");
-
-	createUnit("Templar");
 	createUnit("Wizard");
+	createUnit("Archer");
 	createUnit("Knight");
 
-	createUnit("Thief");
+	createUnit("Mage");
+	createUnit("Templar");
+	createUnit("Soldier");
+
+	createUnit("Guard");
+	createUnit("Cleric");
+
+
+	units[2].energy=50;
+
 	//createEGroup("Goblin","Goblin","Goblin","Goblin","Goblin",entrance1, 1000);
 	//tempStart();
 
@@ -65,6 +80,7 @@ function Start () {
 	items["Berries"]=10;
 	items["Herbs"]=10;
 	items["Essence"]=10;
+	items["Teleport Potion"]=1;
 	items["Revive Potion"]=1;
 	items["Recover Potion"]=1;
 	items["Defense Potion"]=2;
@@ -78,14 +94,14 @@ function Start () {
 function tempStart(){
 	
 	
-	units[0].actionsActive["Zap"]=true;
+	units[0].actionsActive["Scout"]=true;
 	units[0].actionsActive["BackStab"]=true;
 	units[0].actionsActive["Flying"]=true;
 	units[0].actionsActive["Reach"]=true;
 	units[0].actionsActive["Cleanse"]=true;
 	units[0].actionsActive["Double Vigor"]=true;
 
-	units[1].actionsActive["Protect"]=true;
+	units[1].actionsActive["Explosion"]=true;
 	units[1].actionsActive["Sweep"]=true;
 	units[1].actionsActive["Swirl"]=true;
 	units[1].actionsActive["Push"]=true;
@@ -93,10 +109,10 @@ function tempStart(){
 	units[1].actionsActive["Ailments"]=true;
 	units[1].actionsActive["Start Charge"]=true;
 
-	units[2].actionsActive["Zap"]=true;
+	units[2].actionsActive["Swirl"]=true;
 
 
-	createEGroup("FireElemental","LightningElemental","","","",ship, 1000);
+	createEGroup("Goblin","","","","",ship, 1000);
 
 	createGroup(0,1,2);
 	checkBattle(ship);
@@ -181,6 +197,7 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 		Egroups[EgroupIndex].slot1Object = unit1;
 		Eunits[EindexNum-1].body = unit1;
 		Eunits[EindexNum-1].hor = 0;
+		quickMessage(Eunits[EindexNum-1].type + " has appeared!");
 	}
 	
 
@@ -195,6 +212,7 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			Egroups[EgroupIndex].slot2Object = unit2;
 			Eunits[EindexNum-1].body = unit2;
 			Eunits[EindexNum-1].hor = 1;
+			quickMessage(Eunits[EindexNum-1].type + " has appeared!");
 	}
 	if(slot3){
 			createEUnit(slot3);
@@ -207,6 +225,7 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			Egroups[EgroupIndex].slot3Object = unit3;
 			Eunits[EindexNum-1].body = unit3;
 			Eunits[EindexNum-1].hor = 2;
+			quickMessage(Eunits[EindexNum-1].type + " has appeared!");
 	}
 	if(slot4){
 			createEUnit(slot4);
@@ -219,6 +238,7 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			Egroups[EgroupIndex].slot4Object = unit4;
 			Eunits[EindexNum-1].body = unit4;
 			Eunits[EindexNum-1].hor = 3;
+			quickMessage(Eunits[EindexNum-1].type + " has appeared!");
 	}
 	if(slot5){
 			createEUnit(slot5);
@@ -231,7 +251,32 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			Egroups[EgroupIndex].slot5Object = unit5;
 			Eunits[EindexNum-1].body = unit5;
 			Eunits[EindexNum-1].hor = 4;
+			quickMessage(Eunits[EindexNum-1].type + " has appeared!");
 	}
+
+	var curPos= curCamera.transform.position;
+
+		//zoom camera
+	var t = 0.0;
+	var startPosition = curCamera.transform.position;
+	var endPosition =location.transform.position;
+	endPosition.y = startPosition.y;
+	while (t < 1.0)
+	{
+		t += 0.05;
+		curCamera.transform.position = Vector3.Lerp(startPosition,endPosition,t);
+		yield;
+	}
+
+	yield WaitForSeconds(1);
+	t = 0.0;
+	while (t < 1.0)
+	{
+		t += 0.05;
+		curCamera.transform.position = Vector3.Lerp(endPosition,startPosition,t);
+		yield;
+	}
+
 
 	EgroupIndex+=1;
 }
@@ -327,6 +372,9 @@ class Ally{
    var healthBoost: boolean=false;
    var evasionBoost: boolean=false;
    var accuracyBoost: boolean=false;
+
+   var enroute: int=0;
+   var healing: int=0;
 
    function Ally(indexNum:int,type:String){
 		if(type=="Archer"){
@@ -501,13 +549,13 @@ class Ally{
 			   this.actionDes1["Attack"] = "Standard Sword Attack";
 			   this.actionDes2["Attack"]  = "Deals damage equal to your knight's attack to an adjacent enemy";
 			   this.actionDes1["Swirl"] = "Swirl of Death";
-			   this.actionDes2["Swirl"]  = "Attacks all adjacent enemies. Costs 15 energy.";
+			   this.actionDes2["Swirl"]  = "Attacks all adjacent enemies. Costs 30 energy.";
 			   this.actionDes1["Sweep"] = "Long Sword Sweep";
-			   this.actionDes2["Sweep"]  = "Attacks an adjacent enemy and the enemies next to it";
+			   this.actionDes2["Sweep"]  = "Attacks an adjacent enemy and the enemies next to it. Costs 30 energy.";
 			   this.actionDes1["FreeMove"] = "Knight is Better at Using His Armor";
 			   this.actionDes2["FreeMove"]  = "Moving no longer costs energy";
 			   this.actionDes1["Push"] = "Back Off";
-			   this.actionDes2["Push"]  = "Pushes an adjacent enemy straight back";
+			   this.actionDes2["Push"]  = "Pushes an adjacent enemy straight back. Costs 30 energy.";
 			   this.actionDes1["Wail"] = "Smash the Enemy Until it Stops Moving";
 			   this.actionDes2["Wail"]  = "Continues to attack until he runs out of energy. Each attack has a reduction of accuracy.";
 			   this.energy=100;
@@ -606,7 +654,7 @@ class Ally{
 			   this.actionDes1["Gust"] = "Blow Away the Enemy";
 			   this.actionDes2["Gust"]  = "Deals Ice Damage to any enemy and pushes it back by one. Costs one charge.";
 			   this.actionDes1["Lightning"] = "Have the Heavens Destroy Your Enemies";
-			   this.actionDes2["Lightning"]  = "Deals Lightning Damage to any enemy that deals damage equal to twice the wizard's attack. Costs two charge.";
+			   this.actionDes2["Lightning"]  = "Deals Lightning Damage to any enemy equal to twice the wizard's attack. Costs two charge.";
 			   this.actionDes1["Missiles"] = "Shoot fiery missiles at your enemy";
 			   this.actionDes2["Missiles"]  = "Deals Fire Damage to an Enemy in a straight line a number of times equal to the wizard's charge. Uses all remaining charge.";
 			   this.actionDes1["Ailments"] = "Inflict your Enemy's with Ailments";
@@ -752,7 +800,10 @@ class Enemy{
    var didAction: boolean=false;
    var alive: boolean=true;
    var height:int=1;
-
+   var hasItem:boolean=true;
+   var chargeAfterAttack=false;
+   var phasedout=false;
+   var phasing=false;
 
    function Enemy(curindexNum:int,type:String,level:int){
 		if(type=="Goblin"){
@@ -994,7 +1045,7 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
-		};
+		};//done
 		if(type=="Clunker"){
 			if (level == 1) {
              this.attack = 20;
@@ -1446,7 +1497,9 @@ class Enemy{
 			 this.defenseType="resistance";
 			 this.charge=0;
 			 this.maxcharge=2;
-		};
+			 this.chargeAfterAttack=true;
+			 this.phasing=true;
+		};//done
 		if(type=="Necromancer"){
 			 if (level == 1) {
              this.attack = 0;
@@ -1537,8 +1590,10 @@ class Enemy{
 			 this.elemental["Lightning"]=2;
 			 this.defenseType="resistance";
 			 this.charge=0;
-			 this.maxcharge=2;
-		};
+			 this.maxcharge=1;
+			 this.chargeAfterAttack=true;
+			 this.phasing=true;
+		};//done
 		if(type=="Frostwraith"){
 			if (level == 1) {
              this.attack = 60;
@@ -1570,7 +1625,9 @@ class Enemy{
 			 this.defenseType="resistance";
 			 this.charge=0;
 			 this.maxcharge=2;
-		};
+			 this.chargeAfterAttack=true;
+			 this.phasing=true;
+		};//done
 		if(type=="Assassin"){
 			if (level == 1) {
              this.attack = 30;
@@ -1783,7 +1840,7 @@ class Enemy{
 			 this.charge=0;
 			 this.maxcharge=3;
 		};
-		if(type=="ESoldier"){
+		if(type=="Soldier"){
 			if (level == 1) {
              this.attack = 50;
              this.health = 100;
@@ -1811,8 +1868,8 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
-		};
-		if(type=="EArcher"){
+		};//done
+		if(type=="Archer"){
 			if (level == 1) {
              this.attack = 15;
              this.health = 60;
@@ -1835,13 +1892,13 @@ class Enemy{
 			 }
 			 this.defense = 10;
 			 this.resistance = 10;
-			 this.attackType="AssassinAttack";
+			 this.attackType="ArrowAttack";
 			 this.moveType="Afraid";
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
-		};
-		if(type=="EMage"){
+		};//,done
+		if(type=="Mage"){
 			if (level == 1) {
              this.attack = 40;
              this.health = 80;
@@ -1871,7 +1928,7 @@ class Enemy{
 			 this.elemental["Lightning"]=1;
 			 this.defenseType="resistance";
 		};
-		if(type=="ERouge"){
+		if(type=="Rouge"){
 			if (level == 1) {
              this.attack = 10;
              this.health = 50;
@@ -1900,7 +1957,7 @@ class Enemy{
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
 		};
-		if(type=="EWizard"){
+		if(type=="Wizard"){
 			 if (level == 1) {
              this.attack = 70;
              this.health = 40;
@@ -1932,7 +1989,7 @@ class Enemy{
 			 this.charge=0;
 			 this.maxcharge=2;
 		};
-		if(type=="EGuard"){
+		if(type=="Guard"){
 			if (level == 1) {
              this.attack = 20;
              this.health = 110;
@@ -1976,15 +2033,33 @@ class Enemy{
 	}
 
 	for(var j = 0;j<groups.length;j++){
-		groups[j].circle.SetActive(false);
+		if(groups[j].circle){
+			groups[j].circle.SetActive(false);
+		}
 	}
 
-	groups[activeGroup].circle.SetActive(true);
+	var circle = groups[activeGroup].circle;
+	circle.SetActive(true);
+	//var curslots = new Array();
+	//if(groups[activeGroup].slot1>-1){
+	//	var unit1 = units[groups[activeGroup].slot1];
+	//	circle.GetComponent("CircleScript").slot1.GetComponent("SpriteRenderer").sprite = getPic(unit1);
+	//}
+	//if(groups[activeGroup].slot2>-1){
+	//	var unit2 = units[groups[activeGroup].slot2];
+	//	Debug.Log(unit2.type);
+	//	circle.GetComponent("CircleScript").slot2.GetComponent("SpriteRenderer").sprite = getPic(unit2);
+	//}
+	//if(groups[activeGroup].slot3>-1){
+	//	var unit3 = units[groups[activeGroup].slot3];
+	//	circle.GetComponent("CircleScript").slot3.GetComponent("SpriteRenderer").sprite = getPic(unit3);
+	//}
+
 	var location = groups[activeGroup].location;
 	var moveLocations=location.GetComponent("locations").allyMoves;
 
 	var objects = GameObject.FindGameObjectsWithTag("Entry");
-	for(var i =0;i<objects.length;i++){
+	for(i =0;i<objects.length;i++){
 		objects[i].GetComponent("entry").readyMove=false;;
 	}
 
@@ -1997,6 +2072,19 @@ class Enemy{
 
 	
   }
+ }
+
+ function getPic(ally){
+ 	 if(ally.type =="Archer"){
+	 	 return ArcherPic;
+	 }
+	 if(ally.type =="Soldier"){
+	 	 return SoldierPic;
+	 }
+	 if(ally.type =="Mage"){
+	 	 return MagePic;
+	 }
+	 return null;
  }
 
  function moveGroup(slot1:Vector3, slot2:Vector3,slot3:Vector3,locIndex:int,location:GameObject){
@@ -2093,13 +2181,17 @@ class Enemy{
  					 for(var i =0;i<groups.length;i++){
 					 	 for(var j =0;j<Egroups.length;j++){
 						 	 if(groups[i].location == Egroups[j].location){
-								startBattle(groups[i].location,i,j);
+								if(inCombat==false){
+									Debug.Log("checkBattle");
+									startBattle(groups[i].location,i,j);
+								}
 							 }
 						 }
 					 }	 				
  }
 
 function startBattle(location,groupNum,EgroupNum){
+	groups[groupNum].circle.SetActive(false);
 	moveGrid.SetActive(false);
 	location.GetComponent("locations").Grid.SetActive(true);
 	inCombat=true;
@@ -2112,6 +2204,7 @@ function startBattle(location,groupNum,EgroupNum){
 		}
 	}
 	slots=[];
+	var scoutPresent=false;
 	for(var j =0;j<units.length;j++){
 		if(!units[j].body){
 			continue;
@@ -2142,7 +2235,28 @@ function startBattle(location,groupNum,EgroupNum){
 			if(units[j].actionsActive["SuperShield"]){
 				units[j].energy=50;
 			}
+			if(units[j].actionsActive["Scout"]){
+				scoutPresent=true;
+			}
 			GetComponent("combat").setEnergyBar(units[j]);
+		}
+		if(units[j].type=="Templar"){
+			units[j].arrows["Silence"]=units[j].arrowCapacity;
+			units[j].arrows["GrapplingHook"]=units[j].arrowCapacity;
+			units[j].arrows["Disrupt"]=units[j].arrowCapacity;
+			units[j].arrows["Burst"]=units[j].arrowCapacity;
+		}
+		if(units[j].type=="Archer"){
+			units[j].arrows["Explosion"]=units[j].arrowCapacity;
+			units[j].arrows["Piercing"]=units[j].arrowCapacity;
+			units[j].arrows["Immobolize"]=units[j].arrowCapacity;
+			units[j].arrows["Titan"]=units[j].arrowCapacity;
+		}
+		if(units[j].type=="Rouge"){
+			units[j].arrows["Poison"]=units[j].arrowCapacity;
+			units[j].arrows["Blindness"]=units[j].arrowCapacity;
+			units[j].arrows["Sleep"]=units[j].arrowCapacity;
+			units[j].arrows["Enfeeble"]=units[j].arrowCapacity;
 		}
 		if(units[j].group==groupNum){
 			slots.push(units[j]);
@@ -2160,6 +2274,13 @@ function startBattle(location,groupNum,EgroupNum){
 		t += 0.05;
 		curCamera.transform.position = Vector3.Lerp(startPosition,endPosition,t);
 		yield;
+	}
+
+	//enemy goes first?
+	var starting = Random.Range(1,3);
+	Debug.Log(starting);
+	if(starting==1 && scoutPresent==false){
+		pass.GetComponent("pass").enemyturn();
 	}
 }
 
@@ -2219,4 +2340,12 @@ function Update(){
  }
  function closeBigBox(){
 	bigBox.SetActive(false);
+ }
+
+ function restart(){
+	Application.LoadLevel(Application.loadedLevel);
+ }
+
+ function gameOver(){
+ 	 gameover.SetActive(true);
  }

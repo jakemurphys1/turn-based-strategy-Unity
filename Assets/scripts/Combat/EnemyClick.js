@@ -63,6 +63,9 @@ function OnRightClick(){
 	animator.SetFloat("Run",Run);
 	animator.SetInteger("hit",hit);
 	animator.SetInteger("attack",attack);
+	if(main.GetComponent("Main").Eunits.length==0){
+		return;
+	}
 	var thisEnemy=main.GetComponent("Main").Eunits[eindex];
 	if(thisEnemy.immobolized>0){
 		immobolized.SetActive(true);

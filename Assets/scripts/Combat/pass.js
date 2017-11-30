@@ -7,21 +7,24 @@ var curDisabled=false;
 var self:GameObject;
 
 function enemyturn(){
+	DisablePass();
 	if(main.GetComponent("Main").inCombat==false){
 		worldturn();
 		return;
 	}
-	DisablePass();
+	
 	//reset allies
 	for(var i =0;i<slots.length;i++){
 		slots[i].hasMoved=false;
 		slots[i].didAction=false;
 		if(slots[i].type=="Knight"){
-			slots[i].energy+=20;
-			if(slots[i].energy>100){
-				slots[i].energy=100;
+			if(slots[i].hasMoved==false && slots[i].didAction==false){
+				slots[i].energy+=30;
+				if(slots[i].energy>100){
+					slots[i].energy=100;
+				}
+				main.GetComponent("combat").setEnergyBar(slots[i]);
 			}
-			main.GetComponent("combat").setEnergyBar(slots[i]);
 		}
 	}
 
@@ -39,6 +42,11 @@ function enemyturn(){
 		}
 		if(eslots[p].type == "Werewolf"){
 			heal(eslots[p],10);
+		}
+		if(eslots[p].phasing && eslots[p].phasedout==false){
+			eslots[p].phasedout=true;
+			eslots[p].body.GetComponent("Thief").turnInvisible();
+			main.GetComponent("combat").wordPopup(eslots[p],"Phased Out");
 		}
 	}
 	
@@ -104,9 +112,23 @@ function enemyturn(){
 function worldturn(){
 	var groups = main.GetComponent("Main").groups;
 	var Egroups = main.GetComponent("Main").Egroups;
+	var units = main.GetComponent("Main").units;
 
 	for(var i = 0;i<groups.length;i++){
 		groups[i].hasMoved=false;
+	}
+	for(i = 0;i<units.length;i++){
+		if(units[i].type=="Sorcerer"){
+			units[i].energy+=10;
+			if(units[i].actionsActive["Surge"]){
+				units[i].energy+=10;
+			}
+			if(units[i].energy>100){
+				units[i].energy=100;
+			}
+			main.GetComponent("combat").setEnergyBar(units[i]);
+		}
+		
 	}
 
 	//move enemies
@@ -114,12 +136,12 @@ function worldturn(){
 		if(!Egroups[i].location){
 			continue;
 		}
-
+		main.GetComponent("Special").groupPass(Egroups[i]);
 		var location = Egroups[i].location;
 		var rand = Random.Range(1,3);
 		
 		var moveLocation = location.GetComponent("locations").enemyMove1;
-		if(rand>1){
+		if(rand>1 && location.GetComponent("locations").enemyMove2){
 			moveLocation = location.GetComponent("locations").enemyMove2;
 		}
 		if(moveLocation){
@@ -133,9 +155,10 @@ function worldturn(){
 				moveEnemies(Egroups[i], moveLocation);
 			}
 		}
+	
 	}
 	main.GetComponent("Special").Pass();
-	yield WaitForSeconds(1);
+	yield WaitForSeconds(2);
 	main.GetComponent("Main").checkBattle(location);
 }
 
@@ -250,10 +273,7 @@ function moveEnemies(Egroup, location:GameObject){
 					 if(curObject5){
 						curObject5.transform.rotation=startDirection5;
 						curObject5.GetComponent("EnemyClick").Run=0;
-					 } 
-
-					 
-					 
+					 } 					 
  }
 
 function DisablePass(){
@@ -308,7 +328,7 @@ function enemyAttack(){
 					continue;
 				}
 			}
-			if(eslots[n].maxcharge>-1){
+			if(eslots[n].maxcharge>-1 && eslots[n].chargeAfterAttack==false){
 				if(eslots[n].charge<eslots[n].maxcharge){
 					charge(eslots[n]);
 					continue;
@@ -333,6 +353,33 @@ function enemyAttack(){
 			}
 			if(eslots[n].attackType=="NecromancerAttack"){
 				NecromancerAttack(eslots[n]);
+			}
+			if(eslots[n].attackType=="FrostwraithAttack"){
+				closeAttack(eslots[n],eslots,slots);
+				if(eslots[n].didAction==false && eslots[n].charge>=eslots[n].maxcharge){
+					IceAttack(eslots[n],eslots,slots);
+				}
+			}
+			if(eslots[n].attackType=="FlamewraithAttack"){
+				closeAttack(eslots[n],eslots,slots);
+				if(eslots[n].didAction==false && eslots[n].charge>=eslots[n].maxcharge){
+					FireAttack(eslots[n]);
+				}
+			}
+			if(eslots[n].attackType=="WaterwraithAttack"){
+				closeAttack(eslots[n],eslots,slots);
+				if(eslots[n].didAction==false && eslots[n].charge>=eslots[n].maxcharge){
+					WaterwraithAttack(eslots[n],eslots,slots);
+				}
+			}
+			if(eslots[n].attackType=="ArrowAttack"){
+				arrowAttack(eslots[n]);
+			}
+			if(eslots[n].maxcharge>-1 && eslots[n].chargeAfterAttack && eslots[n].didAction==false){
+				if(eslots[n].charge<eslots[n].maxcharge){
+					charge(eslots[n]);
+					continue;
+				}
 			}
 		}
 	}
@@ -403,6 +450,31 @@ function closeAttack(enemy,eslots,slots){
 			move(enemy.body,reverseX,reverseY);
 			counter(enemy,slots[attackThis]);
 		}
+}
+function arrowAttack(enemy){
+	enemy.didAction=true;
+	enemy.hasMoved=true;
+	var waittime=0;
+	if(enemy.body.GetComponent("EnemyClick").Run>0){
+		waittime=1;
+	}
+	var target = lowestDefense(slots,enemy.defenseType);
+	lookAt(enemy,target);
+
+	yield WaitForSeconds(waittime);
+	lookAt(enemy,target);
+	enemy.body.GetComponent("EnemyClick").attack =1;
+	var damage = enemy.attack-main.GetComponent("combat").getdefense(target,enemy.defenseType);
+
+	yield WaitForSeconds(1);
+	main.GetComponent("combat").damageAlly(target.index,damage,enemy,1);
+	yield WaitForSeconds(1);
+	enemy.body.GetComponent("EnemyClick").attack =0;
+	main.GetComponent("sounds").playSound("arrow");
+
+		 
+		 
+		counter(enemy,target);
 }
 function IceAttack(enemy,eslots,slots){
 	var attackThis = isTwoAway(enemy.hor,enemy.vert,slots);
@@ -662,8 +734,37 @@ function NecromancerAttack(enemy){
 	}
 		enemy.charge-=1;
 		enemy.body.GetComponent("EnemyClick").chargeText.GetComponent("Text").text=enemy.charge.ToString();
-		summon(enemy,curhor,curvert,"Zombie");
+		summon(enemy,curhor,curvert,"Zombie");	
+}
+function WaterwraithAttack(enemy,eslots,slots){
+	enemy.charge-=enemy.maxcharge;
+	enemy.body.GetComponent("EnemyClick").chargeText.GetComponent("Text").text=enemy.charge.ToString();
+	enemy.didAction=true;
+	enemy.hasMoved=true;
+	enemy.body.GetComponent("EnemyClick").animator.SetInteger("special",1);
+
+	magic = Resources.Load("effects/Waves", GameObject);
+	instance = Instantiate(magic);
+	instance.transform.position = enemy.body.transform.position;
+	instance.transform.position.x+=250;
+
+		var startPosition = instance.transform.position;
+		var endPosition = new Vector3(instance.transform.position.x-300,instance.transform.position.y,instance.transform.position.z);
+		
+		var t = 0.0;
+		 while (t < 1.0)
+		 {
+			 t += 0.006;
+			 instance.transform.position = Vector3.Lerp(startPosition,endPosition,t);
+			 yield;
+		 }
+		 Destroy(instance);
 	
+	enemy.body.GetComponent("EnemyClick").animator.SetInteger("special",0);
+	for(var i = 0;i<slots.length;i++){
+		var damage = enemy.attack-main.GetComponent("combat").getdefense(slots[i],"resistance");
+		main.GetComponent("combat").damageAlly(slots[i].index,damage,enemy,1);
+	}
 }
 
 //moves

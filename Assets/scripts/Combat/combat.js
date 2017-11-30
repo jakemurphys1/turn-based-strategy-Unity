@@ -4,6 +4,17 @@
  
  function damageEnemy(enemy,amount,element){
 	amount=amount*enemy.elemental[element];
+	if(enemy.phasedout){
+		if(element!="None"){
+			enemy.phasedout=false;
+			enemy.body.GetComponent("Thief").turnVisible();
+			wordPopup(enemy,"Phased In!");
+		}
+		if(enemy.elemental[element]<2){
+			amount=0;
+		}
+		
+	}
 	if(enemy.elemental[element]>1){
 		wordPopup(enemy,"Effective!");
 	}
@@ -132,6 +143,7 @@
 	 if(type == "Ally"){
 		var index = body.GetComponent("AllyClick").index;
 		var slots = pass.GetComponent("pass").slots;
+		GetComponent("Main").units[index].health=0;
 		for (var i =0;i<slots.length;i++){
 			if(slots[i].index==index){
 				pass.GetComponent("pass").slots.splice(i,1);
@@ -141,9 +153,12 @@
 		body.GetComponent("AllyClick").animator.SetFloat("death",1.0f);
 		yield WaitForSeconds(3);
 		Destroy(body);
+		var curGroup = GetComponent("Main").units[index].group;
+		GetComponent("Main").units[index].group=-1;
 		if(pass.GetComponent("pass").slots.length==0){
-			loseBattle();
+			loseBattle(curGroup);
 		}
+
 	 }else{
 		var eindex = body.GetComponent("EnemyClick").eindex;
 		var eslots = pass.GetComponent("pass").eslots;
@@ -156,6 +171,7 @@
 		GetComponent("Main").Eunits[eindex].alive=false;
 		body.GetComponent("EnemyClick").animator.SetFloat("death",1.0f);
 		yield WaitForSeconds(3);
+		getIngredients();
 		Destroy(body);
 		if(pass.GetComponent("pass").eslots.length==0){
 			winBattle(group);
@@ -163,13 +179,50 @@
 	 }
  }
 
+ function getIngredients(){
+	var randnum = Random.Range(1,11);
+	var item;
+	switch(randnum){
+		case 1:
+			item = "Flowers";
+			break;
+		case 2:
+			item = "Mushrooms";
+			break;
+		case 3:
+			item = "Honey";
+			break;
+		case 4:
+			item = "Roots";
+			break;
+		case 5:
+			item = "Powder";
+			break;
+		case 6:
+			item = "Sap";
+			break;
+		case 7:
+			item = "Extract";
+			break;
+		case 8:
+			item = "Berries";
+			break;
+		case 9:
+			item = "Herbs";
+			break;
+		case 10:
+			item = "Essence";
+			break;
+	}
+	GetComponent("Main").increaseItems(item,1);
+ }
 
- function loseBattle(){
+ function loseBattle(group){
 	menu.GetComponent("Menu").hideAll();
 	resetSpaces();
 	if(GetComponent("Main").inCombat==true){
 		 GetComponent("Main").inCombat=false;
-
+		 GetComponent("Main").groups[group].location = null;
 		 var eslots = pass.GetComponent("pass").eslots;
 		 var spaces = pass.GetComponent("pass").spaces;
 		for(var i =0;i<eslots.length;i++){
@@ -195,8 +248,10 @@
 	}
  }
 
+ var curlocation;
  function winBattle(groupNum){
 	var Egroup = GetComponent("Main").Egroups[groupNum];
+	curlocation = Egroup.location;
 	Egroup.location = null;
 	menu.GetComponent("Menu").hideAll();
 	resetSpaces();
@@ -255,6 +310,9 @@
 		unit.actionsActive[newability]=true;
 	}else{
 		GetComponent("Main").moveGrid.SetActive(true);
+		Debug.Log("got here");
+		Debug.Log(curlocation);
+		GetComponent("Main").checkBattle(curlocation);
 	}
  }
 
@@ -624,11 +682,11 @@
 	}
 	if(thisUnit.type == "Knight"){
 		if(curAction=="Attack" && isAdjacent(curEnemy,thisUnit)){
-			if(thisUnit.energy<15){
+			if(thisUnit.energy<20){
 				wordPopup(thisUnit,"Low Energy");
 				return;
 			}else{
-				thisUnit.energy-=15;
+				thisUnit.energy-=20;
 				setEnergyBar(thisUnit);
 				swordattack(thisUnit,curEnemy);
 			}
@@ -1234,6 +1292,9 @@
 	if(ally.type!="Knight" && ally.type!="Sorcerer" && ally.type!="Guard"){
 		return;
 	}
+	if(ally.group<0){
+		return;
+	}
 	var energybar = ally.body.GetComponent("AllyClick").energybar;
 	var energy = ally.energy + 0.0f;
 
@@ -1347,6 +1408,11 @@
 
 //Thief
 function steal(ally,enemy){
+
+	if(enemy.hasItem==false){
+		wordPopup(enemy,"Nothing To Steal");
+		return;
+	}
 	var health = enemy.health;
 	var maxhealth = enemy.maxhealth;
 	var healthCheck = Random.Range(1,maxhealth);
@@ -1355,6 +1421,7 @@ function steal(ally,enemy){
 		wordPopup(ally,"Failed To Steal");
 		return;
 	}
+	enemy.hasItem=false;
 
 	var randnum = Random.Range(1,17);
 	var item;

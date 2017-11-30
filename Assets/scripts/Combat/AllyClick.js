@@ -218,8 +218,25 @@ function zoomin(){
 }
 
 function switchUnits(){
+
+
 	var group1 = main.GetComponent("Main").groups[main.GetComponent("Main").units[index].group];
 	var group2 = main.GetComponent("Main").groups[main.GetComponent("Main").activeGroup];
+
+	//see if units are beside each other
+	var location1 = group1.location;
+	var location2 = group2.location;
+	var isAdjacent = false;
+	if(location1.GetComponent("locations").allyMove1==location2 || location1.GetComponent("locations").allyMove1==location2 || location1.GetComponent("locations").allyMove3==location2 || location1.GetComponent("locations").allyMove4==location2 || location1.GetComponent("locations").allyMove5==location2 || location1.GetComponent("locations").allyMove6==location2){
+		isAdjacent=true;
+	}
+	if(location1==location2){
+		isAdjacent=true;
+	}
+	if(isAdjacent==false){
+		return;
+	}
+
 
 	var groupScreen = main.GetComponent("Main").groupScreen;
 	main.GetComponent("Main").groupScreen.SetActive(true);
@@ -258,6 +275,10 @@ function switchUnits(){
 				groupScreen.transform.GetChild(0).transform.GetChild(1).GetComponent("Switch").location = main.GetComponent("Main").groups[unitInfo.group].location;
 				groupScreen.transform.GetChild(0).transform.GetChild(2).GetComponent("Switch").location = main.GetComponent("Main").groups[unitInfo.group].location;
 
+				groupScreen.transform.GetChild(0).transform.GetChild(0).GetComponent("Switch").giveGroup = main.GetComponent("Main").groups[unitInfo.group];
+				groupScreen.transform.GetChild(0).transform.GetChild(1).GetComponent("Switch").giveGroup = main.GetComponent("Main").groups[unitInfo.group];
+				groupScreen.transform.GetChild(0).transform.GetChild(2).GetComponent("Switch").giveGroup = main.GetComponent("Main").groups[unitInfo.group];
+
 				unit.GetComponent("barrackpicbutton").locationType="Switch";
 				unit.GetComponent("barrackpic").index=unitInfo.index;
 				var level = unit.GetComponent("barrackpic").levelText;
@@ -279,6 +300,10 @@ function switchUnits(){
 			groupScreen.transform.GetChild(1).transform.GetChild(0).GetComponent("Switch").location = main.GetComponent("Main").groups[unitInfo2.group].location;
 			groupScreen.transform.GetChild(1).transform.GetChild(1).GetComponent("Switch").location = main.GetComponent("Main").groups[unitInfo2.group].location;
 			groupScreen.transform.GetChild(1).transform.GetChild(2).GetComponent("Switch").location = main.GetComponent("Main").groups[unitInfo2.group].location;
+
+			groupScreen.transform.GetChild(1).transform.GetChild(0).GetComponent("Switch").giveGroup = main.GetComponent("Main").groups[unitInfo2.group];
+			groupScreen.transform.GetChild(1).transform.GetChild(1).GetComponent("Switch").giveGroup = main.GetComponent("Main").groups[unitInfo2.group];
+			groupScreen.transform.GetChild(1).transform.GetChild(2).GetComponent("Switch").giveGroup = main.GetComponent("Main").groups[unitInfo2.group];
 			unit2.GetComponent("barrackpicbutton").locationType="Switch";
 			unit2.GetComponent("barrackpic").index=unitInfo2.index;
 			level = unit2.GetComponent("barrackpic").levelText;

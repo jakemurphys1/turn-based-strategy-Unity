@@ -13,13 +13,18 @@ var EvasionIcon:GameObject;
 var AccuracyIcon:GameObject;
 var	quantity:GameObject;
 var main:GameObject;
+var healthbar:GameObject;
 
 
+function Start(){
+	updateQuanity();
+}
 
-function goRight(){
+function goLeft(){
 	if(curSlot==3){
 		return;
 	}
+	Debug.Log(slot1);
 	slot1.body.GetComponent("AllyClick").curcamera.enabled = false;
 	slot2.body.GetComponent("AllyClick").curcamera.enabled = false;
 	slot3.body.GetComponent("AllyClick").curcamera.enabled = false;
@@ -29,13 +34,14 @@ function goRight(){
 		curUnit = slot2;
 	}
 	if(curSlot==3){
-		slot1.body.GetComponent("AllyClick").curcamera.enabled = true;
+		slot3.body.GetComponent("AllyClick").curcamera.enabled = true;
 		curUnit = slot1;
 	}
 	updateIcons();
 }
 
-function goLeft(){
+function goRight(){
+	
 	if(curSlot==1){
 			return;
 		}
@@ -44,7 +50,7 @@ function goLeft(){
 	slot3.body.GetComponent("AllyClick").curcamera.enabled = false;
 	curSlot-=1;
 	if(curSlot==1){
-		slot3.body.GetComponent("AllyClick").curcamera.enabled = true;
+		slot1.body.GetComponent("AllyClick").curcamera.enabled = true;
 		curUnit = slot3;
 	}
 	if(curSlot==2){
@@ -80,12 +86,17 @@ function updateIcons(){
 	if(curUnit.accuracyBoost){
 		AccuracyIcon.SetActive(true);
 	}
+	//healthbar
+	var health = curUnit.health + 0.0f;
+	var maxhealth = curUnit.maxhealth + 0.0f;
+	var percentage= health/maxhealth;
+	var newlength = 1 * percentage;
+	healthbar.transform.localScale = Vector3(newlength,1,1);
 }
 
 function givePotion(){
 	var potion = selectedPotion.GetComponent("Dropdown").options[selectedPotion.GetComponent("Dropdown").value].text;
 	var curUnit=currentUnit();
-
 	
 
 	if(potion =="Attack Boost"){
@@ -173,6 +184,20 @@ function givePotion(){
 			main.GetComponent("Main").makeBigMessage("This unit has already used this potion in this battle");
 		}
 	}
+	if(potion =="Recover Potion"){
+		if(curUnit.health<curUnit.maxhealth){
+			if(main.GetComponent("Main").items["Recover Potion"]==0){
+				main.GetComponent("Main").makeBigMessage("You don't have any of those potions");
+				return;
+			}
+			main.GetComponent("Main").items["Recover Potion"]-=1;
+			curUnit.health= curUnit.maxhealth;
+			updateIcons();
+		}else{
+			main.GetComponent("Main").makeBigMessage("This unit is already fully healed");
+		}
+	}
+	updateQuanity();
 }
 
 function currentUnit(){
@@ -190,26 +215,43 @@ function currentUnit(){
 function updateQuanity(){
 	var potion = selectedPotion.GetComponent("Dropdown").options[selectedPotion.GetComponent("Dropdown").value].text;
 	var curquantity;
+	var curDes="description";
 	if(potion == "Attack Boost"){
 		curquantity = main.GetComponent("Main").items["Attack Potion"]; 
+		curDes = "Increases the unit's attack by 30% for the rest of the battle. Once potion per battle.";
 	}
 	if(potion == "Defense Boost"){
 		curquantity = main.GetComponent("Main").items["Defense Potion"]; 
+		curDes = "Increases the unit's defense by 30% for the rest of the battle. Once potion per battle.";
 	}
 	if(potion == "Resistance Boost"){
 		curquantity = main.GetComponent("Main").items["Resistance Potion"]; 
+		curDes = "Increases the unit's resistance by 30% for the rest of the battle. Once potion per battle.";
 	}
 	if(potion == "Health Boost"){
 		curquantity = main.GetComponent("Main").items["Health Potion"]; 
+		curDes = "Increases the unit's max health by 30% for the rest of the battle. Once potion per battle.";
 	}
 	if(potion == "Evasion Boost"){
 		curquantity = main.GetComponent("Main").items["Evasion Potion"]; 
+		curDes = "Increases the unit's evasion by 1 for the rest of the battle. Once potion per battle.";
 	}
 	if(potion == "Accuracy Boost"){
 		curquantity = main.GetComponent("Main").items["Accuracy Potion"]; 
+		curDes = "Increases the unit's accuracy by 1 for the rest of the battle. Once potion per battle.";
 	}
 	if(potion == "Recover Potion"){
 		curquantity = main.GetComponent("Main").items["Recover Potion"]; 
+		curDes = "Completely restores the unit's health.'";
 	}
 	quantity.GetComponent("Text").text=curquantity.ToString();
+	description.GetComponent("Text").text=curDes.ToString();
+}
+
+function close(){
+	gameObject.SetActive(false);
+	slot1.body.GetComponent("AllyClick").curcamera.enabled = false;
+	slot2.body.GetComponent("AllyClick").curcamera.enabled = false;
+	slot3.body.GetComponent("AllyClick").curcamera.enabled = false;
+	//main.GetComponent("Main").curCamera.enabled = true;
 }

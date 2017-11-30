@@ -20,6 +20,8 @@ var vigor:AudioClip;
 var spit:AudioClip;
 var summon:AudioClip;
 var brew: AudioClip;
+var water:AudioClip;
+var wallCollapse:AudioClip;
 
 function playSound(name){
 	var audio: AudioSource = GetComponent.<AudioSource>();
@@ -67,8 +69,12 @@ function playSound(name){
 		audio.clip = summon;
 	}else if(name =="brew"){
 		audio.clip = brew;
+	}else if(name =="water"){
+		audio.clip = water;
+	}else if(name =="wallCollapse"){
+		audio.clip = wallCollapse;
 	}
-	
+	Debug.Log(name);
 	audio.Play();
 
 }

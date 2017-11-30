@@ -4,19 +4,30 @@ var option3: GameObject;
 var option4: GameObject;
 var option5: GameObject;
 var option6: GameObject;
+var escape:GameObject;
 var optionIndex:int;
 var main: GameObject;
 var stats: GameObject;
 var elements:GameObject;
+var curAlly;
 
 
 function setMenu(x,y,actions,type,actionsActive,ally){
 	transform.position.x = x+ 50;
 	transform.position.y = y;
 	hideAll();
+	curAlly = ally;
+	escape.SetActive(true);
 
 	option1.GetComponent("Image").enabled=true;
 	option1.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = true;
+
+	option1.GetComponent("MenuButton").allowAction=true;
+	option2.GetComponent("MenuButton").allowAction=true;
+	option3.GetComponent("MenuButton").allowAction=true;
+	option4.GetComponent("MenuButton").allowAction=true;
+	option5.GetComponent("MenuButton").allowAction=true;
+	option6.GetComponent("MenuButton").allowAction=true;
 
 	main.GetComponent("Main").curAction = actions[0];
 	option1.GetComponent("MenuButton").textBox.GetComponent("Text").text=actions[0];
@@ -141,6 +152,8 @@ function hideAll(){
 	option5.GetComponent("MenuButton").count.GetComponent("Text").text="";
 	option6.GetComponent("MenuButton").count.GetComponent("Text").text="";
 
+	escape.SetActive(false);
+
 	elements.SetActive(false);
 }
 
@@ -150,4 +163,25 @@ function isArrow(action){
 	}else{
 		return false;
 	}
+}
+
+function escapeButton(){
+	if(curAlly.didAction){
+		return;
+	}
+	curAlly.enroute=5;
+	Destroy(curAlly.body);
+	var curgroup = curAlly.group;
+	curAlly.group=-1;
+	var slots = main.GetComponent("Main").pass.GetComponent("pass").slots;
+	for (var i =0;i<slots.length;i++){
+			if(slots[i].index==curAlly.index){
+				slots.splice(i,1);
+			}
+		}
+	hideAll();
+	main.GetComponent("Main").makeBigMessage("The unit has escaped back to the Nexus. You can't use it for 5 turns.");
+		if(slots.length==0){
+			 main.GetComponent("combat").loseBattle(curgroup);
+		}
 }
