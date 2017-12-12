@@ -14,62 +14,62 @@ var replicateBox:GameObject;
 
 
 function gotobarracks(){
-barracks.SetActive(true);
-makePotions.SetActive(false);
-potionInfo.SetActive(false);
-statsBox.SetActive(true);
-var addX = 0;
-var addY = 0;
-	gameObjects =  GameObject.FindGameObjectsWithTag ("barrackPic");
+	barracks.SetActive(true);
+	makePotions.SetActive(false);
+	potionInfo.SetActive(false);
+	statsBox.SetActive(true);
+	var addX = 0;
+	var addY = 0;
+		gameObjects =  GameObject.FindGameObjectsWithTag ("barrackPic");
  
-     for(var p = 0 ; p < gameObjects.length ; p ++){
-		Destroy(gameObjects[p]);
-	 }
+		 for(var p = 0 ; p < gameObjects.length ; p ++){
+			Destroy(gameObjects[p]);
+		 }
          
 
-	var units = main.GetComponent("Main").units;
-	for(var i = 0;i<units.length;i++){
-		if(units[i].group==-1){
+		var units = main.GetComponent("Main").units;
+		for(var i = 0;i<units.length;i++){
+			if(units[i].group==-1){
 				
-				unit = Instantiate(Resources.Load("alliesPics/" + units[i].type + "_prefab"));
-				unit.transform.SetParent(listField.transform,false);
-				if(addX>=375){
-					addY+=100;
-					addX=0;
-				}
-				unit.transform.position.x+=addX;
-				unit.transform.position.y-=addY;
-				addX+=75;
-				unit.GetComponent("barrackpic").index = units[i].index;
-				var healthbar = unit.GetComponent("barrackpic").healthbar;
-				var health = units[i].health + 0.0f;
-				var maxhealth = units[i].maxhealth + 0.0f;
-				var percentage= health/maxhealth;
-				var newlength = 1 * percentage;
-				healthbar.transform.localScale = Vector3(newlength,1,0.02);
+					unit = Instantiate(Resources.Load("alliesPics/" + units[i].type + "_prefab"));
+					unit.transform.SetParent(listField.transform,false);
+					if(addX>=375){
+						addY+=100;
+						addX=0;
+					}
+					unit.transform.position.x+=addX;
+					unit.transform.position.y-=addY;
+					addX+=75;
+					unit.GetComponent("barrackpic").index = units[i].index;
+					var healthbar = unit.GetComponent("barrackpic").healthbar;
+					var health = units[i].health + 0.0f;
+					var maxhealth = units[i].maxhealth + 0.0f;
+					var percentage= health/maxhealth;
+					var newlength = 1 * percentage;
+					healthbar.transform.localScale = Vector3(newlength,1,0.02);
 
-				var level = unit.GetComponent("barrackpic").levelText;
-				level.GetComponent("Text").text=units[i].level.ToString();
-				if(units[i].enroute>0 || units[i].healing>0 || units[i].alive==false){
-					var items = main.GetComponent("Main").items;
-					var potionText = unit.GetComponent("barrackpicbutton").potionText;
-					var potionBox =unit.GetComponent("barrackpicbutton").potion;
-					if(units[i].enroute>0 && items["Teleport Potion"]>0){
-						potionBox.SetActive(true);
-						potionText.GetComponent("Text").text="Teleport";
+					var level = unit.GetComponent("barrackpic").levelText;
+					level.GetComponent("Text").text=units[i].level.ToString();
+					if(units[i].enroute>0 || units[i].healing>0 || units[i].alive==false){
+						var items = main.GetComponent("Main").items;
+						var potionText = unit.GetComponent("barrackpicbutton").potionText;
+						var potionBox =unit.GetComponent("barrackpicbutton").potion;
+						if(units[i].enroute>0 && items["Teleport Potion"]>0){
+							potionBox.SetActive(true);
+							potionText.GetComponent("Text").text="Teleport";
+						}
+						if(units[i].healing>0 && items["Recover Potion"]>0){
+							potionBox.SetActive(true);
+							potionText.GetComponent("Text").text="Recover";
+						}
+						if(units[i].alive==false && items["Revive Potion"]>0){
+							potionBox.SetActive(true);
+							potionText.GetComponent("Text").text="Revive";
+						}
+						unit.GetComponent("Image").color = new Color32(150,150,150,100);
 					}
-					if(units[i].healing>0 && items["Recover Potion"]>0){
-						potionBox.SetActive(true);
-						potionText.GetComponent("Text").text="Recover";
-					}
-					if(units[i].alive==false && items["Revive Potion"]>0){
-						potionBox.SetActive(true);
-						potionText.GetComponent("Text").text="Revive";
-					}
-					unit.GetComponent("Image").color = new Color32(150,150,150,100);
-				}
+			}
 		}
-	}
 }
 function Exit(){
 	var objects = GameObject.FindGameObjectsWithTag("barrackPic");
@@ -82,6 +82,9 @@ function Exit(){
 	slot2.GetComponent("slots").isfilled = false;
 	slot3.GetComponent("slots").index = -1;
 	slot3.GetComponent("slots").isfilled = false;
+	Debug.Log(makePotions);
+	makePotions.SetActive(false);
+	barracks.SetActive(true);
 	menu.SetActive(false);
 }
 

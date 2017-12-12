@@ -28,7 +28,7 @@ function makePotions(){
 	potionBox.SetActive(true);
 	potionInfo.SetActive(true);
 	statsBox.SetActive(false);
-	usePotionsBox.SetActive(false);
+	//usePotionsBox.SetActive(false);
 	var items = main.GetComponent("Main").items;
 	flowers.GetComponent("Text").text = items["Flowers"].ToString();
 	mushrooms.GetComponent("Text").text = items["Mushrooms"].ToString();

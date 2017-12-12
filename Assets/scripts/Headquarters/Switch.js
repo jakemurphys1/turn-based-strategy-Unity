@@ -31,6 +31,7 @@ function takeSpace(){
 
 	var oldgroup = unit1.group;
 	var oldHor = unit1.hor;
+	unit1.hor = givehor;
 	unit1.group = giveGroup.index;
 
 	var space = location.GetComponent("locations").allspaces[0][givehor];

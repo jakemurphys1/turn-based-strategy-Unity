@@ -48,6 +48,7 @@ function OnRightClick(){
 	 }
 	 for(i = 0;i<units.length;i++){
 	 	 if(units[i].group == theGroup){
+			groups[units[i].group].location=null;
 		 	 units[i].group = -1;
 			 Destroy(units[i].body);
 			 Destroy(groups[theGroup].circle);

@@ -11,6 +11,7 @@ var groupIndex:int=0;
 var EgroupIndex:int=0;
 var activeIndex:int=0;
 var test: int = 12;
+var isOverMenu:boolean=false;
 var ship: GameObject;
 var inCombat:boolean = false;
 var Terrain:GameObject;
@@ -24,6 +25,7 @@ var curAction: String;
 var statBox:GameObject;
 var statBox2:GameObject;
 var pass: GameObject;
+var other: GameObject;
 var level:int;
 var groupScreen: GameObject;
 var switchNum:int=-1;
@@ -37,67 +39,52 @@ var bigMessage:GameObject;
 var barrackButton:GameObject;
 var healButton:GameObject;
 var gameover: GameObject;
-var ArcherPic: Sprite;
-var ClericPic: Sprite;
-var GuardPic: Sprite;
-var KnightPic: Sprite;
-var MagePic: Sprite;
-var RougePic: Sprite;
-var SoldierPic: Sprite;
-var SorcererPic: Sprite;
-var TemplarPic: Sprite;
-var ThiefPic: Sprite;
-var WizardPic: Sprite;
+var victoryScreen:GameObject;
+var menu:GameObject;
 
 
 
 function Start () {
-
+	createUnit("Templar");
+	createUnit("Cleric");
+	createUnit("Knight");
 	createUnit("Wizard");
 	createUnit("Archer");
-	createUnit("Knight");
+	
 
 	createUnit("Mage");
-	createUnit("Templar");
+	
 	createUnit("Soldier");
-
 	createUnit("Guard");
-	createUnit("Cleric");
-
-
-	units[2].energy=50;
-
-	//createEGroup("Goblin","Goblin","Goblin","Goblin","Goblin",entrance1, 1000);
+	//units[1].actionsActive["Reach"]=true;
 	//tempStart();
 
-	items["Flowers"]=10;
-	items["Mushrooms"]=10;
-	items["Honey"]=10;
-	items["Roots"]=10;
-	items["Powder"]=10;
-	items["Sap"]=10;
-	items["Extract"]=10;
-	items["Berries"]=10;
-	items["Herbs"]=10;
-	items["Essence"]=10;
-	items["Teleport Potion"]=1;
-	items["Revive Potion"]=1;
-	items["Recover Potion"]=1;
-	items["Defense Potion"]=2;
-	items["Resistance Potion"]=2;
-	items["Attack Potion"]=1;
-	items["Health Potion"]=2;
-	items["Accuracy Potion"]=1;
-	items["Evasion Potion"]=2;
+	items["Flowers"]=0;
+	items["Mushrooms"]=0;
+	items["Honey"]=0;
+	items["Roots"]=0;
+	items["Powder"]=0;
+	items["Sap"]=0;
+	items["Extract"]=0;
+	items["Berries"]=0;
+	items["Herbs"]=0;
+	items["Essence"]=0;
+	items["Teleport Potion"]=0;
+	items["Revive Potion"]=0;
+	items["Recover Potion"]=0;
+	items["Defense Potion"]=1;
+	items["Resistance Potion"]=0;
+	items["Attack Potion"]=0;
+	items["Health Potion"]=0;
+	items["Accuracy Potion"]=0;
+	items["Evasion Potion"]=0;
 }
 
 function tempStart(){
 	
 	
-	units[0].actionsActive["Scout"]=true;
-	units[0].actionsActive["BackStab"]=true;
-	units[0].actionsActive["Flying"]=true;
-	units[0].actionsActive["Reach"]=true;
+	units[0].actionsActive["Sleep"]=true;
+	units[0].actionsActive["Ailments"]=true;
 	units[0].actionsActive["Cleanse"]=true;
 	units[0].actionsActive["Double Vigor"]=true;
 
@@ -109,14 +96,15 @@ function tempStart(){
 	units[1].actionsActive["Ailments"]=true;
 	units[1].actionsActive["Start Charge"]=true;
 
-	units[2].actionsActive["Swirl"]=true;
-
+	units[2].actionsActive["Immobolize"]=true;
+	units[2].accuracy=5;
 
 	createEGroup("Goblin","","","","",ship, 1000);
 
 	createGroup(0,1,2);
 	checkBattle(ship);
 	curGrid = ship.GetComponent("locations").allspaces;
+	inCombat=true;
 	activeGroup=0;
 }
 
@@ -151,6 +139,13 @@ function createGroup(slot1:int,slot2:int,slot3:int){
 	units[slot1].body = unit1;
 	GetComponent("combat").setEnergyBar(units[slot1]);
 
+	var healthbar=units[slot1].body.GetComponent("AllyClick").healthbar;
+	var health = units[slot1].health + 0.0f;
+	var maxhealth = units[slot1].maxhealth + 0.0f;
+	var percentage= health/maxhealth;
+	var newlength = 0.15 * percentage;
+	healthbar.transform.localScale = Vector3(newlength,0.2,0.02);
+
 
 	if(slot2!=-1 && units.length>slot2){
 		units[slot2].group = groupIndex;
@@ -162,6 +157,12 @@ function createGroup(slot1:int,slot2:int,slot3:int){
 		units[slot2].hor = 2;
 		units[slot2].body = unit2;
 		GetComponent("combat").setEnergyBar(units[slot2]);
+		healthbar=units[slot2].body.GetComponent("AllyClick").healthbar;
+		health = units[slot2].health + 0.0f;
+		maxhealth = units[slot2].maxhealth + 0.0f;
+		percentage= health/maxhealth;
+		newlength = 0.15 * percentage;
+		healthbar.transform.localScale = Vector3(newlength,0.2,0.02);
 	}
 	if(slot3!=-1 && units.length>slot3){
 		units[slot3].group = groupIndex;
@@ -173,6 +174,12 @@ function createGroup(slot1:int,slot2:int,slot3:int){
 		units[slot3].hor = 3;
 		units[slot3].body=unit3;
 		GetComponent("combat").setEnergyBar(units[slot3]);
+		healthbar=units[slot3].body.GetComponent("AllyClick").healthbar;
+		health = units[slot3].health + 0.0f;
+		maxhealth = units[slot3].maxhealth + 0.0f;
+		percentage= health/maxhealth;
+		newlength = 0.15 * percentage;
+		healthbar.transform.localScale = Vector3(newlength,0.2,0.02);
 	}
 
 	
@@ -269,6 +276,9 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 	}
 
 	yield WaitForSeconds(1);
+	if(inCombat){
+		return;
+	}
 	t = 0.0;
 	while (t < 1.0)
 	{
@@ -338,7 +348,7 @@ class Ally{
    var blind:int=0;
    var silenced:int=0;
    var poison:int=0;
-   var evasion:int=3;
+   var evasion:int=2;
    var energy:int;
    var charge:int=0;
    var index:int;
@@ -365,6 +375,8 @@ class Ally{
    var experience: int = 0;
    var protectedBy:int = -1;
    var height:int=1;
+   var shield1:GameObject;
+   var shield2: GameObject;
 
    var attackBoost: boolean=false;
    var defenseBoost: boolean=false;
@@ -382,7 +394,8 @@ class Ally{
 			   this.attack=40;
 			   this.defense=10;
 			   this.resistance=10;
-			   this.accuracy=3;
+			   this.accuracy=2;
+			   this.evasion=3;
 			   this.actions[0] = "Normal";
 			   this.actions[1] = "Explosion";
 			   this.actions[2] = "Piercing";
@@ -418,7 +431,8 @@ class Ally{
 			   this.attack=30;
 			   this.defense=10;
 			   this.resistance=10;
-			   this.accuracy=3;
+			   this.accuracy=2;
+			   this.evasion=3;
 			   this.actions[0] = "Normal";
 			   this.actions[1] = "Poison";
 			   this.actions[2] = "Blindness";
@@ -458,7 +472,8 @@ class Ally{
 			   this.attack=30;
 			   this.defense=0;
 			   this.resistance=30;
-			   this.accuracy=3;
+			   this.accuracy=2;
+			   this.evasion=3;
 			   this.actions[0] = "Normal";
 			   this.actions[1] = "Silence";
 			   this.actions[2] = "GrapplingHook";
@@ -633,7 +648,7 @@ class Ally{
 			   this.attack=60;
 			   this.defense=0;
 			   this.resistance=30;
-			   this.accuracy=3;
+			   this.accuracy=2;
 			   this.actions[0] = "Charge";
 			   this.actions[1] = "Gust";
 			   this.actions[2] = "Lightning";
@@ -669,7 +684,7 @@ class Ally{
 			   this.attack=40;
 			   this.defense=0;
 			   this.resistance=30;
-			   this.accuracy=3;
+			   this.accuracy=2;
 			   this.actions[0] = "Blizzard";
 			   this.actions[1] = "Bolt";
 			   this.actions[2] = "FireBlast";
@@ -774,10 +789,11 @@ class Enemy{
    var maxhealth:int=30;
    var health:int=30;
    var attack:int=10;
+   var secondaryAttack:int=0;
    var defense:int=5;
    var resistance:int=5;
    var accuracy:int=3;
-   var evasion:int=3;
+   var evasion:int=2;
    var immobolized:int=0;
    var charge:int=-1;
    var maxcharge:int=-1;
@@ -863,6 +879,8 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
+			 this.accuracy=2;
+			 this.evasion=3;
 		};//done
 		if(type=="BrownOoze"){
 			if (level == 1) {
@@ -893,6 +911,7 @@ class Enemy{
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
 			 this.defenseType="resistance";
+			 this.accuracy=2;
 		};//done
 		if(type=="RedOoze"){
 			if (level == 1) {
@@ -924,6 +943,7 @@ class Enemy{
 			 this.elemental["Lightning"]=1;
 			 this.defenseType="resistance";
 			 this.charge=0;
+			 this.accuracy=2;
 		};//done
 		if(type=="BlueOoze"){
 			if (level == 1) {
@@ -956,6 +976,7 @@ class Enemy{
 			 this.defenseType="resistance";
 			 this.charge=0;
 			 this.maxcharge=1;
+			 this.accuracy=2;
 		};//done
 		if(type=="GreenOoze"){
 			if (level == 1) {
@@ -986,6 +1007,7 @@ class Enemy{
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
 			 this.defenseType="resistance";
+			 this.accuracy=2;
 		};//done
 		if(type=="Gremlin"){
 			if (level == 1) {
@@ -1074,6 +1096,7 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=2;
+			 this.evasion=3;
 		};//done
 		if(type=="Vacuum"){
 			if (level == 1) {
@@ -1257,27 +1280,28 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
+			 this.evasion=3;
 		};//done
 		if(type=="Silencer"){
 			if (level == 1) {
-             this.attack = 40;
-             this.health = 50;
-             this.maxhealth = 50;
+             this.attack = 20;
+             this.health = 30;
+             this.maxhealth = 30;
 			 }
 			 if (level == 2) {
-				 this.attack = 50;
-				 this.health = 80; //40
-				 this.maxhealth = 80; //40
+				 this.attack = 30;
+				 this.health = 40; //40
+				 this.maxhealth = 40; //40
 			 }
 			 if (level == 3) {
-				 this.attack = 60;
-				 this.health = 110;
-				 this.maxhealth = 110;
+				 this.attack = 40;
+				 this.health = 50;
+				 this.maxhealth = 50;
 			 }
 			 if (level == 4) {
-				 this.attack = 75;
-				 this.health = 135;
-				 this.maxhealth = 135;
+				 this.attack = 50;
+				 this.health = 70;
+				 this.maxhealth = 70;
 			 }
 			 this.defense = 15;
 			 this.resistance = 50;
@@ -1287,6 +1311,8 @@ class Enemy{
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=2;
 			 this.height=10;
+			 this.accuracy=2;
+			 this.evasion=3;
 		};//done
 		if(type=="Vampire"){
 			if (level == 1) {
@@ -1436,6 +1462,8 @@ class Enemy{
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
 			 this.height=10;
+			 this.accuracy=2;
+			 this.evasion=3;
 		};//done
 		if(type=="Spider"){
 			if (level == 1) {
@@ -1563,21 +1591,25 @@ class Enemy{
 		if(type=="Waterwraith"){
 			if (level == 1) {
              this.attack = 60;
+			 this.secondaryAttack=30;
              this.health = 100;
              this.maxhealth = 100;
 			 }
 			 if (level == 2) {
 				 this.attack = 80;
+				 this.secondaryAttack=40;
 				 this.health = 120;
 				 this.maxhealth = 120;
 			 }
 			 if (level == 3) {
 				 this.attack = 100;
+				 this.secondaryAttack=50;
 				 this.health = 140;
 				 this.maxhealth = 140;
 			 }
 			 if (level == 4) {
 				 this.attack = 125;
+				 this.secondaryAttack=60;
 				 this.health = 175;
 				 this.maxhealth = 175;
 			 }
@@ -1779,6 +1811,8 @@ class Enemy{
 			 this.elemental["Lightning"]=1;
 			 this.charge=0;
 			 this.maxcharge=3;
+			 this.accuracy=2;
+			 this.evasion=3;
 		};
 		if(type=="Djinn"){
 			if (level == 1) {
@@ -1897,6 +1931,8 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
+			 this.accuracy=2;
+			 this.evasion=3;
 		};//,done
 		if(type=="Mage"){
 			if (level == 1) {
@@ -1956,6 +1992,8 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
+			 this.accuracy=2;
+			 this.evasion=3;
 		};
 		if(type=="Wizard"){
 			 if (level == 1) {
@@ -1988,6 +2026,8 @@ class Enemy{
 			 this.defenseType="resistance";
 			 this.charge=0;
 			 this.maxcharge=2;
+			 this.accuracy=2;
+			 this.evasion=3;
 		};
 		if(type=="Guard"){
 			if (level == 1) {
@@ -2028,9 +2068,6 @@ class Enemy{
  function clickGroup(index){
   if(inCombat==false){
 	activeGroup = units[index].group;
-	if(groups[activeGroup].hasMoved){
-		return;
-	}
 
 	for(var j = 0;j<groups.length;j++){
 		if(groups[j].circle){
@@ -2040,20 +2077,6 @@ class Enemy{
 
 	var circle = groups[activeGroup].circle;
 	circle.SetActive(true);
-	//var curslots = new Array();
-	//if(groups[activeGroup].slot1>-1){
-	//	var unit1 = units[groups[activeGroup].slot1];
-	//	circle.GetComponent("CircleScript").slot1.GetComponent("SpriteRenderer").sprite = getPic(unit1);
-	//}
-	//if(groups[activeGroup].slot2>-1){
-	//	var unit2 = units[groups[activeGroup].slot2];
-	//	Debug.Log(unit2.type);
-	//	circle.GetComponent("CircleScript").slot2.GetComponent("SpriteRenderer").sprite = getPic(unit2);
-	//}
-	//if(groups[activeGroup].slot3>-1){
-	//	var unit3 = units[groups[activeGroup].slot3];
-	//	circle.GetComponent("CircleScript").slot3.GetComponent("SpriteRenderer").sprite = getPic(unit3);
-	//}
 
 	var location = groups[activeGroup].location;
 	var moveLocations=location.GetComponent("locations").allyMoves;
@@ -2061,6 +2084,10 @@ class Enemy{
 	var objects = GameObject.FindGameObjectsWithTag("Entry");
 	for(i =0;i<objects.length;i++){
 		objects[i].GetComponent("entry").readyMove=false;;
+	}
+
+	if(groups[activeGroup].hasMoved){
+		return;
 	}
 
 	for(i =0;i<moveLocations.length;i++){
@@ -2072,19 +2099,6 @@ class Enemy{
 
 	
   }
- }
-
- function getPic(ally){
- 	 if(ally.type =="Archer"){
-	 	 return ArcherPic;
-	 }
-	 if(ally.type =="Soldier"){
-	 	 return SoldierPic;
-	 }
-	 if(ally.type =="Mage"){
-	 	 return MagePic;
-	 }
-	 return null;
  }
 
  function moveGroup(slot1:Vector3, slot2:Vector3,slot3:Vector3,locIndex:int,location:GameObject){
@@ -2182,7 +2196,6 @@ class Enemy{
 					 	 for(var j =0;j<Egroups.length;j++){
 						 	 if(groups[i].location == Egroups[j].location){
 								if(inCombat==false){
-									Debug.Log("checkBattle");
 									startBattle(groups[i].location,i,j);
 								}
 							 }
@@ -2191,7 +2204,12 @@ class Enemy{
  }
 
 function startBattle(location,groupNum,EgroupNum){
+	if(groups[groupNum].circle==null){
+		return;
+	}
 	groups[groupNum].circle.SetActive(false);
+	menu.SetActive(true);
+	activeGroup=groupNum;
 	moveGrid.SetActive(false);
 	location.GetComponent("locations").Grid.SetActive(true);
 	inCombat=true;
@@ -2276,9 +2294,10 @@ function startBattle(location,groupNum,EgroupNum){
 		yield;
 	}
 
+	GetComponent("combat").returnUnits(slots);
+
 	//enemy goes first?
 	var starting = Random.Range(1,3);
-	Debug.Log(starting);
 	if(starting==1 && scoutPresent==false){
 		pass.GetComponent("pass").enemyturn();
 	}
@@ -2307,11 +2326,11 @@ function Update(){
 	var d = Input.GetAxis("Mouse ScrollWheel");
 	 if (d < 0f && curCamera.transform.position.y<285)
 	 {
-		 curCamera.transform.position.y+=5;
+		 curCamera.transform.position.y+=15;
 	 }
 	 else if (d > 0f && curCamera.transform.position.y>6)
 	 {
-		 curCamera.transform.position.y-=5;
+		 curCamera.transform.position.y-=15;
 	 }
 }
  
@@ -2330,7 +2349,7 @@ function Update(){
 	instance.transform.SetParent(messageBox.transform, false);
 	instance.transform.position.y-=(30*qmNum);
 	qmNum+=1;
-	yield WaitForSeconds(2);
+	yield WaitForSeconds(4);
 	qmNum-=1;
 	Destroy(instance);
  }
@@ -2348,4 +2367,7 @@ function Update(){
 
  function gameOver(){
  	 gameover.SetActive(true);
+ }
+ function victory(){
+ 	 victoryScreen.SetActive(true);
  }

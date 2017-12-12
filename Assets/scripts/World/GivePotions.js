@@ -24,7 +24,6 @@ function goLeft(){
 	if(curSlot==3){
 		return;
 	}
-	Debug.Log(slot1);
 	slot1.body.GetComponent("AllyClick").curcamera.enabled = false;
 	slot2.body.GetComponent("AllyClick").curcamera.enabled = false;
 	slot3.body.GetComponent("AllyClick").curcamera.enabled = false;
@@ -68,6 +67,7 @@ function updateIcons(){
 	AccuracyIcon.SetActive(false);
 	EvasionIcon.SetActive(false);
 	var curUnit=currentUnit();
+	Debug.Log(curUnit.type);
 	if(curUnit.attackBoost){
 		AttackIcon.SetActive(true);
 	}
@@ -193,6 +193,7 @@ function givePotion(){
 			main.GetComponent("Main").items["Recover Potion"]-=1;
 			curUnit.health= curUnit.maxhealth;
 			updateIcons();
+			main.GetComponent("combat").heal(curUnit, curUnit.maxhealth);
 		}else{
 			main.GetComponent("Main").makeBigMessage("This unit is already fully healed");
 		}

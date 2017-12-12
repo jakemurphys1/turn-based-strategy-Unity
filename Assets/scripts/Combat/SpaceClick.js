@@ -47,7 +47,6 @@ function Update()
 		var selectedUnit = main.GetComponent("Main").selectedUnit;
 		var curIndex = selectedUnit.GetComponent("AllyClick").index;
 		var ally = main.GetComponent("Main").units[curIndex];
-
 		//Soldier
 		if(main.GetComponent("Main").units[curIndex].hasMoved==true){
 			if((main.GetComponent("Main").units[curIndex].actionsActive["Dash"] && main.GetComponent("Main").units[curIndex].didAction==false)){
@@ -61,11 +60,11 @@ function Update()
 		//knight energy
 		if(ally.type=="Knight"){
 			if(!ally.actionsActive["FreeMove"]){
-				if(ally.energy<10){
+				if(ally.energy<30){
 					main.GetComponent("combat").wordPopup(ally,"Low Energy");
 					return;
 				}else{
-					ally.energy-=10;
+					ally.energy-=30;
 					main.GetComponent("combat").setEnergyBar(ally);
 				}
 			}
@@ -91,7 +90,7 @@ function Update()
 		 main.GetComponent("Main").units[curIndex].hor=hor;
 
 		 		 //hide menu
-		 menu.GetComponent("Menu").hideAll();
+		 main.GetComponent("Main").menu.GetComponent("Menu").hideAll();
 
 		var t = 0.0;
 		 while (t < 1.0)

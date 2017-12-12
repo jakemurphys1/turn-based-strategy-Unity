@@ -10,7 +10,6 @@ var Entrances = new Array();
 function Start () {
 	MakeEnemies();
 	if(Entrance1){
-		Debug.Log("check");
 		Entrances.push(Entrance1);
 	}
 	if(Entrance2){

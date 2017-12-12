@@ -15,8 +15,6 @@ function enemyturn(){
 	
 	//reset allies
 	for(var i =0;i<slots.length;i++){
-		slots[i].hasMoved=false;
-		slots[i].didAction=false;
 		if(slots[i].type=="Knight"){
 			if(slots[i].hasMoved==false && slots[i].didAction==false){
 				slots[i].energy+=30;
@@ -26,6 +24,8 @@ function enemyturn(){
 				main.GetComponent("combat").setEnergyBar(slots[i]);
 			}
 		}
+		slots[i].hasMoved=false;
+		slots[i].didAction=false;
 	}
 
 	//reset enemies
@@ -38,7 +38,7 @@ function enemyturn(){
 			if(eslots[p].health<11){
 				pDamage=eslots[p].health-1;
 			}
-			main.GetComponent("combat").damageEnemy(eslots[p],pDamage);
+			main.GetComponent("combat").damageEnemy(eslots[p],pDamage,"None");
 		}
 		if(eslots[p].type == "Werewolf"){
 			heal(eslots[p],10);
@@ -70,18 +70,22 @@ function enemyturn(){
 	for(var k =0;k<eslots.length;k++){
 		if(eslots[k].immobolized>0){
 			eslots[k].immobolized-=1;
+			main.GetComponent("combat").wordPopup(eslots[k],"Immobolized - " + eslots[k].immobolized);
 		}
 		if(eslots[k].sleep>0){
 			eslots[k].sleep-=1;
+			main.GetComponent("combat").wordPopup(eslots[k],"Sleep - " + eslots[k].sleep);
 		}
 		if(eslots[k].enfeebled>0){
 			eslots[k].enfeebled-=1;
 		}
 		if(eslots[k].blind>0){
 			eslots[k].blind-=1;
+			main.GetComponent("combat").wordPopup(eslots[k],"Blind - " + eslots[k].blind);
 		}
 		if(eslots[k].silenced>0){
 			eslots[k].silenced-=1;
+			main.GetComponent("combat").wordPopup(eslots[k],"Silenced - " + eslots[k].silenced);
 		}
 		if(eslots[k].poison>0){
 			eslots[k].poison-=1;
@@ -105,6 +109,11 @@ function enemyturn(){
 			slots[q].silenced-=1;
 		}
 		if(slots[q].poison>0){
+			pDamage = 10;
+			if(slots[q].health<11){
+				pDamage=slots[q].health-1;
+			}
+			main.GetComponent("combat").damageAlly(q,pDamage,null,0);
 			slots[q].poison-=1;
 		}
 	}
@@ -128,7 +137,18 @@ function worldturn(){
 			}
 			main.GetComponent("combat").setEnergyBar(units[i]);
 		}
-		
+		if(units[i].enroute>0){
+			units[i].enroute-=1;
+			if(units[i].enroute==0){
+				main.GetComponent("Main").quickMessage(units[i].type + " has returned to the Nexus.");
+			}
+		}
+		if(units[i].healing>0){
+			units[i].healing-=1;
+			if(units[i].healing==0){
+				main.GetComponent("Main").quickMessage(units[i].type + " has fully healed.");
+			}
+		}
 	}
 
 	//move enemies
@@ -316,7 +336,10 @@ function enemyMove(){
 function enemyAttack(){
 	for(var n =0;n<eslots.length;n++){
 		if(eslots[n].didAction==false){
-			if(eslots[n].sleep>0 || eslots[n].didAction){
+			if(eslots[n].sleep>0){
+				continue;
+			}
+			if(eslots[n].didAction){
 				continue;
 			}
 			if(eslots[n].defenseType=="defense"){
@@ -388,6 +411,7 @@ function enemyAttack(){
 
 
 //Attacks
+var enemyHit;
 function closeAttack(enemy,eslots,slots){
 		var waittime=0;
 		if(enemy.body.GetComponent("EnemyClick").Run>0){
@@ -401,6 +425,7 @@ function closeAttack(enemy,eslots,slots){
 			isSpecial=true;
 		}
 		if(attackThis!=-1){
+			enemyHit = main.GetComponent("combat").hitResult(slots[attackThis].evasion,enemy.accuracy);
 			enemy.hasMoved=true;
 			enemy.didAction=true;
 			yield WaitForSeconds(waittime);
@@ -762,7 +787,7 @@ function WaterwraithAttack(enemy,eslots,slots){
 	
 	enemy.body.GetComponent("EnemyClick").animator.SetInteger("special",0);
 	for(var i = 0;i<slots.length;i++){
-		var damage = enemy.attack-main.GetComponent("combat").getdefense(slots[i],"resistance");
+		var damage = enemy.secondaryAttack-main.GetComponent("combat").getdefense(slots[i],"resistance");
 		main.GetComponent("combat").damageAlly(slots[i].index,damage,enemy,1);
 	}
 }
@@ -1185,6 +1210,9 @@ function shootObject(instance,target){
  }
 
  function doAilment(target,type){
+	if(enemyHit==false){
+		return;
+	}
  	 if(type=="Enfeebled"){
 	 	 target.enfeebled+=2;
 	 }

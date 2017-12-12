@@ -123,6 +123,7 @@ function OnPointerExit(){
 }
 
 function makeSwitch(){
+	main.GetComponent("combat").preventDoubleAction();
 	var parent1 = transform.parent;
 	var otherImage = main.GetComponent("Main").switchImage;
 	var parent2 = main.GetComponent("Main").switchImage.transform.parent;

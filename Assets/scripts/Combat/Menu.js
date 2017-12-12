@@ -171,8 +171,18 @@ function escapeButton(){
 	}
 	curAlly.enroute=5;
 	Destroy(curAlly.body);
-	var curgroup = curAlly.group;
+	var curgroup = main.GetComponent("Main").groups[curAlly.group];
+	var index = curAlly.index;
 	curAlly.group=-1;
+	if(curgroup.slot1==index){
+			curgroup.slot1=-1;
+		}
+		if(curgroup.slot2==index){
+			curgroup.slot2=-1;
+		}
+		if(curgroup.slot3==index){
+			curgroup.slot3=-1;
+		}
 	var slots = main.GetComponent("Main").pass.GetComponent("pass").slots;
 	for (var i =0;i<slots.length;i++){
 			if(slots[i].index==curAlly.index){
@@ -184,4 +194,11 @@ function escapeButton(){
 		if(slots.length==0){
 			 main.GetComponent("combat").loseBattle(curgroup);
 		}
+}
+
+function MouseEnter(){
+	main.GetComponent("Main").isOverMenu=true;
+}
+function MouseExit(){
+	main.GetComponent("Main").isOverMenu=false;
 }

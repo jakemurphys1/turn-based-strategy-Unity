@@ -74,7 +74,6 @@ function playSound(name){
 	}else if(name =="wallCollapse"){
 		audio.clip = wallCollapse;
 	}
-	Debug.Log(name);
 	audio.Play();
 
 }
