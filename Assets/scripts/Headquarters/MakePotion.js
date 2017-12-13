@@ -21,6 +21,15 @@ var potionInfo:GameObject;
 var statsBox:GameObject;
 var replicateBox:GameObject;
 var usePotionsBox:GameObject;
+var reviveButton: GameObject;
+var recoverButton: GameObject;
+var replicateButton: GameObject;
+var accuracyButton: GameObject;
+var evasionButton: GameObject;
+var defenseButton: GameObject;
+var resistanceButton: GameObject;
+var attackButton: GameObject;
+var healthButton: GameObject;
 
 
 function makePotions(){
@@ -49,6 +58,107 @@ function makePotions(){
 	attack.GetComponent("Text").text = items["Attack Potion"].ToString();
 	health.GetComponent("Text").text = items["Health Potion"].ToString();
 	main.GetComponent("sounds").playSound("brew");
+
+	var colors;
+	//Revive
+	colors = reviveButton.GetComponent("Button").colors;
+	if( int.Parse(flowers.GetComponent("Text").text)>=4 && int.Parse(extract.GetComponent("Text").text)>=4){
+		colors.normalColor = Color.black;
+		colors.highlightedColor=Color.black;
+	}else{
+		colors.normalColor = Color.grey;
+		colors.highlightedColor=Color.grey;
+	}
+	reviveButton.GetComponent("Button").colors = colors;
+
+	//defense
+	colors = defenseButton.GetComponent("Button").colors;
+	if( int.Parse(roots.GetComponent("Text").text)>=2 && int.Parse(honey.GetComponent("Text").text)>=2){
+		colors.normalColor = Color.black;
+		colors.highlightedColor=Color.black;
+	}else{
+		colors.normalColor = Color.grey;
+		colors.highlightedColor=Color.grey;
+	}
+	defenseButton.GetComponent("Button").colors = colors;
+
+	//resistance
+	colors = resistanceButton.GetComponent("Button").colors;
+	if( int.Parse(herbs.GetComponent("Text").text)>=2 && int.Parse(honey.GetComponent("Text").text)>=2){
+		colors.normalColor = Color.black;
+		colors.highlightedColor=Color.black;
+	}else{
+		colors.normalColor = Color.grey;
+		colors.highlightedColor=Color.grey;
+	}
+	resistanceButton.GetComponent("Button").colors = colors;
+
+	//attack
+	colors = attackButton.GetComponent("Button").colors;
+	if( int.Parse(berries.GetComponent("Text").text)>=2 && int.Parse(mushrooms.GetComponent("Text").text)>=2){
+		colors.normalColor = Color.black;
+		colors.highlightedColor=Color.black;
+	}else{
+		colors.normalColor = Color.grey;
+		colors.highlightedColor=Color.grey;
+	}
+	attackButton.GetComponent("Button").colors = colors;
+
+	//health
+	colors = healthButton.GetComponent("Button").colors;
+	if( int.Parse(sap.GetComponent("Text").text)>=2 && int.Parse(mushrooms.GetComponent("Text").text)>=2){
+		colors.normalColor = Color.black;
+		colors.highlightedColor=Color.black;
+	}else{
+		colors.normalColor = Color.grey;
+		colors.highlightedColor=Color.grey;
+	}
+	healthButton.GetComponent("Button").colors = colors;
+
+	//recover
+	colors = recoverButton.GetComponent("Button").colors;
+	if( int.Parse(berries.GetComponent("Text").text)>=2 && int.Parse(flowers.GetComponent("Text").text)>=2){
+		colors.normalColor = Color.black;
+		colors.highlightedColor=Color.black;
+	}else{
+		colors.normalColor = Color.grey;
+		colors.highlightedColor=Color.grey;
+	}
+	recoverButton.GetComponent("Button").colors = colors;
+
+	//replicate
+	colors = replicateButton.GetComponent("Button").colors;
+	if( int.Parse(essence.GetComponent("Text").text)>=1){
+		colors.normalColor = Color.black;
+		colors.highlightedColor=Color.black;
+	}else{
+		colors.normalColor = Color.grey;
+		colors.highlightedColor=Color.grey;
+	}
+	replicateButton.GetComponent("Button").colors = colors;
+
+	//accuracy
+	colors = accuracyButton.GetComponent("Button").colors;
+	if( int.Parse(sap.GetComponent("Text").text)>=2 && int.Parse(powder.GetComponent("Text").text)>=2){
+		colors.normalColor = Color.black;
+		colors.highlightedColor=Color.black;
+	}else{
+		colors.normalColor = Color.grey;
+		colors.highlightedColor=Color.grey;
+	}
+	accuracyButton.GetComponent("Button").colors = colors;
+
+	//evasion
+	colors = evasionButton.GetComponent("Button").colors;
+	if( int.Parse(roots.GetComponent("Text").text)>=2 && int.Parse(powder.GetComponent("Text").text)>=2){
+		colors.normalColor = Color.black;
+		colors.highlightedColor=Color.black;
+	}else{
+		colors.normalColor = Color.grey;
+		colors.highlightedColor=Color.grey;
+	}
+	evasionButton.GetComponent("Button").colors = colors;
+	
 }
 function replicate(){
 	barracks.SetActive(false);

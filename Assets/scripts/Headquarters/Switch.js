@@ -86,4 +86,10 @@ function takeSpace(){
 			 unit1.body.transform.position = Vector3.Lerp(startPosition,endPosition,t);
 			 yield;
 		 }
+		 if(groups[oldgroup].slot1Object==null && groups[oldgroup].slot2Object==null && groups[oldgroup].slot3Object==null){
+			Debug.Log("remove");
+			Debug.Log(groups[oldgroup].location);
+			groups[oldgroup].location=null;
+			Debug.Log(groups[oldgroup].location);
+		 }
 }

@@ -45,9 +45,9 @@ var menu:GameObject;
 
 
 function Start () {
+	createUnit("Knight");
 	createUnit("Templar");
 	createUnit("Cleric");
-	createUnit("Knight");
 	createUnit("Wizard");
 	createUnit("Archer");
 	
@@ -72,7 +72,7 @@ function Start () {
 	items["Teleport Potion"]=0;
 	items["Revive Potion"]=0;
 	items["Recover Potion"]=0;
-	items["Defense Potion"]=1;
+	items["Defense Potion"]=0;
 	items["Resistance Potion"]=0;
 	items["Attack Potion"]=0;
 	items["Health Potion"]=0;
@@ -96,8 +96,8 @@ function tempStart(){
 	units[1].actionsActive["Ailments"]=true;
 	units[1].actionsActive["Start Charge"]=true;
 
-	units[2].actionsActive["Immobolize"]=true;
-	units[2].accuracy=5;
+	//units[2].actionsActive["Immobolize"]=true;
+	//units[2].accuracy=5;
 
 	createEGroup("Goblin","","","","",ship, 1000);
 

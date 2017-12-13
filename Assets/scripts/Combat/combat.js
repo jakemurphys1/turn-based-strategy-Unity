@@ -251,7 +251,7 @@
 	GetComponent("Main").menu.SetActive(false);
 	if(GetComponent("Main").inCombat==true){
 		 GetComponent("Main").inCombat=false;
-		 GetComponent("Main").groups[group].location = null;
+		 group.location = null;
 		 var eslots = pass.GetComponent("pass").eslots;
 		 var spaces = pass.GetComponent("pass").spaces;
 		for(var i =0;i<eslots.length;i++){
@@ -266,7 +266,7 @@
 		 //zoom camera
 		var t = 0.0;
 		var startPosition = curCamera.transform.position;
-		var endPosition = Vector3(curCamera.transform.position.x,100,curCamera.transform.position.z);
+		var endPosition = Vector3(curCamera.transform.position.x,295,curCamera.transform.position.z);
 		while (t < 1.0)
 		{
 			t += 0.05;
@@ -295,6 +295,7 @@
 		 var group = GetComponent("Main").groups[slots[0].group];
 		 var slotPosition = [group.slot1,group.slot2,group.slot3];
 		for(var i =0;i<slots.length;i++){
+			
 			//level up
 			slots[i].experience+=experience;
 			//move back to original space
