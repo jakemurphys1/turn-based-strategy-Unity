@@ -122,7 +122,11 @@ function OnPointerExit(){
 	isOver=false;
 }
 
+
 function makeSwitch(){
+	if(main.GetComponent("combat").usedAction){
+		return;
+	}
 	main.GetComponent("combat").preventDoubleAction();
 	var parent1 = transform.parent;
 	var otherImage = main.GetComponent("Main").switchImage;
@@ -161,27 +165,27 @@ function makeSwitch(){
 	unit2.hor = tempHor;
 
 	var groups = main.GetComponent("Main").groups;
-	if(unit1.hor==1){
-		groups[unit1.group].slot1Object=unit1.body;
-		groups[unit1.group].slot1=unit1.index;
-	} else if(unit1.hor==2){
-		groups[unit1.group].slot2Object=unit1.body;
-		groups[unit1.group].slot2=unit1.index;
-	}else if(unit1.hor==3){
-		groups[unit1.group].slot3Object=unit1.body;
-		groups[unit1.group].slot3=unit1.index;
-	}
+	//if(unit1.hor==1){
+		//groups[unit1.group].slot1Object=unit1.body;
+		//groups[unit1.group].slot1=unit1.index;
+	//} else if(unit1.hor==2){
+		//groups[unit1.group].slot2Object=unit1.body;
+	//	groups[unit1.group].slot2=unit1.index;
+	//}else if(unit1.hor==3){
+		//groups[unit1.group].slot3Object=unit1.body;
+	//	groups[unit1.group].slot3=unit1.index;
+	//}
 
-	if(unit2.hor==1){
-		groups[unit2.group].slot1Object=unit2.body;
-		groups[unit2.group].slot1=unit2.index;
-	} else if(unit2.hor==2){
-		groups[unit2.group].slot2Object=unit2.body;
-		groups[unit2.group].slot2=unit2.index;
-	}else if(unit2.hor==3){
-		groups[unit2.group].slot3Object=unit2.body;
-		groups[unit2.group].slot3=unit2.index;
-	}
+	//if(unit2.hor==1){
+		//groups[unit2.group].slot1Object=unit2.body;
+	//	groups[unit2.group].slot1=unit2.index;
+	//} else if(unit2.hor==2){
+		//groups[unit2.group].slot2Object=unit2.body;
+	//	groups[unit2.group].slot2=unit2.index;
+	//}else if(unit2.hor==3){
+		//groups[unit2.group].slot3Object=unit2.body;
+	//	groups[unit2.group].slot3=unit2.index;
+	//}
 
 		var startPosition = unit1.body.transform.position;
 		var endPosition = new Vector3(unit2.body.transform.position.x,unit2.body.transform.position.y,unit2.body.transform.position.z);

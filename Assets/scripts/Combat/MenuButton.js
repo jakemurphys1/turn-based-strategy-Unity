@@ -101,4 +101,6 @@ function charge(ally){
 	instance.transform.position.y+=5;
 	yield WaitForSeconds(0.1);	
 	ally.body.GetComponent("AllyClick").animator.SetInteger("Special",0);
+	yield WaitForSeconds(2);
+	Destroy(instance);
 }

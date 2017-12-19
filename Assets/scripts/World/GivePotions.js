@@ -24,17 +24,30 @@ function goLeft(){
 	if(curSlot==3){
 		return;
 	}
-	slot1.body.GetComponent("AllyClick").curcamera.enabled = false;
-	slot2.body.GetComponent("AllyClick").curcamera.enabled = false;
-	slot3.body.GetComponent("AllyClick").curcamera.enabled = false;
 	curSlot+=1;
 	if(curSlot==2){
-		slot2.body.GetComponent("AllyClick").curcamera.enabled = true;
-		curUnit = slot2;
-	}
-	if(curSlot==3){
+		if(slot2){
+			hideCameras();
+			slot2.body.GetComponent("AllyClick").curcamera.enabled = true;
+			curUnit = slot2;
+		}else{
+			curSlot+=1;
+			if(slot3){
+				hideCameras();
+				slot3.body.GetComponent("AllyClick").curcamera.enabled = true;
+				curUnit = slot1;
+			}else{
+				curSlot+=2;
+				return;
+			}
+		}
+	}else if(curSlot==3 && slot3){
+		hideCameras();
 		slot3.body.GetComponent("AllyClick").curcamera.enabled = true;
 		curUnit = slot1;
+	}else{
+		curSlot-=1;
+		return;
 	}
 	updateIcons();
 }
@@ -44,19 +57,44 @@ function goRight(){
 	if(curSlot==1){
 			return;
 		}
-	slot1.body.GetComponent("AllyClick").curcamera.enabled = false;
-	slot2.body.GetComponent("AllyClick").curcamera.enabled = false;
-	slot3.body.GetComponent("AllyClick").curcamera.enabled = false;
 	curSlot-=1;
-	if(curSlot==1){
+	if(curSlot==2){
+		if(slot2){
+			hideCameras();
+			slot2.body.GetComponent("AllyClick").curcamera.enabled = true;
+			curUnit = slot2;
+		}else{
+			curSlot-=1;
+			if(slot1){
+				hideCameras();
+				slot3.body.GetComponent("AllyClick").curcamera.enabled = true;
+				curUnit = slot3;
+			}else{
+				curSlot-=2;
+				return;
+			}
+		}
+	}else if(curSlot==1 && slot1){
+		hideCameras();
 		slot1.body.GetComponent("AllyClick").curcamera.enabled = true;
 		curUnit = slot3;
-	}
-	if(curSlot==2){
-		slot2.body.GetComponent("AllyClick").curcamera.enabled = true;
-		curUnit = slot2;
+	}else{
+		curSlot-=1;
+		return;
 	}
 	updateIcons();
+}
+
+function hideCameras(){
+	if(slot1){
+		slot1.body.GetComponent("AllyClick").curcamera.enabled = false;
+	}
+	if(slot2){
+		slot2.body.GetComponent("AllyClick").curcamera.enabled = false;
+	}
+	if(slot3){
+		slot3.body.GetComponent("AllyClick").curcamera.enabled = false;
+	}
 }
 
 function updateIcons(){
@@ -67,7 +105,6 @@ function updateIcons(){
 	AccuracyIcon.SetActive(false);
 	EvasionIcon.SetActive(false);
 	var curUnit=currentUnit();
-	Debug.Log(curUnit.type);
 	if(curUnit.attackBoost){
 		AttackIcon.SetActive(true);
 	}
@@ -93,11 +130,14 @@ function updateIcons(){
 	var newlength = 1 * percentage;
 	healthbar.transform.localScale = Vector3(newlength,1,1);
 }
+function potionEffect(ally,potion,increase){
+	main.GetComponent("Main").quickMessage("The " + ally.type + "'s " + potion.ToString() + " increases by " + increase);
+	main.GetComponent("sounds").playSound("brew");
+}
 
 function givePotion(){
 	var potion = selectedPotion.GetComponent("Dropdown").options[selectedPotion.GetComponent("Dropdown").value].text;
 	var curUnit=currentUnit();
-	
 
 	if(potion =="Attack Boost"){
 		if(curUnit.attackBoost==false){
@@ -107,8 +147,10 @@ function givePotion(){
 			}
 			main.GetComponent("Main").items["Attack Potion"]-=1;
 			curUnit.attackBoost=true;
+			var increase = (curUnit.attack*0.3);
 			curUnit.attack += (curUnit.attack*0.3);
 			AttackIcon.SetActive(true);
+			potionEffect(curUnit,"Attack",increase);
 		}else{
 			main.GetComponent("Main").makeBigMessage("This unit has already used this potion in this battle");
 		}
@@ -121,8 +163,10 @@ function givePotion(){
 			}
 			main.GetComponent("Main").items["Defense Potion"]-=1;
 			curUnit.defenseBoost=true;
+			increase = (curUnit.defense*0.3);
 			curUnit.defense += (curUnit.defense*0.3);
 			DefenseIcon.SetActive(true);
+			potionEffect(curUnit,"Defense",increase);
 		}else{
 			main.GetComponent("Main").makeBigMessage("This unit has already used this potion in this battle");
 		}
@@ -135,8 +179,10 @@ function givePotion(){
 			}
 			main.GetComponent("Main").items["Resistance Potion"]-=1;
 			curUnit.resistanceBoost=true;
+			increase = (curUnit.resistance*0.3);
 			curUnit.resistance += (curUnit.resistance*0.3);
 			ResistanceIcon.SetActive(true);
+			potionEffect(curUnit,"Resistance",increase);
 		}else{
 			main.GetComponent("Main").makeBigMessage("This unit has already used this potion in this battle");
 		}
@@ -149,9 +195,11 @@ function givePotion(){
 			}
 			main.GetComponent("Main").items["Health Potion"]-=1;
 			curUnit.healthBoost=true;
+			increase = (curUnit.maxhealth*0.3);
 			curUnit.health += (curUnit.maxhealth*0.3);
 			curUnit.maxhealth += (curUnit.maxhealth*0.3);
 			HealthIcon.SetActive(true);
+			potionEffect(curUnit,"Max Health",increase);
 		}else{
 			main.GetComponent("Main").makeBigMessage("This unit has already used this potion in this battle");
 		}
@@ -166,6 +214,7 @@ function givePotion(){
 			curUnit.accuracyBoost=true;
 			curUnit.accuracy += 1;
 			AccuracyIcon.SetActive(true);
+			potionEffect(curUnit,"Accuracy",1);
 		}else{
 			main.GetComponent("Main").makeBigMessage("This unit has already used this potion in this battle");
 		}
@@ -180,6 +229,7 @@ function givePotion(){
 			curUnit.evasionBoost=true;
 			curUnit.evasion += 1;
 			EvasionIcon.SetActive(true);
+			potionEffect(curUnit,"Evasion",1);
 		}else{
 			main.GetComponent("Main").makeBigMessage("This unit has already used this potion in this battle");
 		}

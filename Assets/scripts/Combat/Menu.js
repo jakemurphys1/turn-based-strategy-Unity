@@ -10,6 +10,7 @@ var main: GameObject;
 var stats: GameObject;
 var elements:GameObject;
 var curAlly;
+var confirmPanel:GameObject;
 
 
 function setMenu(x,y,actions,type,actionsActive,ally){
@@ -166,6 +167,7 @@ function isArrow(action){
 }
 
 function escapeButton(){
+	confirmPanel.SetActive(false);
 	if(curAlly.didAction){
 		return;
 	}
@@ -174,26 +176,34 @@ function escapeButton(){
 	var curgroup = main.GetComponent("Main").groups[curAlly.group];
 	var index = curAlly.index;
 	curAlly.group=-1;
-	if(curgroup.slot1==index){
-			curgroup.slot1=-1;
-		}
-		if(curgroup.slot2==index){
-			curgroup.slot2=-1;
-		}
-		if(curgroup.slot3==index){
-			curgroup.slot3=-1;
-		}
+	//if(curgroup.slot1==index){
+	//		curgroup.slot1=-1;
+	//	}
+	//	if(curgroup.slot2==index){
+	//		curgroup.slot2=-1;
+	//	}
+	//	if(curgroup.slot3==index){
+	//		curgroup.slot3=-1;
+	//	}
 	var slots = main.GetComponent("Main").pass.GetComponent("pass").slots;
 	for (var i =0;i<slots.length;i++){
 			if(slots[i].index==curAlly.index){
 				slots.splice(i,1);
 			}
 		}
+	slots = main.GetComponent("Main").pass.GetComponent("pass").slots=slots;
 	hideAll();
 	main.GetComponent("Main").makeBigMessage("The unit has escaped back to the Nexus. You can't use it for 5 turns.");
 		if(slots.length==0){
 			 main.GetComponent("combat").loseBattle(curgroup);
 		}
+}
+
+function hideConfirm(){
+	confirmPanel.SetActive(false);
+}
+function showConfirm(){
+	confirmPanel.SetActive(true);
 }
 
 function MouseEnter(){

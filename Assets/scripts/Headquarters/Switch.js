@@ -37,27 +37,27 @@ function takeSpace(){
 	var space = location.GetComponent("locations").allspaces[0][givehor];
 
 	var groups = main.GetComponent("Main").groups;
-	if(unit1.hor==1){
-		groups[unit1.group].slot1Object=unit1.body;
-		groups[unit1.group].slot1=unit1.index;
-	} else if(unit1.hor==2){
-		groups[unit1.group].slot2Object=unit1.body;
-		groups[unit1.group].slot2=unit1.index;
-	}else if(unit1.hor==3){
-		groups[unit1.group].slot3Object=unit1.body;
-		groups[unit1.group].slot3=unit1.index;
-	}
+	//if(unit1.hor==1){
+		//groups[unit1.group].slot1Object=unit1.body;
+		//groups[unit1.group].slot1=unit1.index;
+	//} else if(unit1.hor==2){
+		//groups[unit1.group].slot2Object=unit1.body;
+		//groups[unit1.group].slot2=unit1.index;
+	//}else if(unit1.hor==3){
+		//groups[unit1.group].slot3Object=unit1.body;
+		//groups[unit1.group].slot3=unit1.index;
+	//}
 
-	if(oldHor==1){
-		groups[oldgroup].slot1Object=null;
-		groups[oldgroup].slot1=-1;
-	} else if(oldHor==2){
-		groups[oldgroup].slot2Object=null;
-		groups[oldgroup].slot2=-1;
-	}else if(oldHor==3){
-		groups[oldgroup].slot3Object=null;
-		groups[oldgroup].slot3=-1;
-	}
+	//if(oldHor==1){
+		//groups[oldgroup].slot1Object=null;
+	//	groups[oldgroup].slot1=-1;
+	//} else if(oldHor==2){
+		//groups[oldgroup].slot2Object=null;
+	//	groups[oldgroup].slot2=-1;
+	//}else if(oldHor==3){
+		//groups[oldgroup].slot3Object=null;
+	//	groups[oldgroup].slot3=-1;
+	//}
 
 	main.GetComponent("Main").switchNum=-1;
 	main.GetComponent("Main").switchImage=null;
@@ -86,10 +86,15 @@ function takeSpace(){
 			 unit1.body.transform.position = Vector3.Lerp(startPosition,endPosition,t);
 			 yield;
 		 }
-		 if(groups[oldgroup].slot1Object==null && groups[oldgroup].slot2Object==null && groups[oldgroup].slot3Object==null){
-			Debug.Log("remove");
-			Debug.Log(groups[oldgroup].location);
+		 var units = main.GetComponent("Main").units;
+
+		 var deleteGroup=true;
+		 for(var i=0;i<units.length;i++){
+			if(units[i].group == oldgroup){
+				deleteGroup=false;
+			}
+		 }
+		 if(deleteGroup){
 			groups[oldgroup].location=null;
-			Debug.Log(groups[oldgroup].location);
 		 }
 }

@@ -199,11 +199,11 @@ function moveEnemies(Egroup, location:GameObject){
 			slot4.y=1;
 			slot5.y=1;
 
-			var curObject1 = Egroup.slot1Object;
-			var curObject2 = Egroup.slot2Object;
-			var curObject3 = Egroup.slot3Object;
-			var curObject4 = Egroup.slot4Object;
-			var curObject5 = Egroup.slot5Object;
+			var curObject1 = giveEnemySlot(0,Egroup.index);
+			var curObject2 = giveEnemySlot(1,Egroup.index);
+			var curObject3 = giveEnemySlot(2,Egroup.index);
+			var curObject4 = giveEnemySlot(3,Egroup.index);
+			var curObject5 = giveEnemySlot(4,Egroup.index);
 			
 			if(curObject1){
 				curObject1.GetComponent("EnemyClick").Run=1;
@@ -302,6 +302,15 @@ function DisablePass(){
 	self.GetComponent("Button").enabled=true;
 }
 
+function giveEnemySlot(number,group){
+	var Eunits = main.GetComponent("Main").Eunits;
+	for(var i =0;i<Eunits.length;i++){
+		if(Eunits[i].group==group && Eunits[i].hor==number){
+			return Eunits[i].body;
+		}
+	}
+	return null;
+ }
 
 function enemyMove(){
 	for(var j =0;j<eslots.length;j++){
@@ -414,6 +423,9 @@ function enemyAttack(){
 var enemyHit;
 function closeAttack(enemy,eslots,slots){
 		var waittime=0;
+		if(!enemy.body){
+			return;
+		}
 		if(enemy.body.GetComponent("EnemyClick").Run>0){
 			waittime=1;
 		}
@@ -530,7 +542,8 @@ function IceAttack(enemy,eslots,slots){
 			 yield;
 		 }
 		 main.GetComponent("sounds").playSound("ice");
-		 main.GetComponent("combat").damageAlly(slots[attackThis].index,10,enemy,0);
+		 var damage = enemy.attack-main.GetComponent("combat").getdefense(slots[attackThis],"resistance");
+		 main.GetComponent("combat").damageAlly(slots[attackThis].index,damage,enemy,0);
 		 item.SetActive(false);
 		 item.transform.position=startPosition;
 
@@ -1038,7 +1051,7 @@ function move(body,x,z){
  function lookAt(enemy,ally){
 	var body = enemy.body;
 	var abody = ally.body;
-
+	Debug.Log(body);
 	enemybody = body.transform.position;
 	allybody= abody.transform.position;
 	var _direction = (allybody - enemybody).normalized;
@@ -1075,7 +1088,7 @@ function isTwoAway(hor,vert,slots){
 	return target;
 }
 function charge(enemy){
-	if(enemy.didAction){
+	if(enemy.didAction || !enemy.body){
 		return;
 	}
 	enemy.didAction=true;
@@ -1110,7 +1123,7 @@ function lowestDefense(options,type){
 		}
 	}else{
 		for(var k = 1;k<options.length;k++){
-			if(options[k].defense<option.resistance){
+			if(options[k].resistance<option.resistance){
 				option= options[k];
 			}
 		}

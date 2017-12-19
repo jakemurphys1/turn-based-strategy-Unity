@@ -22,6 +22,7 @@ var summon:AudioClip;
 var brew: AudioClip;
 var water:AudioClip;
 var wallCollapse:AudioClip;
+var returnEnergy:AudioClip;
 
 function playSound(name){
 	var audio: AudioSource = GetComponent.<AudioSource>();
@@ -73,7 +74,10 @@ function playSound(name){
 		audio.clip = water;
 	}else if(name =="wallCollapse"){
 		audio.clip = wallCollapse;
+	}else if(name =="returnEnergy"){
+		audio.clip = returnEnergy;
 	}
+	
 	audio.Play();
 
 }

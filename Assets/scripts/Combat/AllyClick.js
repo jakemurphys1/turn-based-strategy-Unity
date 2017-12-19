@@ -237,6 +237,7 @@ function switchUnits(){
 
 	var group1 = main.GetComponent("Main").groups[main.GetComponent("Main").units[index].group];
 	var group2 = main.GetComponent("Main").groups[main.GetComponent("Main").activeGroup];
+	var groupScreen = main.GetComponent("Main").groupScreen;
 
 	//see if units are beside each other
 	var location1 = group1.location;
@@ -250,12 +251,14 @@ function switchUnits(){
 	}
 	if(location1==location2){
 		isAdjacent=true;
+		groupScreen.GetComponent("GroupScreen").switchAll.SetActive(false);
+	}else{
+		groupScreen.GetComponent("GroupScreen").switchAll.SetActive(true);
 	}
 	if(isAdjacent==false){
 		return;
 	}
 
-	var groupScreen = main.GetComponent("Main").groupScreen;
 	main.GetComponent("Main").groupScreen.SetActive(true);
 	if(group1==group2){
 		groupScreen.transform.GetChild(2).gameObject.SetActive(false);
@@ -270,14 +273,14 @@ function switchUnits(){
 
 	
 	var curslots = new Array();
-	curslots[0] = group2.slot1;
-	curslots[1]=group2.slot2;
-	curslots[2]=group2.slot3;
+	curslots[0] = giveUnitSlotIndex(1,group2.index);
+	curslots[1]=giveUnitSlotIndex(2,group2.index);
+	curslots[2]=giveUnitSlotIndex(3,group2.index);
 
 	var curslots2 = new Array();
-	curslots2[0] = group1.slot1;
-	curslots2[1]=group1.slot2;
-	curslots2[2]=group1.slot3;
+	curslots2[0] = giveUnitSlotIndex(1,group1.index);
+	curslots2[1]=giveUnitSlotIndex(2,group1.index);
+	curslots2[2]=giveUnitSlotIndex(3,group1.index);
 
 	for(i = 0;i<curslots.length;i++){
 		
@@ -341,3 +344,13 @@ function switchUnits(){
 		
 	}
 }
+
+ function giveUnitSlotIndex(number,group){
+	var units = main.GetComponent("Main").units;
+	for(var i =0;i<units.length;i++){
+		if(units[i].group==group && units[i].hor==number){
+			return units[i].index;
+		}
+	}
+	return -1;
+ }

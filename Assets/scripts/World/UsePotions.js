@@ -10,25 +10,33 @@ function Start(){
 function OnMouseDown(){
 
 	var group = main.GetComponent("Main").groups[groupIndex];
-	if(group.slot1>-1){
-		var slot1 = main.GetComponent("Main").units[group.slot3];
-	}
-	if(group.slot2>-1){
-		var slot2 = main.GetComponent("Main").units[group.slot2];
-	}
-	if(group.slot3>-1){
-		var slot3 = main.GetComponent("Main").units[group.slot1];
+	var units = main.GetComponent("Main").units;
+	for(var i =0;i<units.length;i++){
+		if(units[i].group == groupIndex){
+			if(units[i].hor==1){
+				var slot1 = units[i];
+			}
+			if(units[i].hor==2){
+				var slot2 = units[i];
+			}
+			if(units[i].hor==3){
+				var slot3 = units[i];
+			}
+		}
 	}
 
 	if(slot1){
 		slot1.body.GetComponent("AllyClick").curcamera.enabled = true;
-		givePotions.GetComponent("GivePotions").curUnit=slot3;
+		givePotions.GetComponent("GivePotions").curUnit=slot1;
+		givePotions.GetComponent("GivePotions").curSlot=1;
 	}else if(slot2){
 		slot2.body.GetComponent("AllyClick").curcamera.enabled = true;
 		givePotions.GetComponent("GivePotions").curUnit=slot2;
+		givePotions.GetComponent("GivePotions").curSlot=2;
 	}else{
 		slot3.body.GetComponent("AllyClick").curcamera.enabled = true;
-		givePotions.GetComponent("GivePotions").curUnit=slot1;
+		givePotions.GetComponent("GivePotions").curUnit=slot3;
+		givePotions.GetComponent("GivePotions").curSlot=3;
 	}
 	
 	main.GetComponent("Main").givePotions.SetActive(true);
@@ -42,6 +50,16 @@ function OnMouseDown(){
 	if(slot3){
 		givePotions.GetComponent("GivePotions").slot3=slot3;
 	}
-	givePotions.GetComponent("GivePotions").curSlot=1;
+	
 	givePotions.GetComponent("GivePotions").updateIcons();
 }
+
+ function giveUnitSlotIndex(number,group){
+	var units = main.GetComponent("Main").units;
+	for(var i =0;i<units.length;i++){
+		if(units[i].group==group && units[i].hor==number){
+			return units[i].index;
+		}
+	}
+	return -1;
+ }

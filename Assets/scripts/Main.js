@@ -45,18 +45,20 @@ var menu:GameObject;
 
 
 function Start () {
+	createUnit("Guard");
 	createUnit("Knight");
+	createUnit("Soldier");
 	createUnit("Templar");
-	createUnit("Cleric");
-	createUnit("Wizard");
 	createUnit("Archer");
 	
 
+
+	createUnit("Cleric");
+
+	createUnit("Wizard");
 	createUnit("Mage");
-	
-	createUnit("Soldier");
-	createUnit("Guard");
-	//units[1].actionsActive["Reach"]=true;
+
+	//units[1].health=50;
 	//tempStart();
 
 	items["Flowers"]=0;
@@ -65,9 +67,9 @@ function Start () {
 	items["Roots"]=0;
 	items["Powder"]=0;
 	items["Sap"]=0;
-	items["Extract"]=0;
+	items["Extract"]=3;
 	items["Berries"]=0;
-	items["Herbs"]=0;
+	items["Herbs"]=3;
 	items["Essence"]=0;
 	items["Teleport Potion"]=0;
 	items["Revive Potion"]=0;
@@ -82,24 +84,22 @@ function Start () {
 
 function tempStart(){
 	
-	
-	units[0].actionsActive["Sleep"]=true;
+	units[0].actionsActive["Protect"]=true;
 	units[0].actionsActive["Ailments"]=true;
 	units[0].actionsActive["Cleanse"]=true;
 	units[0].actionsActive["Double Vigor"]=true;
 
-	units[1].actionsActive["Explosion"]=true;
-	units[1].actionsActive["Sweep"]=true;
+	units[1].actionsActive["Zap"]=true;
+	//units[1].actionsActive["Flying"]=true;
 	units[1].actionsActive["Swirl"]=true;
 	units[1].actionsActive["Push"]=true;
 	units[1].actionsActive["Drain"]=true;
-	units[1].actionsActive["Ailments"]=true;
 	units[1].actionsActive["Start Charge"]=true;
 
 	//units[2].actionsActive["Immobolize"]=true;
 	//units[2].accuracy=5;
 
-	createEGroup("Goblin","","","","",ship, 1000);
+	createEGroup("","Bat","","","",ship, 1000);
 
 	createGroup(0,1,2);
 	checkBattle(ship);
@@ -122,6 +122,12 @@ function createGroup(slot1:int,slot2:int,slot3:int){
 	if(slot1==-1){
 		return;
 	}
+	for(var i = 0;i<groups.length;i++){
+		if(groups[i].location==ship){
+			makeBigMessage("There is already a group in that location.");
+			return;
+		}
+	}
 
 	groups[groupIndex]= new Group(slot1,slot2,slot3,ship);
 	circle = Instantiate(Resources.Load("GroupCircle", GameObject));
@@ -134,7 +140,7 @@ function createGroup(slot1:int,slot2:int,slot3:int){
 	unit1.transform.position=ship.GetComponent.<locations>().space10.transform.position;
 	unit1.transform.SetParent(Terrain.transform,false);
 	unit1.GetComponent("AllyClick").index=slot1;
-	groups[groupIndex].slot1Object = unit1;
+	//groups[groupIndex].slot1Object = unit1;
 	units[slot1].hor = 1;
 	units[slot1].body = unit1;
 	GetComponent("combat").setEnergyBar(units[slot1]);
@@ -153,7 +159,7 @@ function createGroup(slot1:int,slot2:int,slot3:int){
 		unit2.transform.position=ship.GetComponent.<locations>().space20.transform.position;
 		unit2.transform.SetParent(Terrain.transform,false);
 		unit2.GetComponent("AllyClick").index=slot2;
-		groups[groupIndex].slot2Object = unit2;
+		//groups[groupIndex].slot2Object = unit2;
 		units[slot2].hor = 2;
 		units[slot2].body = unit2;
 		GetComponent("combat").setEnergyBar(units[slot2]);
@@ -170,7 +176,7 @@ function createGroup(slot1:int,slot2:int,slot3:int){
 		unit3.transform.position=ship.GetComponent.<locations>().space30.transform.position;
 		unit3.transform.SetParent(Terrain.transform,false);
 		unit3.GetComponent("AllyClick").index=slot3;
-		groups[groupIndex].slot3Object = unit3;
+		//groups[groupIndex].slot3Object = unit3;
 		units[slot3].hor = 3;
 		units[slot3].body=unit3;
 		GetComponent("combat").setEnergyBar(units[slot3]);
@@ -190,7 +196,7 @@ function createGroup(slot1:int,slot2:int,slot3:int){
 	groupIndex+=1;
 }
 function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:String,location:GameObject,experience:int){
-	Egroups[EgroupIndex]= new EGroup(EindexNum,EindexNum+1,EindexNum+2,EindexNum+3,EindexNum+4,location,experience);
+	Egroups[EgroupIndex]= new EGroup(EindexNum,EindexNum+1,EindexNum+2,EindexNum+3,EindexNum+4,location,experience,EgroupIndex);
 
 	if(slot1){
 		createEUnit(slot1);
@@ -201,7 +207,7 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 	
 		unit1.transform.SetParent(Terrain.transform,false);
 		unit1.GetComponent("EnemyClick").eindex = EindexNum-1;
-		Egroups[EgroupIndex].slot1Object = unit1;
+		//Egroups[EgroupIndex].slot1Object = unit1;
 		Eunits[EindexNum-1].body = unit1;
 		Eunits[EindexNum-1].hor = 0;
 		quickMessage(Eunits[EindexNum-1].type + " has appeared!");
@@ -216,7 +222,7 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			unit2.transform.position.y=1;
 			unit2.transform.SetParent(Terrain.transform,false);
 			unit2.GetComponent("EnemyClick").eindex = EindexNum-1;
-			Egroups[EgroupIndex].slot2Object = unit2;
+			//Egroups[EgroupIndex].slot2Object = unit2;
 			Eunits[EindexNum-1].body = unit2;
 			Eunits[EindexNum-1].hor = 1;
 			quickMessage(Eunits[EindexNum-1].type + " has appeared!");
@@ -229,7 +235,7 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			unit3.transform.position.y=1;
 			unit3.transform.SetParent(Terrain.transform,false);
 			unit3.GetComponent("EnemyClick").eindex = EindexNum-1;
-			Egroups[EgroupIndex].slot3Object = unit3;
+			//Egroups[EgroupIndex].slot3Object = unit3;
 			Eunits[EindexNum-1].body = unit3;
 			Eunits[EindexNum-1].hor = 2;
 			quickMessage(Eunits[EindexNum-1].type + " has appeared!");
@@ -242,7 +248,7 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			unit4.transform.position.y=1;
 			unit4.transform.SetParent(Terrain.transform,false);
 			unit4.GetComponent("EnemyClick").eindex = EindexNum-1;
-			Egroups[EgroupIndex].slot4Object = unit4;
+			//Egroups[EgroupIndex].slot4Object = unit4;
 			Eunits[EindexNum-1].body = unit4;
 			Eunits[EindexNum-1].hor = 3;
 			quickMessage(Eunits[EindexNum-1].type + " has appeared!");
@@ -255,7 +261,7 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			unit5.transform.position.y=1;
 			unit5.transform.SetParent(Terrain.transform,false);
 			unit5.GetComponent("EnemyClick").eindex = EindexNum-1;
-			Egroups[EgroupIndex].slot5Object = unit5;
+			//Egroups[EgroupIndex].slot5Object = unit5;
 			Eunits[EindexNum-1].body = unit5;
 			Eunits[EindexNum-1].hor = 4;
 			quickMessage(Eunits[EindexNum-1].type + " has appeared!");
@@ -292,46 +298,47 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 }
 class Group{
 	var location:GameObject;
-	var slot1: int;
-	var slot2: int;
-	var slot3: int;
-	var slot1Object: GameObject;
-	var slot2Object: GameObject;
-	var slot3Object: GameObject;
+	var slot1: int=-1;
+	var slot2: int=-1;
+	var slot3: int=-1;
+	//var slot1Object: GameObject;
+	//var slot2Object: GameObject;
+	//var slot3Object: GameObject;
 	var circle:GameObject;
 	var hasMoved: boolean=false;
 	var index:int;
 
 	function Group(slot1:int,slot2:int,slot3:int,location:GameObject){
 		this.location=location;
-		this.slot1=slot1;
-		this.slot2=slot2;
-		this.slot3=slot3;
+		//this.slot1=slot1;
+		//this.slot2=slot2;
+		//this.slot3=slot3;
 	}
 }
 class EGroup{
 	var location:GameObject;
-	var slot1: int;
-	var slot2: int;
-	var slot3: int;
-	var slot4: int;
-	var slot5: int;
-	var slot1Object: GameObject;
-	var slot2Object: GameObject;
-	var slot3Object: GameObject;
+	//var slot1: int;
+	//var slot2: int;
+	//var slot3: int;
+	//var slot4: int;
+	//var slot5: int;
+	//var slot1Object: GameObject;
+	//var slot2Object: GameObject;
+	//var slot3Object: GameObject;
 	var slot4Object: GameObject;
 	var slot5Object: GameObject;
 	var experience: int;
+	var index:int;
 
-	function EGroup(slot1:int,slot2:int,slot3:int,slot4:int,slot5:int,location:GameObject,experience:int){
+	function EGroup(slot1:int,slot2:int,slot3:int,slot4:int,slot5:int,location:GameObject,experience:int,EgroupIndex:int){
 		this.location=location;
-		this.slot1=slot1;
-		this.slot2=slot2;
-		this.slot3=slot3;
-		this.slot4=slot4;
-		this.slot5=slot5;
+		//this.slot1=slot1;
+		//this.slot2=slot2;
+		//this.slot3=slot3;
+		//this.slot4=slot4;
+		//this.slot5=slot5;
 		this.experience=experience;
-		
+		this.index=EgroupIndex;
 	}
 }
 class Ally{
@@ -1096,7 +1103,6 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=2;
-			 this.evasion=3;
 		};//done
 		if(type=="Vacuum"){
 			if (level == 1) {
@@ -2068,7 +2074,6 @@ class Enemy{
  function clickGroup(index){
   if(inCombat==false){
 	activeGroup = units[index].group;
-
 	for(var j = 0;j<groups.length;j++){
 		if(groups[j].circle){
 			groups[j].circle.SetActive(false);
@@ -2096,8 +2101,6 @@ class Enemy{
 		}
 		moveLocations[i].GetComponent("locations").entry.GetComponent("entry").readyMove=true;
 	}
-
-	
   }
  }
 
@@ -2112,9 +2115,9 @@ class Enemy{
 			slot2.y=1;
 			slot3.y=1;
 
-			var curObject1 = groups[activeGroup].slot1Object;
-			var curObject2 = groups[activeGroup].slot2Object;
-			var curObject3 = groups[activeGroup].slot3Object;
+			var curObject1 = giveUnitSlot(1,activeGroup);
+			var curObject2 = giveUnitSlot(2,activeGroup);
+			var curObject3 = giveUnitSlot(3,activeGroup);
 			
 			if(curObject1){
 				curObject1.GetComponent("AllyClick").Run=1;
@@ -2191,6 +2194,15 @@ class Enemy{
 					checkBattle(location);
  }
 
+ function giveUnitSlot(number,group){
+	for(var i =0;i<units.length;i++){
+		if(units[i].group==group && units[i].hor==number){
+			return units[i].body;
+		}
+	}
+	return null;
+ }
+
  function checkBattle(location:GameObject){
  					 for(var i =0;i<groups.length;i++){
 					 	 for(var j =0;j<Egroups.length;j++){
@@ -2211,75 +2223,84 @@ function startBattle(location,groupNum,EgroupNum){
 	menu.SetActive(true);
 	activeGroup=groupNum;
 	moveGrid.SetActive(false);
-	location.GetComponent("locations").Grid.SetActive(true);
+	if(location){
+		location.GetComponent("locations").Grid.SetActive(true);
+	}
 	inCombat=true;
 	GetComponent("combat").resetSpaces();
 	//set active slots
 	eslots=[];
 	for(var i =0;i<Eunits.length;i++){
-		if(Eunits[i].group==EgroupNum){
+		if(Eunits[i].group==EgroupNum && Egroups[EgroupNum].location == location && Eunits[i].alive){
 			eslots.push(Eunits[i]);
+			if(Eunits[i].charge>0){
+				Eunits[i].charge=0;
+				Eunits[i].body.GetComponent("EnemyClick").chargeText.GetComponent("Text").text=Eunits[i].charge.ToString();
+			}
 		}
 	}
 	slots=[];
 	var scoutPresent=false;
-	for(var j =0;j<units.length;j++){
-		if(!units[j].body){
-			continue;
-		}
-		units[j].didAction=false;
-		units[j].hasMoved=false;
-		units[j].protectedBy=-1;
-		if(units[j].type=="Thief"){
-			if(units[j].actionsActive["Invisible"]){
-				units[j].invisible=true;
-				units[j].body.GetComponent("Thief").turnInvisible();
-				GetComponent("combat").wordPopup(units[j],"Invisible");
+	for(var p = 1;p<4;p++){
+		for(var j =0;j<units.length;j++){
+			if(!units[j].body){
+				continue;
 			}
-		}
-		if(units[j].type=="Wizard" && units[j].body){
-			units[j].charge=0;
-			if(units[j].actionsActive["Start Charge"]){
-				units[j].charge=2;
+			units[j].didAction=false;
+			units[j].hasMoved=false;
+			units[j].protectedBy=-1;
+			if(units[j].type=="Thief"){
+				if(units[j].actionsActive["Invisible"]){
+					units[j].invisible=true;
+					units[j].body.GetComponent("Thief").turnInvisible();
+					GetComponent("combat").wordPopup(units[j],"Invisible");
+				}
 			}
-			units[j].body.GetComponent("AllyClick").item.GetComponent("Text").text=units[j].charge.ToString();
-		}
-		if(units[j].type=="Knight"){
-			units[j].energy=100;
-			GetComponent("combat").setEnergyBar(units[j]);
-		}
-		if(units[j].type=="Guard"){
-			units[j].energy=25;
-			if(units[j].actionsActive["SuperShield"]){
-				units[j].energy=50;
+			if(units[j].type=="Wizard" && units[j].body){
+				units[j].charge=0;
+				if(units[j].actionsActive["Start Charge"]){
+					units[j].charge=2;
+				}
+				units[j].body.GetComponent("AllyClick").item.GetComponent("Text").text=units[j].charge.ToString();
 			}
-			if(units[j].actionsActive["Scout"]){
-				scoutPresent=true;
+			if(units[j].type=="Knight"){
+				units[j].energy=100;
+				GetComponent("combat").setEnergyBar(units[j]);
 			}
-			GetComponent("combat").setEnergyBar(units[j]);
-		}
-		if(units[j].type=="Templar"){
-			units[j].arrows["Silence"]=units[j].arrowCapacity;
-			units[j].arrows["GrapplingHook"]=units[j].arrowCapacity;
-			units[j].arrows["Disrupt"]=units[j].arrowCapacity;
-			units[j].arrows["Burst"]=units[j].arrowCapacity;
-		}
-		if(units[j].type=="Archer"){
-			units[j].arrows["Explosion"]=units[j].arrowCapacity;
-			units[j].arrows["Piercing"]=units[j].arrowCapacity;
-			units[j].arrows["Immobolize"]=units[j].arrowCapacity;
-			units[j].arrows["Titan"]=units[j].arrowCapacity;
-		}
-		if(units[j].type=="Rouge"){
-			units[j].arrows["Poison"]=units[j].arrowCapacity;
-			units[j].arrows["Blindness"]=units[j].arrowCapacity;
-			units[j].arrows["Sleep"]=units[j].arrowCapacity;
-			units[j].arrows["Enfeeble"]=units[j].arrowCapacity;
-		}
-		if(units[j].group==groupNum){
-			slots.push(units[j]);
+			if(units[j].type=="Guard"){
+				units[j].energy=25;
+				if(units[j].actionsActive["SuperShield"]){
+					units[j].energy=50;
+				}
+				if(units[j].actionsActive["Scout"]){
+					scoutPresent=true;
+				}
+				GetComponent("combat").setEnergyBar(units[j]);
+			}
+			if(units[j].type=="Templar"){
+				units[j].arrows["Silence"]=units[j].arrowCapacity;
+				units[j].arrows["GrapplingHook"]=units[j].arrowCapacity;
+				units[j].arrows["Disrupt"]=units[j].arrowCapacity;
+				units[j].arrows["Burst"]=units[j].arrowCapacity;
+			}
+			if(units[j].type=="Archer"){
+				units[j].arrows["Explosion"]=units[j].arrowCapacity;
+				units[j].arrows["Piercing"]=units[j].arrowCapacity;
+				units[j].arrows["Immobolize"]=units[j].arrowCapacity;
+				units[j].arrows["Titan"]=units[j].arrowCapacity;
+			}
+			if(units[j].type=="Rouge"){
+				units[j].arrows["Poison"]=units[j].arrowCapacity;
+				units[j].arrows["Blindness"]=units[j].arrowCapacity;
+				units[j].arrows["Sleep"]=units[j].arrowCapacity;
+				units[j].arrows["Enfeeble"]=units[j].arrowCapacity;
+			}
+			if(units[j].group==groupNum && units[j].hor==p){
+				slots.push(units[j]);
+			}
 		}
 	}
+	
 	pass.GetComponent("pass").setInfo(slots,eslots,location,Egroups[EgroupNum].experience);
 	curGrid = location.GetComponent("locations").allspaces;
 

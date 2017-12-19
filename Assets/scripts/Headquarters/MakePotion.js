@@ -15,6 +15,9 @@ var defense:GameObject;
 var resistance:GameObject;
 var attack: GameObject;
 var health: GameObject;
+var evasion: GameObject;
+var accuracy: GameObject;
+var teleport: GameObject;
 var barracks: GameObject;
 var potionBox:GameObject;
 var potionInfo:GameObject;
@@ -57,6 +60,9 @@ function makePotions(){
 	resistance.GetComponent("Text").text = items["Resistance Potion"].ToString();
 	attack.GetComponent("Text").text = items["Attack Potion"].ToString();
 	health.GetComponent("Text").text = items["Health Potion"].ToString();
+	evasion.GetComponent("Text").text = items["Evasion Potion"].ToString();
+	accuracy.GetComponent("Text").text = items["Accuracy Potion"].ToString();
+	teleport.GetComponent("Text").text = items["Teleport Potion"].ToString();
 	main.GetComponent("sounds").playSound("brew");
 
 	var colors;
@@ -175,7 +181,7 @@ function replicate(){
 	berries.GetComponent("Text").text = items["Berries"].ToString();
 	herbs.GetComponent("Text").text = items["Herbs"].ToString();
 	essence.GetComponent("Text").text = items["Essence"].ToString();
-	Debug.Log("got ehre");
+
 	revive.GetComponent("Text").text = items["Revive Potion"].ToString();
 	recover.GetComponent("Text").text = items["Recover Potion"].ToString();
 	defense.GetComponent("Text").text = items["Defense Potion"].ToString();

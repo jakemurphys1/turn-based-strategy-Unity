@@ -3,6 +3,7 @@ var main: GameObject;
 
 function OnMouseDown(){
 	menu.SetActive(true);
+
 }
 function Start(){
 	main = GameObject.Find("Main");
@@ -48,11 +49,30 @@ function OnRightClick(){
 	 }
 	 for(i = 0;i<units.length;i++){
 	 	 if(units[i].group == theGroup){
+			energyReturn(units[i]);
 			groups[units[i].group].location=null;
 		 	 units[i].group = -1;
 			 Destroy(units[i].body);
 			 Destroy(groups[theGroup].circle);
+			  
 		 }
+		
 	 }
 
+ }
+
+ function energyReturn(ally){
+			var magic = Resources.Load("effects/energy", GameObject);
+			var instance = Instantiate(magic);
+			instance.transform.position = ally.body.transform.position;
+			var startPosition = instance.transform.position;
+			var endPosition = new Vector3(gameObject.transform.position.x,gameObject.transform.position.y,gameObject.transform.position.z);
+			Debug.Log(endPosition);
+			t = 0.0;
+			 while (t < 1.0)
+			 {
+				 t += 0.01;
+				 instance.transform.position = Vector3.Lerp(startPosition,endPosition,t);
+				 yield;
+			 }
  }

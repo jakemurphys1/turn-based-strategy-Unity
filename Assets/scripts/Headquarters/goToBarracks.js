@@ -18,6 +18,7 @@ function gotobarracks(){
 	makePotions.SetActive(false);
 	potionInfo.SetActive(false);
 	statsBox.SetActive(true);
+	replicateBox.SetActive(false);
 	var addX = 0;
 	var addY = 0;
 		gameObjects =  GameObject.FindGameObjectsWithTag ("barrackPic");
@@ -82,10 +83,12 @@ function Exit(){
 	slot2.GetComponent("slots").isfilled = false;
 	slot3.GetComponent("slots").index = -1;
 	slot3.GetComponent("slots").isfilled = false;
-	Debug.Log(makePotions);
+
+	replicateBox.SetActive(false);
 	makePotions.SetActive(false);
-	barracks.SetActive(true);
+	barracks.SetActive(false);
 	menu.SetActive(false);
+	statsBox.SetActive(false);
 }
 
 function ExitReplicate(){

@@ -11,6 +11,9 @@ function replicate(){
 	var making = makeIngre.options[makeIngre.value].text;
 	var using = useIngre.options[useIngre.value].text;
 	var items = main.GetComponent("Main").items;
+	if(items[using]==0 || items["Essence"]==0){
+		return;
+	}
 
 	items[using]-=1;
 	items["Essence"]-=1;

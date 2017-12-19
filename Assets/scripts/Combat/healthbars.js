@@ -6,6 +6,8 @@ var rotation;
   }
   function Update()
   {
-        transform.rotation = rotation;
+	if(transform){
+		transform.rotation = rotation;
+	}
 		//transform.position = position;
   }
