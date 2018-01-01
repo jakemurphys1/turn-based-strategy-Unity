@@ -22,13 +22,13 @@ function goBottomLeft(){
 	direction="bottomLeft";
 }
 function goBottomRight(){
-	direction="BottomRight";
+	direction="bottomRight";
 }
 function goTopLeft(){
-	direction="TopLeft";
+	direction="topLeft";
 }
 function goTopRight(){
-	direction="TopRight";
+	direction="topRight";
 }
 function stopIt(){
 	direction="";
@@ -38,45 +38,27 @@ function Update(){
 	if(thisCamera.transform.position.y<50){
 		speed=1;
 	}else if(thisCamera.transform.position.y>=50 && thisCamera.transform.position.y<100){
-		speed=2;
+		speed=1;
 	}else if(thisCamera.transform.position.y>=100 && thisCamera.transform.position.y<150){
-		speed=3;
+		speed=2;
 	}else if(thisCamera.transform.position.y>=150 && thisCamera.transform.position.y<200){
-		speed=4;
+		speed=2;
 	}else if(thisCamera.transform.position.y>=200 && thisCamera.transform.position.y<250){
-		speed=5;
+		speed=3;
 	}else if(thisCamera.transform.position.y>=250 && thisCamera.transform.position.y<300){
-		speed=6;
+		speed=3;
 	}
-
-	if(direction=="left" && thisCamera.transform.position.x>maxleft){
+	if((direction=="left" || direction=="bottomLeft" || direction=="topLeft") && thisCamera.transform.position.x>maxleft){
 		thisCamera.transform.position.x -=speed;
-		Debug.Log("left");
 	}
-	if(direction=="right" && thisCamera.transform.position.x<maxright){
+	if((direction=="right" || direction=="bottomRight" || direction=="topRight") && thisCamera.transform.position.x<maxright){
 		thisCamera.transform.position.x +=speed;
 	}
-	if(direction=="top" && thisCamera.transform.position.z<maxtop){
+	if((direction=="top" || direction=="topLeft" || direction=="topRight") && thisCamera.transform.position.z<maxtop){
 		thisCamera.transform.position.z +=speed;
 	}
-	if(direction=="bottom" && thisCamera.transform.position.z>maxbottom){
+	if((direction=="bottom" || direction=="bottomLeft" || direction=="bottomRight") && thisCamera.transform.position.z>maxbottom){
+		
 		thisCamera.transform.position.z -=speed;
-	}
-
-	if(direction=="bottomLeft" && thisCamera.transform.position.x>maxleft && thisCamera.transform.position.z>maxbottom){
-		thisCamera.transform.position.x -=speed;
-		thisCamera.transform.position.z -=speed;
-	}
-	if(direction=="BottomRight" && thisCamera.transform.position.x<maxright && thisCamera.transform.position.z>maxbottom){
-		thisCamera.transform.position.z -=speed;
-		thisCamera.transform.position.x +=speed;
-	}
-	if(direction=="TopLeft" && thisCamera.transform.position.z<maxtop && thisCamera.transform.position.x>maxleft){
-		thisCamera.transform.position.x -=speed;
-		thisCamera.transform.position.z +=speed;
-	}
-	if(direction=="TopRight" && thisCamera.transform.position.z<maxtop && thisCamera.transform.position.x<maxright){
-		thisCamera.transform.position.x +=speed;
-		thisCamera.transform.position.z +=speed;
 	}
 }

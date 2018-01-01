@@ -32,7 +32,7 @@ var level:int;
 var groupScreen: GameObject;
 var switchNum:int=-1;
 var switchImage:GameObject;
-var items = {};
+var items={};
 var messageBox: GameObject;
 var messages = new Array();
 var givePotions: GameObject;
@@ -45,8 +45,16 @@ var victoryScreen:GameObject;
 var menu:GameObject;
 var options:GameObject;
 var musicText:GameObject;
+var StoreInfo:GameObject;
 
-
+function Awake(){
+	StoreInfo = GameObject.Find("StoreInfo");
+	if(StoreInfo){
+		level = StoreInfo.GetComponent("StoreInfo").level;
+	}else{
+		level=1;
+	}
+}
 
 
 function Start () {
@@ -78,6 +86,10 @@ function Start () {
 	items["Health Potion"]=0;
 	items["Accuracy Potion"]=0;
 	items["Evasion Potion"]=0;
+
+	Cursor.lockState = CursorLockMode.Confined;
+
+
 }
 
 function tempStart(){
@@ -1761,7 +1773,7 @@ class Enemy{
 			 this.maxcharge=2;
 			 this.chargeAfterAttack=true;
 			 this.phasing=true;
-			 this.description="Wraiths phase out every turn, making them imperious to damage. To phase them in, hit them with an elemental attack. Fire attacks will phase them in and still do damage. They can do a physical attack to any unit beside it, or if it has 2 charge, deals magic damage to all units beside it.";
+			 this.description="Wraiths phase out every turn, making them imperious to damage. To phase them in, hit them with an elemental attack. Fire attacks will phase them in and still do damage. They can do a physical attack to any unit beside it, or if it has 2 charge, deals magic damage to any unit two spaces away.";
 			 this.strong="Units with low resistance and ice attacks.";
 			 this.weak="Fire Attacks.";
 		};//done
@@ -2503,10 +2515,8 @@ function Update(){
 }
  
  function increaseItems(item, amount){
-	if(items[item]){
-		items[item]+=amount;
-		quickMessage("Recieved " + amount  + " " + item);
-	}
+			items[item]+=amount;
+			quickMessage("Recieved " + amount  + " " + item);
  }
 
  var qmNum=0;

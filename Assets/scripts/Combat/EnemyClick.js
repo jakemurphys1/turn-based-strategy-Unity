@@ -127,7 +127,6 @@ function moveTo(space){
 		 Run=0;
 		 main.GetComponent("Main").Eunits[eindex].hasMoved=true;
 		 if(main.GetComponent("Main").inCombat==false){
-			//transform.Rotate(new Vector3(0,180,0));
 			transform.eulerAngles = Vector3(0, 180, 0);
 		 }
 }

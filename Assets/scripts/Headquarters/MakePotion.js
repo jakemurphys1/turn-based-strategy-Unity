@@ -43,6 +43,7 @@ function makePotions(){
 	replicateBox.SetActive(false);
 
 	var items = main.GetComponent("Main").items;
+	Debug.Log(items);
 	flowers.GetComponent("Text").text = items["Flowers"].ToString();
 	mushrooms.GetComponent("Text").text = items["Mushrooms"].ToString();
 	honey.GetComponent("Text").text = items["Honey"].ToString();
