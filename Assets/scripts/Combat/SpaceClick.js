@@ -43,7 +43,9 @@ function Update()
 
  function moveActive(){
 	var thisposition = transform.position;
+	
 	if(readyMove==true){
+		main.GetComponent("Special").SpecialFunction("moveUnit");
 		var selectedUnit = main.GetComponent("Main").selectedUnit;
 		var curIndex = selectedUnit.GetComponent("AllyClick").index;
 		var ally = main.GetComponent("Main").units[curIndex];

@@ -19,4 +19,5 @@ function replicate(){
 	items["Essence"]-=1;
 	items[making]+=1;
 	makePotions.GetComponent("MakePotion").replicate();
+	makePotions.GetComponent("MakePotion").updateColors();
 }

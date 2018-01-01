@@ -1,5 +1,6 @@
 ﻿var main: GameObject;
 var eindex:int=0;
+var  groupnum:int;
 var health: GameObject;
 var healthbar:GameObject;
 var Run:float;
@@ -27,6 +28,7 @@ function Start(){
 function OnMouseDown(){
 	
 	var active = main.GetComponent("Main").Eunits[eindex];
+	main.GetComponent("Main").activeEnemy=active;
 	statsBox.SetActive(true);
 	statsBox.GetComponent("stats").updateText(active,active.health,active.maxhealth,active.attack,active.defense,active.resistance,active.accuracy,active.type,active.evasion, active.passiveActions);
 }
@@ -125,7 +127,8 @@ function moveTo(space){
 		 Run=0;
 		 main.GetComponent("Main").Eunits[eindex].hasMoved=true;
 		 if(main.GetComponent("Main").inCombat==false){
-			transform.Rotate(new Vector3(0,180,0));
+			//transform.Rotate(new Vector3(0,180,0));
+			transform.eulerAngles = Vector3(0, 180, 0);
 		 }
 }
 

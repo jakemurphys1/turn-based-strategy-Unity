@@ -16,6 +16,7 @@ var message:GameObject;
 var message2:GameObject;
 var showMessage: boolean=false;
 var self:GameObject;
+var details:GameObject;
 
 function Start(){
 	allAbilities=[ability1,ability2,ability3,ability4,ability5];
@@ -73,4 +74,9 @@ function showIt(){
 		message.GetComponent("Text").enabled=true;
 		message2.GetComponent("Text").enabled=true;
 	}
+}
+
+function showdetails(){
+	details.SetActive(true);
+	details.GetComponent("Details").updateInfo();
 }

@@ -40,6 +40,7 @@ function OnMouseDown(){
 	}
 	
 	main.GetComponent("Main").givePotions.SetActive(true);
+	main.GetComponent("Main").givePotions.GetComponent("GivePotions").updateQuanity();
 
 	if(slot1){
 		givePotions.GetComponent("GivePotions").slot1=slot1;

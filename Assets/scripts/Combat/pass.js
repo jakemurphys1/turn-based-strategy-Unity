@@ -12,6 +12,10 @@ function enemyturn(){
 		worldturn();
 		return;
 	}
+	main.GetComponent("Special").SpecialFunction("pass2");
+	if(slots.length==0){
+		main.GetComponent("Main").loseBattle();
+	}
 	
 	//reset allies
 	for(var i =0;i<slots.length;i++){
@@ -123,8 +127,19 @@ function worldturn(){
 	var Egroups = main.GetComponent("Main").Egroups;
 	var units = main.GetComponent("Main").units;
 
+	main.GetComponent("Special").SpecialFunction("pass");
+
 	for(var i = 0;i<groups.length;i++){
 		groups[i].hasMoved=false;
+		var groupempty=true;
+		for(var j = 0;j<units.length;j++){
+			if(units[j].group == i){
+				groupempty=false;
+			}
+		}
+		if(groupempty){
+			groups[i].location =null;
+		}
 	}
 	for(i = 0;i<units.length;i++){
 		if(units[i].type=="Sorcerer"){
@@ -153,17 +168,23 @@ function worldturn(){
 
 	//move enemies
 	for(i = 0;i<Egroups.length;i++){
-		if(!Egroups[i].location){
+		if(!Egroups[i].location || Egroups[i].location==null){
 			continue;
 		}
 		main.GetComponent("Special").groupPass(Egroups[i]);
 		var location = Egroups[i].location;
 		var rand = Random.Range(1,3);
 		
-		var moveLocation = location.GetComponent("locations").enemyMove1;
+		var moveLocation; 
+		if(location.GetComponent("locations").enemyMove1){
+			moveLocation = location.GetComponent("locations").enemyMove1;
+		}else{
+			continue;
+		}
 		if(rand>1 && location.GetComponent("locations").enemyMove2){
 			moveLocation = location.GetComponent("locations").enemyMove2;
 		}
+
 		if(moveLocation){
 			var isFilled = false;
 			for(j = 0;j<Egroups.length;j++){
@@ -423,7 +444,7 @@ function enemyAttack(){
 var enemyHit;
 function closeAttack(enemy,eslots,slots){
 		var waittime=0;
-		if(!enemy.body){
+		if(!enemy.body || enemy.blind>0){
 			return;
 		}
 		if(enemy.body.GetComponent("EnemyClick").Run>0){
@@ -485,7 +506,7 @@ function closeAttack(enemy,eslots,slots){
 				heal(enemy,damage);
 			}
 			move(enemy.body,reverseX,reverseY);
-			counter(enemy,slots[attackThis]);
+				counter(enemy,slots[attackThis]);
 		}
 }
 function arrowAttack(enemy){
@@ -1224,6 +1245,10 @@ function shootObject(instance,target){
 
  function doAilment(target,type){
 	if(enemyHit==false){
+		return;
+	}
+	if(target.actionsActive["Immunity"]){
+		main.GetComponent("combat").wordPopup(target,"Immune");
 		return;
 	}
  	 if(type=="Enfeebled"){

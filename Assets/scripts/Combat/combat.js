@@ -2,6 +2,7 @@
  var victoryScreen: GameObject;
  var menu:GameObject;
  var usedAction:boolean=false;
+ var nulllocation:GameObject;
  
  function damageEnemy(enemy,amount,element){
 	amount=amount*enemy.elemental[element];
@@ -171,21 +172,11 @@
 		GetComponent("Main").units[index].alive=false;
 		body.GetComponent("AllyClick").animator.SetFloat("death",1.0f);
 		yield WaitForSeconds(3);
+		GetComponent("Main").returnMagic(body,GetComponent("Main").nexus);
 		Destroy(body);
 		var curGroup = GetComponent("Main").groups[GetComponent("Main").units[index].group];
 		GetComponent("Main").units[index].group=-1;
-		//if(curGroup.slot1==index){
-		//	curGroup.slot1=-1;
-			//curGroup.slot1Object=null;
-		//}
-		//if(curGroup.slot2==index){
-		//	curGroup.slot2=-1;
-			//curGroup.slot2Object=null;
-		//}
-		//if(curGroup.slot3==index){
-		//	curGroup.slot3=-1;
-			//curGroup.slot3Object=null;
-		//}
+		
 		if(pass.GetComponent("pass").slots.length==0){
 			loseBattle(curGroup);
 		}
@@ -255,7 +246,8 @@
 	GetComponent("Main").menu.SetActive(false);
 	if(GetComponent("Main").inCombat==true){
 		 GetComponent("Main").inCombat=false;
-		 group.location = null;
+		 group.location = nulllocation;
+		 group.alive=false;
 		 var eslots = pass.GetComponent("pass").eslots;
 		 var spaces = pass.GetComponent("pass").spaces;
 		for(var i =0;i<eslots.length;i++){
@@ -289,7 +281,9 @@
 	menu.GetComponent("Menu").hideAll();
 	resetSpaces();
 	DestroyShields();
+	GetComponent("Main").moveGrid.SetActive(true);
 	GetComponent("Main").menu.SetActive(false);
+	GetComponent("Special").SpecialFunction("winBattle");
 	if(GetComponent("Main").inCombat==true){
 		 GetComponent("Main").inCombat=false;
 
@@ -297,15 +291,14 @@
 		 var spaces = pass.GetComponent("pass").spaces;
 		 var experience = pass.GetComponent("pass").experience;
 		 var group;
-		 if(slots[0].group>-1){
+		 if(slots[0] && slots[0].group>-1){
 			group= GetComponent("Main").groups[slots[0].group];
-		 }else if(slots[1].group>-1){
+		 }else if(slots[1] && slots[1].group>-1){
 			group= GetComponent("Main").groups[slots[1].group];
 		 }else{
 			group= GetComponent("Main").groups[slots[2].group];
 		 }
 		 
-		 //var slotPosition = [group.slot1,group.slot2,group.slot3];
 		 var slotPosition=new Array();
 		 for(var j=0;j<slots.length;j++){
 			 if(slots[j]){
@@ -317,6 +310,9 @@
 		 
 
 		for(var i =0;i<slots.length;i++){
+			if(slots[i].alive==false){
+				continue;
+			}
 			if(slotPosition[i]>-1){
 				//level up
 				slots[i].experience+=experience;
@@ -336,8 +332,6 @@
 			}
 		}
 
-		
-
 		 var curCamera = GetComponent("Main").curCamera;
 		 //zoom camera
 		var t = 0.0;
@@ -350,7 +344,6 @@
 			yield;
 		}
 		yield WaitForSeconds(1);
-		GetComponent("Main").moveGrid.SetActive(true);
 		returnUnits(slots);
 		levelup();
 	}	
@@ -369,6 +362,9 @@
 	victoryScreen.SetActive(false);
 	var unit = findlevelup();
 	if(unit!=false){
+		if(unit.level>=6){
+			return;
+		}
 		unit.experience -=1000;
 		unit.level+=1;
 		unit.body.GetComponent("AllyClick").curcamera.enabled=true;
@@ -392,7 +388,7 @@
 	 var replyItem;
 	 for(var i = 0;i<slots.length;i++){
 		slots[i].body.GetComponent("AllyClick").curcamera.enabled=false;
-	 	 if(slots[i].experience>=1000){
+	 	 if(slots[i].experience>=1000 && slots[i].level<6){
 		 	 replyItem = slots[i];
 		 }
 	 }
@@ -527,6 +523,7 @@
 	}
 	var damage:int;
 	if(thisUnit.type == "Archer"){
+		GetComponent("Special").SpecialFunction("archerAttack");
 		shootarrow(thisUnit,curEnemy);
 			var intercept = interceptArrow();
 			if(intercept!=-1){
@@ -1127,6 +1124,7 @@
 				wordPopup(thisUnit,"Not Enough Charge");
 				return;
 			}else{
+				GetComponent("Special").SpecialFunction("Gust");
 				magicAttack(thisUnit,curEnemy);
 				yield WaitForSeconds(0.5);
 				thisUnit.charge-=1;
@@ -1543,15 +1541,15 @@
 		 if((allyAcc+randnum)>=(enemyEv+3)){
 			GetComponent("sounds").playSound("poison");
 			if(type=="Sleep"){
-				enemy.sleep+=2;
+				enemy.sleep=2;
 				wordPopup(enemy,"Sleep");
 			}
 			if(type=="Blind"){
-				enemy.blind+=3;
+				enemy.blind=3;
 				wordPopup(enemy,"Blinded");
 			}
 			if(type=="Immobolized"){
-				enemy.immobolized+=3;
+				enemy.immobolized=3;
 				wordPopup(enemy,"Immobolized");
 			}
 		 }

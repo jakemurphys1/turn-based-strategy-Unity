@@ -93,51 +93,7 @@ function switchGroup(){
 					BottomSlotUnits[i].group=group1.index;
 			}
 		}
-
-		///if(BottomSlotUnits[0]!=null){
-			//group1.slot1Object=BottomSlotUnits[0].body;
-		//	group1.slot1 = BottomSlotUnits[0].index;
-		//}else{
-			//group1.slot1Object=null;
-		//	group1.slot1 = -1;
-		//}
-		//if(BottomSlotUnits[1]!=null){
-			//group1.slot2Object=BottomSlotUnits[1].body;
-		//	group1.slot2 = BottomSlotUnits[1].index;
-		//}else{
-			//group1.slot2Object=null;
-		//	group1.slot2 = -1;
-		//}
-		//if(BottomSlotUnits[2]!=null){
-			//group1.slot3Object=BottomSlotUnits[2].body;
-		//	group1.slot3 = BottomSlotUnits[2].index;
-		//}else{
-			//group1.slot3Object=null;
-		//	group1.slot3 = -1;
-		//}
-
-		//if(TopSlotUnits[0]!=null){
-			//group2.slot1Object=TopSlotUnits[0].body;
-		//	group2.slot1 = TopSlotUnits[0].index;
-		//}else{
-			//group2.slot1Object=null;
-		//	group2.slot1 = -1;
-		////}
-		//if(TopSlotUnits[1]!=null){
-			//group2.slot2Object=TopSlotUnits[1].body;
-		//	group2.slot2 = TopSlotUnits[1].index;
-		//}else{
-			//group2.slot2Object=null;
-		//	group2.slot2 = -1;
-		//}
-		//if(TopSlotUnits[2]!=null){
-			//group2.slot3Object=TopSlotUnits[2].body;
-		//	group2.slot3 = TopSlotUnits[2].index;
-		//}else{
-			//group2.slot3Object=null;
-		//	group2.slot3 = -1;
-		//}
-
+		main.GetComponent("Main").hideCircles();
 		
 		//move bodies
 		for(i=0;i<3;i++){

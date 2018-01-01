@@ -3,7 +3,8 @@ var main: GameObject;
 
 function OnMouseDown(){
 	menu.SetActive(true);
-
+	//tutorial
+	main.GetComponent("Special").SpecialFunction("nexus");
 }
 function Start(){
 	main = GameObject.Find("Main");
@@ -41,6 +42,7 @@ function OnRightClick(){
 	 var units = main.GetComponent("Main").units;
 	 var theGroup=-2;
 	 main.GetComponent("Main").hideEntries();
+	 main.GetComponent("sounds").playSound("returnEnergy");
 
 	 for(var i = 0;i<groups.length;i++){
 	 	 if(groups[i].location == ship){
@@ -67,7 +69,6 @@ function OnRightClick(){
 			instance.transform.position = ally.body.transform.position;
 			var startPosition = instance.transform.position;
 			var endPosition = new Vector3(gameObject.transform.position.x,gameObject.transform.position.y,gameObject.transform.position.z);
-			Debug.Log(endPosition);
 			t = 0.0;
 			 while (t < 1.0)
 			 {

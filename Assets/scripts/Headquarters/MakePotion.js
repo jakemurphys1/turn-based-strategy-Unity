@@ -40,7 +40,8 @@ function makePotions(){
 	potionBox.SetActive(true);
 	potionInfo.SetActive(true);
 	statsBox.SetActive(false);
-	//usePotionsBox.SetActive(false);
+	replicateBox.SetActive(false);
+
 	var items = main.GetComponent("Main").items;
 	flowers.GetComponent("Text").text = items["Flowers"].ToString();
 	mushrooms.GetComponent("Text").text = items["Mushrooms"].ToString();
@@ -65,6 +66,11 @@ function makePotions(){
 	teleport.GetComponent("Text").text = items["Teleport Potion"].ToString();
 	main.GetComponent("sounds").playSound("brew");
 
+	updateColors();
+	
+}
+
+function updateColors(){
 	var colors;
 	//Revive
 	colors = reviveButton.GetComponent("Button").colors;
@@ -164,7 +170,6 @@ function makePotions(){
 		colors.highlightedColor=Color.grey;
 	}
 	evasionButton.GetComponent("Button").colors = colors;
-	
 }
 function replicate(){
 	barracks.SetActive(false);

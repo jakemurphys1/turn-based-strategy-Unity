@@ -77,7 +77,5 @@ function playSound(name){
 	}else if(name =="returnEnergy"){
 		audio.clip = returnEnergy;
 	}
-	
 	audio.Play();
-
 }

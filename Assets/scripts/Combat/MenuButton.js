@@ -39,6 +39,7 @@ function clickit(){
 	}
 	if(clickButton=="Charge"){
 			menu.GetComponent("Menu").hideAll();
+			main.GetComponent("Special").SpecialFunction("charge");
 			ally.charge+=1;
 			ally.body.GetComponent("AllyClick").item.GetComponent("Text").text=ally.charge.ToString();
 			ally.didAction=true;

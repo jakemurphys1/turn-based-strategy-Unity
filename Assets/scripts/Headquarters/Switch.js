@@ -3,6 +3,7 @@ var giveGroup;
 var isOver:boolean=false;
 var location: GameObject;
 var main: GameObject;
+var groupScreen:GameObject;
 
 function Start(){
 	main = GameObject.Find("Main");
@@ -37,27 +38,6 @@ function takeSpace(){
 	var space = location.GetComponent("locations").allspaces[0][givehor];
 
 	var groups = main.GetComponent("Main").groups;
-	//if(unit1.hor==1){
-		//groups[unit1.group].slot1Object=unit1.body;
-		//groups[unit1.group].slot1=unit1.index;
-	//} else if(unit1.hor==2){
-		//groups[unit1.group].slot2Object=unit1.body;
-		//groups[unit1.group].slot2=unit1.index;
-	//}else if(unit1.hor==3){
-		//groups[unit1.group].slot3Object=unit1.body;
-		//groups[unit1.group].slot3=unit1.index;
-	//}
-
-	//if(oldHor==1){
-		//groups[oldgroup].slot1Object=null;
-	//	groups[oldgroup].slot1=-1;
-	//} else if(oldHor==2){
-		//groups[oldgroup].slot2Object=null;
-	//	groups[oldgroup].slot2=-1;
-	//}else if(oldHor==3){
-		//groups[oldgroup].slot3Object=null;
-	//	groups[oldgroup].slot3=-1;
-	//}
 
 	main.GetComponent("Main").switchNum=-1;
 	main.GetComponent("Main").switchImage=null;
@@ -96,5 +76,10 @@ function takeSpace(){
 		 }
 		 if(deleteGroup){
 			groups[oldgroup].location=null;
+			groups[oldgroup].alive=false;
+			main.GetComponent("Main").hideCircles();
+			groupScreen.SetActive(false);
+			main.GetComponent("Special").SpecialFunction("combine");
+			main.GetComponent("Main").hideEntries();
 		 }
 }

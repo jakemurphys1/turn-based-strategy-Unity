@@ -45,6 +45,7 @@ function OnMouseDown(){
 		}
 
 		main.GetComponent("Main").activeIndex = index;
+		main.GetComponent("Main").activeEnemy = thisAlly;
 		main.GetComponent("Main").selectedUnit = itself;
 		var curGrid = main.GetComponent("Main").curGrid;
 		var activeGroup = main.GetComponent("Main").activeGroup;
@@ -93,6 +94,7 @@ function OnMouseDown(){
 		statsBox.GetComponent("stats").updateText(active,active.health,active.maxhealth,active.attack,active.defense,active.resistance,active.accuracy,active.type,active.evasion, active.passiveActions);
 	}else{
 		main.GetComponent("Main").clickGroup(index);
+		main.GetComponent("Special").SpecialFunction("clickGroup");
 	}	
 }
 function OnRightClick(){

@@ -4,10 +4,16 @@ var Entrance3: GameObject;
 var Entrance4: GameObject;
 var Entrance5: GameObject;
 var Entrance6: GameObject;
+var Potion:GameObject;
+var PotionOn:boolean=true;
+var dodgePotion:GameObject;
+var dodgePotionOn:boolean=true;
 var Entrances = new Array();
+var specialItem:GameObject;
 
 
 function Start () {
+	GetComponent("Main").other.GetComponent("Music").playMusic("mainMusic");
 	MakeEnemies();
 	if(Entrance1){
 		Entrances.push(Entrance1);
@@ -26,6 +32,9 @@ function Start () {
 	}
 	if(Entrance6){
 		Entrances.push(Entrance6);
+	}
+	if(dodgePotionOn){
+		dodgePotion.SetActive(true);
 	}
 }
 
@@ -54,5 +63,11 @@ function isEmpty(location){
 
 function placeEnemies(location, count){
 	GetComponent("special_" + GetComponent("Main").curname).placeEnemies(location,count);
+}
 
+function SpecialFunction(curName){
+	Debug.Log("special-" + curName);
+	//if(GetComponent("special_" + GetComponent("Main").curname).SpecialFunction){
+		GetComponent("special_" + GetComponent("Main").curname).SpecialFunction(curName);
+	//}
 }
