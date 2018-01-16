@@ -46,21 +46,19 @@ var menu:GameObject;
 var options:GameObject;
 var musicText:GameObject;
 var StoreInfo:GameObject;
+var loading:GameObject;
 
 function Awake(){
 	StoreInfo = GameObject.Find("StoreInfo");
 	if(StoreInfo){
 		level = StoreInfo.GetComponent("StoreInfo").level;
 	}else{
-		level=1;
+		//level=1;
 	}
 }
 
 
 function Start () {
-	//units[1].health=50;
-	//tempStart();
-
 	if(GetComponent("Special").PotionOn){
 		GetComponent("Special").Potion.SetActive(true);
 	}else{
@@ -88,28 +86,24 @@ function Start () {
 	items["Evasion Potion"]=0;
 
 	Cursor.lockState = CursorLockMode.Confined;
-
-
 }
 
 function tempStart(){
 	
-	units[0].actionsActive["Blindness"]=true;
-	units[0].actionsActive["Scout"]=true;
-	units[0].actionsActive["Flying"]=true;
+	units[0].actionsActive["Sleep"]=true;
+	units[0].actionsActive["Enfeeble"]=true;
+	units[0].actionsActive["FirstBlow"]=true;
 
-	units[1].actionsActive["Zap"]=true;
+	units[1].actionsActive["FireBlast"]=true;
 	//units[1].actionsActive["Flying"]=true;
-	units[1].actionsActive["Swirl"]=true;
+	//units[1].actionsActive["Immunity"]=true;
 	units[1].actionsActive["Push"]=true;
 	units[1].actionsActive["Drain"]=true;
-	units[1].actionsActive["Start Charge"]=true;
+	units[1].actionsActive[""]=true;
 
-	//units[2].actionsActive["Immobolize"]=true;
-	//units[2].accuracy=5;
+	units[2].actionsActive["Scout"]=true;
 
-	createEGroup("","Goblin","","","",ship, 1000);
-	Eunits[0].attack=1000;
+	createEGroup("","Vacuum","","","",ship, 1000);
 
 	createGroup(0,1,2,ship);
 	yield WaitForSeconds(2);
@@ -225,6 +219,7 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 	if(slot3){
 			createEUnit(slot3);
 			Eunits[EindexNum-1].group = EgroupIndex;
+			Debug.Log(Eunits[EindexNum-1].type);
 			unit3 = Instantiate(Resources.Load("enemy3D/" + Eunits[EindexNum-1].type, GameObject));
 			unit3.transform.position=location.GetComponent.<locations>().space24.transform.position;
 			unit3.transform.position.y=1;
@@ -345,6 +340,8 @@ class Ally{
    var blind:int=0;
    var silenced:int=0;
    var poison:int=0;
+   var ailmentBody= {};
+
    var evasion:int=2;
    var energy:int;
    var charge:int=0;
@@ -374,6 +371,7 @@ class Ally{
    var height:int=1;
    var shield1:GameObject;
    var shield2: GameObject;
+   var damageCount:int = 0;
 
    var attackBoost: boolean=false;
    var defenseBoost: boolean=false;
@@ -836,6 +834,8 @@ class Enemy{
    var blind:int=0;
    var silenced:int=0;
    var poison:int=0;
+   var ailmentBody= {};
+
    var elemental = {};
    var index:int;
    var vert: int;
@@ -1192,7 +1192,7 @@ class Enemy{
 			 this.description="These robots can immediately draw a unit to itself.";
 			 this.strong="Any unit with low defense.";
 			 this.weak="Any close-range fighter with high defense. Also, lightning attacks. Thieves can instantly kill machines if they steal from it.";
-		};
+		};//done
 		if(type=="Magnet"){
 			if (level == 1) {
              this.attack = 30;
@@ -1595,7 +1595,7 @@ class Enemy{
 			 this.description="These creatures can instantly draw an unit to itself and poison it.";
 			 this.strong="Any ranged unit.";
 			 this.weak="Any close-range fighter with high attack.";
-		};
+		};//done
 		if(type=="Flamewraith"){
 			if (level == 1) {
              this.attack = 50;
@@ -2012,6 +2012,57 @@ class Enemy{
 			 this.strong="Fire Attacks.";
 			 this.weak="Ice Attacks";
 		};
+		if(type=="Wisp"){
+			if (level == 1) {
+             this.attack = 40;
+             this.health = 40; //40
+             this.maxhealth = 40; //40
+			 }
+			 if (level == 2) {
+				 this.attack = 60;
+				 this.health = 60;
+				 this.maxhealth = 60;
+			 }
+			 if (level == 3) {
+				 this.attack = 80;
+				 this.health = 80;
+				 this.maxhealth = 80;
+			 }
+			 if (level == 4) {
+				 this.attack = 100;
+				 this.health = 100;
+				 this.maxhealth = 100;
+			 }
+			 this.defense = 0;
+			 this.resistance = 30;
+			 this.attackType="FireAttack";
+			 this.moveType="Random";
+			 this.elemental["Fire"]=2;
+			 this.elemental["Ice"]=0.5;
+			 this.elemental["Lightning"]=1;
+			 this.description="These creatures fly randomly around the area. At a cost of one charge, it can attack any unit with an ice attack.";
+			 this.strong="Any unit with low resistance and magic users.";
+			 this.weak="Long random attackers with physical attacks and fire.";
+		}
+		if(type=="Wolf"){
+		
+		}
+		if(type=="Bear"){
+		
+		}
+		if(type=="Hellhound"){
+		
+		}
+		if(type=="Elk"){
+		
+		}
+		if(type=="Turtle"){
+		
+		}
+		if(type=="Assassin"){
+		
+		}
+
 		if(type=="Soldier"){
 			if (level == 1) {
              this.attack = 50;
@@ -2381,6 +2432,7 @@ function startBattle(location,groupNum,EgroupNum){
 	}else{
 		return;
 	}
+	hideEntries();
 	inCombat=true;
 	GetComponent("combat").resetSpaces();
 	//set active slots
@@ -2552,7 +2604,8 @@ function Update(){
  	 victoryScreen.SetActive(true);
  }
  function gotoMainMenu(){
- 	 Application.LoadLevel(0);
+	loading.SetActive(true);
+ 	 Application.LoadLevel(1);
  }
  function toggleMusic(){
  	 var curmusicText = musicText.GetComponent("Text").text;

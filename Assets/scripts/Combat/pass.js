@@ -407,6 +407,16 @@ function enemyAttack(){
 			if(eslots[n].attackType=="NecromancerAttack"){
 				NecromancerAttack(eslots[n]);
 			}
+			if(eslots[n].attackType=="SpiderAttack"){
+				SpiderAttack(eslots[n]);
+			}
+			if(eslots[n].attackType=="VacuumAttack"){
+				closeAttack(eslots[n],eslots,slots);
+				if(eslots[n].didAction==false){
+					SpiderAttack(eslots[n]);
+				}
+			}
+
 			if(eslots[n].attackType=="FrostwraithAttack"){
 				closeAttack(eslots[n],eslots,slots);
 				if(eslots[n].didAction==false && eslots[n].charge>=eslots[n].maxcharge){
@@ -824,6 +834,110 @@ function WaterwraithAttack(enemy,eslots,slots){
 		var damage = enemy.secondaryAttack-main.GetComponent("combat").getdefense(slots[i],"resistance");
 		main.GetComponent("combat").damageAlly(slots[i].index,damage,enemy,1);
 	}
+}
+
+function SpiderAttack(enemy){
+	var options = new Array();
+	for(var i = 0;i<slots.length;i++){
+		if((slots[i].hor)==enemy.hor){
+			options.push(slots[i]);
+		}
+	}
+	if(options.length==0){
+		return;
+	}
+	enemy.didAction=true;
+	enemy.hasMoved=true;
+
+	var waittime=0;
+	if(enemy.body.GetComponent("EnemyClick").Run>0){
+		waittime=1;
+	}
+	var target = lowestDefense(options,enemy.defenseType);
+
+	yield WaitForSeconds(waittime);
+	lookAt(enemy,target);
+	if(enemy.type=="Spider"){
+		enemy.body.GetComponent("EnemyClick").attack =1;
+	}
+	
+			var newlength;
+			var moveToHor;
+			var moveToVert;
+
+			ropeEffect = Resources.Load("effects/Rope", GameObject);
+			rope = Instantiate(ropeEffect);
+			rope.transform.position = enemy.body.transform.position;
+			if(enemy.type=="Vacuum"){
+				rope.SetActive(false);
+			}
+
+			if(target.hor == enemy.hor){
+				if(target.vert>enemy.vert){
+					//enemy on top
+					newlength= target.body.transform.position.z-enemy.body.transform.position.z;
+					if(main.GetComponent("combat").spaceEmpty(enemy.hor,enemy.vert+1,slots,eslots)){
+						moveToHor=enemy.hor;
+						moveToVert=enemy.vert+1;
+					}
+				}else{
+					newlength= enemy.body.transform.position.z-target.body.transform.position.z;
+					if(main.GetComponent("combat").spaceEmpty(enemy.hor,enemy.vert-1,slots,eslots)){
+						moveToHor=enemy.hor;
+						moveToVert=enemy.vert-1;
+						}
+				}
+			}else{
+				rope.transform.rotation.eulerAngles.y=rope.transform.rotation.eulerAngles.y+90;
+				if(enemy.hor>enemy.hor){
+					//enemy on left
+					newlength= target.body.transform.position.x-enemy.body.transform.position.x;
+					if(main.GetComponent("combat").spaceEmpty(enemy.hor+1,enemy.vert,slots,eslots)){
+						moveToHor=enemy.hor+1;
+						moveToVert=enemy.vert;
+					}
+				}else{
+				newlength= enemy.body.transform.position.x-target.body.transform.position.x;
+					if(main.GetComponent("combat").spaceEmpty(enemy.hor-1,enemy.vert,slots,eslots)){
+						moveToHor=enemy.hor-1;
+						moveToVert=enemy.vert;
+						}
+				}
+			}
+	
+			var ropePos = rope.transform.position;
+			var ropeLength = rope.transform.localScale;
+			var newPosition =Vector3((target.body.transform.position.x+enemy.body.transform.position.x)/2,enemy.body.transform.position.y+5,(target.body.transform.position.z+enemy.body.transform.position.z)/2);
+			var newRopeLength = new Vector3(ropeLength.x,newlength/2,ropeLength.z);
+			var t = 0.0;
+			 while (t < 1.0)
+			 {
+				 t += 0.05;
+				 rope.transform.localScale = Vector3.Lerp(ropeLength,newRopeLength,t);
+				 rope.transform.position = Vector3.Lerp(ropePos,newPosition,t);
+				 yield;
+			 }
+			enemy.didAction=true;
+			main.GetComponent("sounds").playSound("rope");
+			//if(hit){
+				moveInstant(target,moveToHor,moveToVert);
+			//}
+			 t=0.0;
+			 while (t < 1.0)
+			 {
+				 t += 0.05;
+				 rope.transform.localScale = Vector3.Lerp(newRopeLength,ropeLength,t);
+				 rope.transform.position = Vector3.Lerp(newPosition,ropePos,t);
+				 yield;
+			 }
+			 Destroy(rope);
+
+	if(enemy.type=="Spider"){
+		doAilment(target,"Poison");
+	}
+		
+
+	counter(enemy,target);
 }
 
 //moves
@@ -1251,27 +1365,46 @@ function shootObject(instance,target){
 		main.GetComponent("combat").wordPopup(target,"Immune");
 		return;
 	}
+	showAilment(type,target);
  	 if(type=="Enfeebled"){
-	 	 target.enfeebled+=2;
+	 	 target.enfeebled=2;
 	 }
 	 if(type=="Sleep"){
-	 	 target.sleep+=1;
+	 	 target.sleep=1;
+		 target.ailmentBody["Sleep"].transform.position.y+=5;
+		 target.ailmentBody["Sleep"].transform.position.x+=3;
+		 target.ailmentBody["Sleep"].transform.position.z+=2;
 	 }
 	 if(type=="Blind"){
-	 	 target.blind+=2;
+	 	 target.blind=2;
 	 }
 	 if(type=="Silenced"){
-	 	 target.silenced+=2;
+		target.ailmentBody["Silenced"].transform.position.y+=5;
+	 	 target.silenced=2;
 	 }
 	 if(type=="Poison"){
-	 	 target.poison+=3;
+	 	 target.poison=3;
 	 }
 	 if(type=="Immobolized"){
-	 	 target.Immobolized+=2;
+	 	 target.immobolized=2;
+		 target.ailmentBody["Immobolized"].transform.position.y-=5;
 	 }
 	 main.GetComponent("combat").wordPopup(target,type);
 	 main.GetComponent("sounds").playSound("poison");
  }
+
+ function showAilment(type, unit){
+		if(unit.ailmentBody[type]){
+			return;
+		}
+		ailment = Resources.Load("ailments/" + type, GameObject);
+		var instance = Instantiate(ailment);
+		instance.transform.position = unit.body.transform.position;
+		instance.transform.position.y+=5;
+		instance.transform.SetParent(unit.body.transform, true);
+		unit.ailmentBody[type]=instance;
+ }
+
  function heal(enemy,amount){
 	enemy.health+=amount;
 	if(enemy.health>enemy.maxhealth){

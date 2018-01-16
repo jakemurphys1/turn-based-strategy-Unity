@@ -94,12 +94,13 @@
 	}
 
 	//popupText
+	ally.damageCount+=1;
 	var damage = amount.ToString();
 	popupText = Resources.Load("Prefabs/PopupTextParent", GameObject);
 	var instance = Instantiate(popupText);
 	instance.transform.position = ally.body.transform.position;
 	instance.transform.position.y+=11;
-	instance.transform.position.z+=3;
+	instance.transform.position.z+=3 + (ally.damageCount*3);
 	var childtext = instance.transform.GetChild(0);
 	childtext.GetComponent("Text").text=damage;
 
@@ -134,6 +135,8 @@
 	if(enemy){
 		enemy.body.GetComponent("EnemyClick").attack =0;
 	}
+
+	ally.damageCount-=1;
 	Destroy(instance);
  }
 
@@ -242,6 +245,7 @@
 
  function loseBattle(group){
 	menu.GetComponent("Menu").hideAll();
+	GetComponent("Main").hideEntries();
 	resetSpaces();
 	GetComponent("Main").menu.SetActive(false);
 	if(GetComponent("Main").inCombat==true){
@@ -279,6 +283,7 @@
 	curlocation = Egroup.location;
 	Egroup.location = null;
 	menu.GetComponent("Menu").hideAll();
+	GetComponent("Main").hideEntries();
 	resetSpaces();
 	DestroyShields();
 	GetComponent("Main").moveGrid.SetActive(true);
@@ -422,6 +427,11 @@
 	if(thisUnit.didAction==true){
 		return;
 	}
+	if(thisUnit.sleep>0){
+		wordPopup(thisUnit,"Sleeping");
+		return;
+	}
+
 	if(thisUnit.type=="Guard"){
 		if(curAction=="Protect"){
 			if(curAlly.protectedBy!=-1){
@@ -521,6 +531,11 @@
 	if(thisUnit.didAction==true){
 		return;
 	}
+	if(thisUnit.sleep>0){
+		wordPopup(thisUnit,"Sleeping");
+		return;
+	}
+
 	var damage:int;
 	if(thisUnit.type == "Archer"){
 		GetComponent("Special").SpecialFunction("archerAttack");
@@ -574,6 +589,7 @@
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
 			if(hit){
 				curEnemy.immobolized=2;
+				showAilment("Immobolized", thisUnit);
 				GetComponent("sounds").playSound("poison");
 				wordPopup(curEnemy,"Immobolized");
 			}
@@ -615,6 +631,7 @@
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
 			if(hit){
 				curEnemy.poison=4;
+				showAilment("Poison", curEnemy);
 				GetComponent("sounds").playSound("poison");
 				wordPopup(curEnemy,"Poisoned");
 			}
@@ -625,6 +642,7 @@
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
 			if(hit){
 				curEnemy.blind=3;
+				showAilment("Blind", curEnemy);
 				GetComponent("sounds").playSound("poison");
 				wordPopup(curEnemy,"Blinded");
 			}
@@ -636,6 +654,7 @@
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
 			if(hit){
 				curEnemy.sleep=2;
+				showAilment("Sleep", curEnemy);
 				GetComponent("sounds").playSound("poison");
 				wordPopup(curEnemy,"Sleep");
 			}
@@ -646,6 +665,7 @@
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
 			if(hit){
 				curEnemy.enfeebled=3;
+				showAilment("Enfeebled", curEnemy);
 				GetComponent("sounds").playSound("poison");
 				wordPopup(curEnemy,"Enfeebled");
 			}
@@ -688,6 +708,7 @@
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
 			if(hit){
 				curEnemy.silenced=2;
+				showAilment("Silenced", curEnemy);
 				wordPopup(curEnemy,"Silenced");
 				GetComponent("sounds").playSound("poison");
 				showElementalArrow(curEnemy,curElement);
@@ -964,26 +985,28 @@
 	}
 	if(thisUnit.type == "Thief"){
 		if(curAction=="Attack" && isAdjacent(curEnemy,thisUnit)){
+			
+			steal(thisUnit,curEnemy);
+			if(thisUnit.actionsActive["FirstBlow"]){
+				if(curEnemy.health==curEnemy.maxhealth && hit){
+					curEnemy.blind=2;
+					showAilment("Blind", curEnemy);
+					wordPopup(curEnemy,"Blinded");
+				}
+			}
+			swordattack(thisUnit,curEnemy);
 			thisUnit.invisible=false;
 			if(thisUnit.actionsActive["Invisible"]){
 				thisUnit.body.GetComponent("Thief").turnVisible();
 				GetComponent("combat").wordPopup(thisUnit,"Visible");
 			}
-			steal(thisUnit,curEnemy);
-			if(thisUnit.actionsActive["FirstBlow"]){
-				if(curEnemy.health==curEnemy.maxhealth && hit){
-					curEnemy.blind=2;
-					wordPopup(curEnemy,"Blinded");
-				}
-			}
-			swordattack(thisUnit,curEnemy);
-
 		}
 		if(curAction=="Steal" && isAdjacent(curEnemy,thisUnit)){
 			
 		}
 		if(curAction=="Phase" && isAdjacent(curEnemy,thisUnit)){
 			curEnemy.enfeebled=2;
+			showAilment("Enfeebled", curEnemy);
 			thisUnit.didAction=true;
 			GetComponent("sounds").playSound("poison");
 			wordPopup(curEnemy,"Enfeebled");
@@ -1217,6 +1240,8 @@
 				instance = Instantiate(magic);
 				var location = GetComponent("Main").groups[thisUnit.group].location;
 				instance.transform.position = location.transform.position;
+				instance.transform.position.x+=25;
+				instance.transform.position.z+=25;
 
 				yield WaitForSeconds(3);
 				for(i = 0;i<eslots.length;i++){
@@ -1439,7 +1464,8 @@
 		if(ally.actionsActive["BackStab"]){
 			enemyAngle= enemy.body.transform.rotation.eulerAngles.y;
 			allyAngle= ally.body.transform.rotation.eulerAngles.y;
-			if(enemyAngle==allyAngle){
+			if(enemyAngle-allyAngle<30 && enemyAngle-allyAngle>-30){
+				Debug.Log(enemyAngle-allyAngle);
 				wordPopup(enemy,"BackStab");
 				damage+=damage;
 			}
@@ -1542,14 +1568,17 @@
 			GetComponent("sounds").playSound("poison");
 			if(type=="Sleep"){
 				enemy.sleep=2;
+				showAilment("Sleep", enemy);
 				wordPopup(enemy,"Sleep");
 			}
 			if(type=="Blind"){
 				enemy.blind=3;
+				showAilment("Blind", enemy);
 				wordPopup(enemy,"Blinded");
 			}
 			if(type=="Immobolized"){
 				enemy.immobolized=3;
+				showAilment("Immobolized", enemy);
 				wordPopup(enemy,"Immobolized");
 			}
 		 }
@@ -1601,7 +1630,7 @@ function steal(ally,enemy){
 	var healthCheck = Random.Range(1,maxhealth);
 
 	if(healthCheck<health){
-		wordPopup(ally,"Failed To Steal");
+		wordPopup(enemy,"Failed To Steal");
 		return;
 	}
 	enemy.hasItem=false;
@@ -1851,4 +1880,16 @@ function showElementalArrow(enemy,element){
 		 }
 	 }
 	 return false;
+ }
+
+  function showAilment(type, unit){
+		if(unit.ailmentBody[type]){
+			return;
+		}
+		ailment = Resources.Load("ailments/" + type, GameObject);
+		var instance = Instantiate(ailment);
+		instance.transform.position = unit.body.transform.position;
+		instance.transform.position.y+=5;
+		instance.transform.SetParent(unit.body.transform, true);
+		unit.ailmentBody[type]=instance;
  }

@@ -10,6 +10,7 @@ var dodgePotion:GameObject;
 var dodgePotionOn:boolean=true;
 var Entrances = new Array();
 var specialItem:GameObject;
+var description:String;
 
 
 function Start () {

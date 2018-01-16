@@ -18,14 +18,9 @@ var health:GameObject;
 var arrow:GameObject;
 var item:GameObject;
 var body:GameObject;
-
-var immobolized:GameObject;
-var blindness:GameObject;
-var poison:GameObject;
-var enfeebled:GameObject;
-var sleep:GameObject;
-var silenced:GameObject;
 var thisAlly;
+
+var spotlight:GameObject;
 
 function Start(){
 	main = GameObject.Find("Main");
@@ -147,36 +142,23 @@ function FixedUpdate(){
 	animator.SetInteger("hit",hit);
 	animator.SetInteger("attack",attack);
 
-	if(thisAlly.immobolized>0){
-		immobolized.SetActive(true);
-	}else{
-		immobolized.SetActive(false);
+	if(thisAlly.poison<=0 && thisAlly.ailmentBody["Poison"]){
+		Destroy(thisAlly.ailmentBody["Poison"]);
 	}
-	if(thisAlly.blind>0){
-		blindness.SetActive(true);
-	}else{
-		blindness.SetActive(false);
+	if(thisAlly.blind<=0 && thisAlly.ailmentBody["Blind"]){
+		Destroy(thisAlly.ailmentBody["Blind"]);
 	}
-	if(thisAlly.sleep>0){
-		sleep.SetActive(true);
-	}else{
-		sleep.SetActive(false);
+	if(thisAlly.immobolized<=0 && thisAlly.ailmentBody["Immobolized"]){
+		Destroy(thisAlly.ailmentBody["Immobolized"]);
 	}
-
-	if(thisAlly.poison>0){
-		poison.SetActive(true);
-	}else{
-		poison.SetActive(false);
+	if(thisAlly.sleep<=0 && thisAlly.ailmentBody["Sleep"]){
+		Destroy(thisAlly.ailmentBody["Sleep"]);
 	}
-	if(thisAlly.enfeebled>0){
-		enfeebled.SetActive(true);
-	}else{
-		enfeebled.SetActive(false);
+	if(thisAlly.enfeebled<=0 && thisAlly.ailmentBody["Enfeebled"]){
+		Destroy(thisAlly.ailmentBody["Enfeebled"]);
 	}
-	if(thisAlly.silenced>0){
-		silenced.SetActive(true);
-	}else{
-		silenced.SetActive(false);
+	if(thisAlly.silenced<=0 && thisAlly.ailmentBody["Silenced"]){
+		Destroy(thisAlly.ailmentBody["Silenced"]);
 	}
 }
 
@@ -356,3 +338,21 @@ function switchUnits(){
 	}
 	return -1;
  }
+
+ function OnMouseOver(){
+	if(spotlight==null && main.GetComponent("Main").inCombat){
+		magic = Resources.Load("prefabs/Spotlight-a", GameObject);
+		instance = Instantiate(magic);
+		spotlight=instance;
+		ally = main.GetComponent("Main").units[index];
+		instance.transform.position = ally.body.transform.position;
+		instance.transform.position.y+=10;
+		instance.transform.SetParent(ally.body.transform,true);
+	}
+}
+
+function OnMouseExit(){
+	if(spotlight){
+		Destroy(spotlight);
+	}
+}

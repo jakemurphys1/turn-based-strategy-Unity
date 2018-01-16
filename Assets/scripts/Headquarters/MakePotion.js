@@ -68,7 +68,6 @@ function makePotions(){
 	main.GetComponent("sounds").playSound("brew");
 
 	updateColors();
-	
 }
 
 function updateColors(){
@@ -198,4 +197,8 @@ function replicate(){
 }
 function makeIt(curname,ingre1,ingre2,ingre1value,ingre2value){
 
+}
+
+function showMission(){
+	main.GetComponent("Main").makeBigMessage(main.GetComponent("Special").description);
 }

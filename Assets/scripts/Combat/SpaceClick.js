@@ -49,6 +49,12 @@ function Update()
 		var selectedUnit = main.GetComponent("Main").selectedUnit;
 		var curIndex = selectedUnit.GetComponent("AllyClick").index;
 		var ally = main.GetComponent("Main").units[curIndex];
+
+		if(ally.sleep){
+			main.GetComponent("combat").wordPopup(ally,"Sleeping");
+			return;
+		}
+
 		//Soldier
 		if(main.GetComponent("Main").units[curIndex].hasMoved==true){
 			if((main.GetComponent("Main").units[curIndex].actionsActive["Dash"] && main.GetComponent("Main").units[curIndex].didAction==false)){

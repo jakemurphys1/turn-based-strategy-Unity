@@ -75,7 +75,7 @@ function takeSpace(){
 			}
 		 }
 		 if(deleteGroup){
-			groups[oldgroup].location=null;
+			//groups[oldgroup].location=null;
 			groups[oldgroup].alive=false;
 			main.GetComponent("Main").hideEntries();
 			main.GetComponent("Main").hideCircles();

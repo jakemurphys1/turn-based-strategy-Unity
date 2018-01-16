@@ -19,6 +19,8 @@ var enfeebled:GameObject;
 var sleep:GameObject;
 var silenced:GameObject;
 
+var spotlight:GameObject;
+
 function Start(){
 	main = GameObject.Find("Main");
 	statsBox = main.GetComponent("Main").statBox;
@@ -26,7 +28,6 @@ function Start(){
 }
 
 function OnMouseDown(){
-	
 	var active = main.GetComponent("Main").Eunits[eindex];
 	main.GetComponent("Main").activeEnemy=active;
 	statsBox.SetActive(true);
@@ -69,36 +70,23 @@ function OnRightClick(){
 		return;
 	}
 	var thisEnemy=main.GetComponent("Main").Eunits[eindex];
-	if(thisEnemy.immobolized>0){
-		immobolized.SetActive(true);
-	}else{
-		immobolized.SetActive(false);
+	if(thisEnemy.poison<=0 && thisEnemy.ailmentBody["Poison"]){
+		Destroy(thisEnemy.ailmentBody["Poison"]);
 	}
-	if(thisEnemy.blind>0){
-		blindness.SetActive(true);
-	}else{
-		blindness.SetActive(false);
+	if(thisEnemy.blind<=0 && thisEnemy.ailmentBody["Blind"]){
+		Destroy(thisEnemy.ailmentBody["Blind"]);
 	}
-	if(thisEnemy.sleep>0){
-		sleep.SetActive(true);
-	}else{
-		sleep.SetActive(false);
+	if(thisEnemy.immobolized<=0 && thisEnemy.ailmentBody["Immobolized"]){
+		Destroy(thisEnemy.ailmentBody["Immobolized"]);
 	}
-
-	if(thisEnemy.poison>0){
-		poison.SetActive(true);
-	}else{
-		poison.SetActive(false);
+	if(thisEnemy.sleep<=0 && thisEnemy.ailmentBody["Sleep"]){
+		Destroy(thisEnemy.ailmentBody["Sleep"]);
 	}
-	if(thisEnemy.enfeebled>0){
-		enfeebled.SetActive(true);
-	}else{
-		enfeebled.SetActive(false);
+	if(thisEnemy.enfeebled<=0 && thisEnemy.ailmentBody["Enfeebled"]){
+		Destroy(thisEnemy.ailmentBody["Enfeebled"]);
 	}
-	if(thisEnemy.silenced>0){
-		silenced.SetActive(true);
-	}else{
-		silenced.SetActive(false);
+	if(thisEnemy.silenced<=0 && thisEnemy.ailmentBody["Silenced"]){
+		Destroy(thisEnemy.ailmentBody["Silenced"]);
 	}
 }
 
@@ -131,3 +119,20 @@ function moveTo(space){
 		 }
 }
 
+function OnMouseOver(){
+	if(spotlight==null  && main.GetComponent("Main").inCombat){
+		magic = Resources.Load("prefabs/Spotlight", GameObject);
+		instance = Instantiate(magic);
+		spotlight=instance;
+		enemy = main.GetComponent("Main").Eunits[eindex];
+		instance.transform.position = enemy.body.transform.position;
+		instance.transform.position.y+=10;
+		instance.transform.SetParent(enemy.body.transform,true);
+	}
+}
+
+function OnMouseExit(){
+	if(spotlight){
+		Destroy(spotlight);
+	}
+}
