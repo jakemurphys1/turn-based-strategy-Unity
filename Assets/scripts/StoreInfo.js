@@ -1,4 +1,5 @@
 ﻿var level=1;
+var stage=1;
 var main: GameObject;
 
 function Start(){

@@ -7,9 +7,13 @@
  function damageEnemy(enemy,amount,element){
 	amount=amount*enemy.elemental[element];
 
-	if(hit==false){
+	if(hit=="Miss"){
 		wordPopup(enemy,"Miss");
 		return;
+	}
+	if(hit=="Near-Miss"){
+		wordPopup(enemy,"Near-Miss");
+		amount=amount/2;
 	}
 
 	if(enemy.phasedout){
@@ -74,9 +78,29 @@
 	}
 	yield WaitForSeconds(delay);
 
-	if(pass.GetComponent("pass").enemyHit==false){
+	if(enemy.enemyHit=="Miss"){
 		wordPopup(ally,"Miss");
+		if(ally.actionsActive["Off Balance"]){
+			enemy.sleep=2;
+			showAilment("Sleep", enemy);
+		}
 		return;
+	}
+	if(enemy.enemyHit=="Near-Miss"){
+		var slots = pass.GetComponent("pass").slots;
+		var enlightenedpresent=false;
+		for(var q = 0;q<slots.length;q++){
+			if(slots[q].actionsActive["Enlightenment"]){
+				enlightenedpresent=true;
+			}
+		}
+		if(enlightenedpresent){
+			wordPopup(ally,"Enlightened");
+			return;
+		}else{
+			wordPopup(ally,"Near-Miss");
+			amount=amount/2;
+		}
 	}
 
 	ally.body.GetComponent("AllyClick").hit=1;
@@ -187,6 +211,7 @@
 	 }else{
 		var eindex = body.GetComponent("EnemyClick").eindex;
 		var eslots = pass.GetComponent("pass").eslots;
+		slots = pass.GetComponent("pass").slots;
 		var group = eslots[0].group;
 		for (var j =0;j<eslots.length;j++){
 			if(eslots[j].index==eindex){
@@ -196,8 +221,20 @@
 		GetComponent("Main").Eunits[eindex].alive=false;
 		body.GetComponent("EnemyClick").animator.SetFloat("death",1.0f);
 		yield WaitForSeconds(3);
+
 		getIngredients();
 		getIngredients();
+		var herbalistPresent=false;
+		for (j =0;j<slots.length;j++){
+			if(slots[j].actionsActive["Herbalist"]){
+				herbalistPresent=true;
+			}
+		}
+		if(herbalistPresent){
+			getIngredients();
+			getIngredients();
+		}
+
 		Destroy(body);
 		if(pass.GetComponent("pass").eslots.length==0){
 			winBattle(group);
@@ -509,6 +546,13 @@
 			Destroy(instance2);
 		}
 	}
+	if(thisUnit.type=="Monk"){
+		if(curAction=="Transfer" && thisUnit.health>30){
+			magicAttack(thisUnit,curAlly);
+			transfer(thisUnit,curAlly,30);
+			GetComponent("sounds").playSound("heal");
+		}
+	}
  }
 
  var hit;
@@ -526,7 +570,7 @@
 	var slots = pass.GetComponent("pass").slots;
 	var num;
 
-	hit = hitResult(curEnemy.evasion,thisUnit.accuracy);
+	hit = hitResult(thisUnit, curEnemy.evasion,thisUnit.accuracy);
 	
 	if(thisUnit.didAction==true){
 		return;
@@ -587,7 +631,7 @@
 		}
 		if(curAction=="Immobolize"){
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
-			if(hit){
+			if(hit=="Hit"){
 				curEnemy.immobolized=2;
 				showAilment("Immobolized", thisUnit);
 				GetComponent("sounds").playSound("poison");
@@ -604,7 +648,7 @@
 		}
 		menu.GetComponent("Menu").hideAll();
 	}
-	if(thisUnit.type == "Rouge"){
+	if(thisUnit.type == "Rogue"){
 		if(thisUnit.vert != curEnemy.vert && thisUnit.hor !=curEnemy.hor){
 			return;
 		}
@@ -629,7 +673,7 @@
 		}
 		if(curAction=="Poison"){
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
-			if(hit){
+			if(hit=="Hit"){
 				curEnemy.poison=4;
 				showAilment("Poison", curEnemy);
 				GetComponent("sounds").playSound("poison");
@@ -640,7 +684,7 @@
 		}
 		if(curAction=="Blindness"){
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
-			if(hit){
+			if(hit=="Hit"){
 				curEnemy.blind=3;
 				showAilment("Blind", curEnemy);
 				GetComponent("sounds").playSound("poison");
@@ -652,7 +696,7 @@
 		}
 		if(curAction=="Sleep"){
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
-			if(hit){
+			if(hit=="Hit"){
 				curEnemy.sleep=2;
 				showAilment("Sleep", curEnemy);
 				GetComponent("sounds").playSound("poison");
@@ -663,7 +707,7 @@
 		}
 		if(curAction=="Enfeeble"){
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
-			if(hit){
+			if(hit=="Hit"){
 				curEnemy.enfeebled=3;
 				showAilment("Enfeebled", curEnemy);
 				GetComponent("sounds").playSound("poison");
@@ -706,7 +750,7 @@
 		}
 		if(curAction=="Silence"){
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
-			if(hit){
+			if(hit=="Hit"){
 				curEnemy.silenced=2;
 				showAilment("Silenced", curEnemy);
 				wordPopup(curEnemy,"Silenced");
@@ -760,7 +804,7 @@
 						}
 				}
 			}
-			if(hit){
+			if(hit=="Hit"){
 				showElementalArrow(curEnemy,curElement);
 			}
 			//extend rope
@@ -785,7 +829,7 @@
 			damageEnemy(curEnemy,damage,curElement);
 			thisUnit.didAction=true;
 			GetComponent("sounds").playSound("rope");
-			if(hit){
+			if(hit=="Hit"){
 				moveInstant(curEnemy,moveToVert,moveToHor);
 			}
 			 t=0.0;
@@ -802,7 +846,7 @@
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
 			damageEnemy(curEnemy,damage,curElement);
 			thisUnit.didAction=true;
-			if(hit){
+			if(hit=="Hit"){
 				GetComponent("sounds").playSound("disrupt");
 				for(num = 0;num<eslots.length;num++){
 					if(eslots[num].charge>0){
@@ -815,7 +859,7 @@
 		}
 		if(curAction=="Burst"){
 			damage = thisUnit.attack-getdefense(curEnemy,"defense") + thisUnit.resistance;
-			if(hit){
+			if(hit=="Hit"){
 				showElementalArrow(curEnemy,curElement);
 			}
 			damageEnemy(curEnemy,damage,curElement);
@@ -967,7 +1011,7 @@
 						keepgoing=false;
 					}
 				}
-				if(hit){
+				if(hit=="Hit"){
 					moveInstant(curEnemy,sendVert,sendHor);
 				}
 			}//end of else
@@ -988,7 +1032,7 @@
 			
 			steal(thisUnit,curEnemy);
 			if(thisUnit.actionsActive["FirstBlow"]){
-				if(curEnemy.health==curEnemy.maxhealth && hit){
+				if(curEnemy.health==curEnemy.maxhealth && hit=="Hit"){
 					curEnemy.blind=2;
 					showAilment("Blind", curEnemy);
 					wordPopup(curEnemy,"Blinded");
@@ -1041,7 +1085,7 @@
 				GetComponent("sounds").playSound("fire");
 				yield WaitForSeconds(1.5);	
 				Destroy(instance);
-				if(hit){
+				if(hit=="Hit"){
 					magicAilments(thisUnit,curEnemy,"Blind");
 				}
 			}
@@ -1096,7 +1140,7 @@
 				GetComponent("sounds").playSound("zap");
 				yield WaitForSeconds(1);	
 				Destroy(instance);
-				if(hit){
+				if(hit=="Hit"){
 					magicAilments(thisUnit,curEnemy,"Immobolized");
 				}
 			}
@@ -1120,7 +1164,7 @@
 				GetComponent("sounds").playSound("ice");
 				yield WaitForSeconds(1);
 				Destroy(frozen);
-				if(hit){
+				if(hit=="Hit"){
 					magicAilments(thisUnit,curEnemy,"Sleep");
 				}
 			}
@@ -1163,7 +1207,7 @@
 				instance.transform.position = curEnemy.body.transform.position;
 				yield WaitForSeconds(1);
 				Destroy(instance);
-				if(hit){
+				if(hit=="Hit"){
 					magicAilments(thisUnit,curEnemy,"Sleep");
 				}
 			}
@@ -1186,7 +1230,7 @@
 				instance.transform.position.y+=50;
 				yield WaitForSeconds(0.5);
 				Destroy(instance);
-				if(hit){
+				if(hit=="Hit"){
 					magicAilments(thisUnit,curEnemy,"Immobolized");
 				}
 			}
@@ -1205,7 +1249,7 @@
 				yield WaitForSeconds(0.5);
 				shootMissile(0,thisUnit,curEnemy,missiles);
 				yield WaitForSeconds(1);
-				if(hit){
+				if(hit=="Hit"){
 					magicAilments(thisUnit,curEnemy,"Blind");
 				}
 			}
@@ -1349,34 +1393,36 @@
 		}
 		menu.GetComponent("Menu").hideAll();
 	}
+	if(thisUnit.type == "Monk"){
+		if(curAction=="Attack" && isAdjacent(curEnemy,thisUnit)){
+			swordattack(thisUnit,curEnemy);
+		}
+		menu.GetComponent("Menu").hideAll();
+	}
  }
 
- function hitResult(evasion,accuracy){
-	var randnum = Random.Range(1,11);
-	var randIncrease;
-	switch(randnum){
-		case 1:
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-			randIncrease=0;
-			break;
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-			randIncrease=1;
-			break;
-		case 10:
-			randIncrease=2;
-			break;
+ function hitResult(unit, evasion,accuracy){
+	
+	if(unit.isAlly){
+		var slots = pass.GetComponent("pass").slots;
+		for(var i = 0;i<slots.length;i++){
+			if(slots[i].actionsActive["Inspire"]){
+				if(isAdjacent(slots[i],unit)){
+					wordPopup(slots[i],"Inspires");
+					return "Hit";
+				}
+			}
+		}
 	}
-	accuracy+=randIncrease;
+
+	var randnum = Random.Range(0,4);
+	accuracy+=randnum;
 	if(accuracy>=evasion){
-		return true;
+		return "Hit";
+	}else if(accuracy==evasion-1){
+		return "Near-Miss";
 	}else{
-		return false;
+		return "Miss";
 	}
  }
  function preventDoubleAction(){
@@ -1465,7 +1511,6 @@
 			enemyAngle= enemy.body.transform.rotation.eulerAngles.y;
 			allyAngle= ally.body.transform.rotation.eulerAngles.y;
 			if(enemyAngle-allyAngle<30 && enemyAngle-allyAngle>-30){
-				Debug.Log(enemyAngle-allyAngle);
 				wordPopup(enemy,"BackStab");
 				damage+=damage;
 			}
@@ -1617,6 +1662,52 @@
 	Destroy(instance);
 	Destroy(instance2);
 }
+
+//Monk
+ function transfer(thisUnit,ally,amount){
+	ally.health+=amount;
+	if(ally.health>ally.maxhealth){
+		ally.health=ally.maxhealth;
+	}
+
+	var healthbar = ally.body.GetComponent("AllyClick").healthbar;
+	var health = ally.health + 0.0f;
+	var maxhealth = ally.maxhealth + 0.0f;
+	var percentage= health/maxhealth;
+	var newlength = 0.15 * percentage;
+	healthbar.transform.localScale = Vector3(newlength,0.2,0.02);
+
+	damageAlly(thisUnit.index,amount,null,0);
+
+	var damage = amount.ToString();
+
+	thisUnit.body.GetComponent("AllyClick").animator.SetInteger("Special",1);
+	magic = Resources.Load("effects/Charge", GameObject);
+	instance = Instantiate(magic);
+	instance.transform.position = thisUnit.body.transform.position;
+	var startPosition = instance.transform.position;
+	var endPosition = new Vector3(ally.body.transform.position.x,ally.body.transform.position.y,ally.body.transform.position.z);
+	t = 0.0;
+		while (t < 1.0)
+		{
+			t += 0.01;
+			instance.transform.position = Vector3.Lerp(startPosition,endPosition,t);
+			yield;
+		}
+		thisUnit.body.GetComponent("AllyClick").animator.SetInteger("Special",0);
+
+
+	popupText = Resources.Load("Prefabs/HealText", GameObject);
+	var instance2 = Instantiate(popupText);
+	instance2.transform.position = ally.body.transform.position;
+	instance2.transform.position.y+=10;
+	var childtext = instance2.transform.GetChild(0);
+	childtext.GetComponent("Text").text=damage;
+	yield WaitForSeconds(1);
+	Destroy(instance);
+	Destroy(instance2);
+}
+
 
 //Thief
 function steal(ally,enemy){

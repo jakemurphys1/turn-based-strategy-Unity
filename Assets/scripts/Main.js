@@ -29,6 +29,7 @@ var statBox2:GameObject;
 var pass: GameObject;
 var other: GameObject;
 var level:int;
+var stage:int;
 var groupScreen: GameObject;
 var switchNum:int=-1;
 var switchImage:GameObject;
@@ -52,6 +53,7 @@ function Awake(){
 	StoreInfo = GameObject.Find("StoreInfo");
 	if(StoreInfo){
 		level = StoreInfo.GetComponent("StoreInfo").level;
+		stage = StoreInfo.GetComponent("StoreInfo").stage;
 	}else{
 		//level=1;
 	}
@@ -90,9 +92,13 @@ function Start () {
 
 function tempStart(){
 	
-	units[0].actionsActive["Sleep"]=true;
-	units[0].actionsActive["Enfeeble"]=true;
-	units[0].actionsActive["FirstBlow"]=true;
+	units[0].actionsActive["Inspire"]=true;
+	units[0].actionsActive["Transfer"]=true;
+	units[0].actionsActive["Enlightenment"]=true;
+	units[0].actionsActive["Herbalist"]=true;
+	units[0].actionsActive["Off Balance"]=true;
+
+	units[1].health=30;
 
 	units[1].actionsActive["FireBlast"]=true;
 	//units[1].actionsActive["Flying"]=true;
@@ -103,7 +109,7 @@ function tempStart(){
 
 	units[2].actionsActive["Scout"]=true;
 
-	createEGroup("","Vacuum","","","",ship, 1000);
+	createEGroup("","","Werewolf","","",ship, 1000);
 
 	createGroup(0,1,2,ship);
 	yield WaitForSeconds(2);
@@ -341,6 +347,7 @@ class Ally{
    var silenced:int=0;
    var poison:int=0;
    var ailmentBody= {};
+   var isAlly:boolean=true;
 
    var evasion:int=2;
    var energy:int;
@@ -393,8 +400,8 @@ class Ally{
 			   this.attack=40;
 			   this.defense=10;
 			   this.resistance=10;
-			   this.accuracy=2;
-			   this.evasion=3;
+			   this.accuracy=3;
+			   this.evasion=1;
 			   this.actions[0] = "Normal";
 			   this.actions[1] = "Explosion";
 			   this.actions[2] = "Piercing";
@@ -428,13 +435,13 @@ class Ally{
 			   this.strong="Any enemy that has low defense. Especially useful against long-range magic users that have to charge.";
 			   this.weak="Any enemy with high defense. Also, any enemy that can quickly attack in the close range like flyers are dangerous since she has low defense.";
 		}
-		if(type=="Rouge"){
+		if(type=="Rogue"){
 			   this.maxhealth=80;
 			   this.attack=30;
 			   this.defense=10;
 			   this.resistance=10;
-			   this.accuracy=2;
-			   this.evasion=3;
+			   this.accuracy=1;
+			   this.evasion=1;
 			   this.actions[0] = "Normal";
 			   this.actions[1] = "Poison";
 			   this.actions[2] = "Blindness";
@@ -451,7 +458,7 @@ class Ally{
 			   this.actionsActive["Normal"]=true;
 			   this.actionsActive["Poison"]=true;
 			   this.actionDes1["Normal"] = "Standard Arrow with unlimited supply";
-			   this.actionDes2["Normal"]  = "Deals damage equal to your rouge's attack to any enemy in a straight line";
+			   this.actionDes2["Normal"]  = "Deals damage equal to your Rogue's attack to any enemy in a straight line";
 			   this.actionDes1["Poison"] = "Poison your enemy";
 			   this.actionDes2["Poison"]  = "Poisons the enemy for two turns, which cause them to lose life every turn. Cannot kill them.";
 			   this.actionDes1["Blindness"] = "Temporarily blinds your enemies";
@@ -461,9 +468,9 @@ class Ally{
 			   this.actionDes1["Enfeeble"] = "Destroy your enemy's defenses.";
 			   this.actionDes2["Enfeeble"]  = "Enfeebles the enemy for two turns, reducing their defense and resistance to 0 for that duration.";
 			   this.actionDes1["Duration"] = "Longer ailments";
-			   this.actionDes2["Duration"]  = "All ailments inflicted by the rouge will last one extra turn.";
+			   this.actionDes2["Duration"]  = "All ailments inflicted by the Rogue will last one extra turn.";
 			   this.actionDes1["Double Arrows"] = "Double Supply of Arrows";
-			   this.actionDes2["Double Arrows"]  = "Rouge begins each battle with two of each type of arrow";
+			   this.actionDes2["Double Arrows"]  = "Rogue begins each battle with two of each type of arrow";
 			   this.arrows["Poison"]=arrowCapacity;
 			   this.arrows["Blindness"]=arrowCapacity;
 			   this.arrows["Sleep"]=arrowCapacity;
@@ -477,8 +484,8 @@ class Ally{
 			   this.attack=30;
 			   this.defense=0;
 			   this.resistance=30;
-			   this.accuracy=2;
-			   this.evasion=3;
+			   this.accuracy=1;
+			   this.evasion=4;
 			   this.actions[0] = "Normal";
 			   this.actions[1] = "Silence";
 			   this.actions[2] = "GrapplingHook";
@@ -523,6 +530,7 @@ class Ally{
 			   this.defense=20;
 			   this.resistance=0;
 			   this.accuracy=3;
+			   this.evasion=1;
 			   this.actions[0] = "Attack";
 			   this.actions[1] = "Medkit";
 			   this.passiveActions[0]= "Dash";
@@ -559,6 +567,7 @@ class Ally{
 			   this.defense=20;
 			   this.resistance=0;
 			   this.accuracy=3;
+			   this.evasion=1;
 			   this.actions[0] = "Attack";
 			   this.actions[1] = "Swirl";
 			   this.actions[2] = "Sweep";
@@ -594,7 +603,8 @@ class Ally{
 			   this.attack=40;
 			   this.defense=10;
 			   this.resistance=10;
-			   this.accuracy=3;
+			   this.accuracy=1;
+			   this.evasion=4;
 			   this.actions[0] = "Attack";
 			   this.actions[1] = "Steal";
 			   this.actions[2] = "Phase";
@@ -634,6 +644,7 @@ class Ally{
 			   this.defense=15;
 			   this.resistance=15;
 			   this.accuracy=3;
+			   this.evasion=1;
 			   this.actions[0] = "Fire";
 			   this.actions[1] = "Zap";
 			   this.actions[2] = "Freeze";
@@ -668,7 +679,8 @@ class Ally{
 			   this.attack=60;
 			   this.defense=0;
 			   this.resistance=30;
-			   this.accuracy=2;
+			   this.accuracy=1;
+			   this.evasion=1;
 			   this.actions[0] = "Charge";
 			   this.actions[1] = "Gust";
 			   this.actions[2] = "Lightning";
@@ -707,7 +719,8 @@ class Ally{
 			   this.attack=40;
 			   this.defense=0;
 			   this.resistance=30;
-			   this.accuracy=2;
+			   this.accuracy=1;
+			   this.evasion=1;
 			   this.actions[0] = "Blizzard";
 			   this.actions[1] = "Bolt";
 			   this.actions[2] = "FireBlast";
@@ -743,7 +756,8 @@ class Ally{
 			   this.attack=30;
 			   this.defense=20;
 			   this.resistance=20;
-			   this.accuracy=3;
+			   this.accuracy=1;
+			   this.evasion=4;
 			   this.actions[0] = "Bash";
 			   this.actions[1] = "Protect";
 			   this.actions[2] = "Reshield";
@@ -779,7 +793,8 @@ class Ally{
 			   this.attack=0;
 			   this.defense=0;
 			   this.resistance=0;
-			   this.accuracy=3;
+			   this.accuracy=1;
+			   this.evasion=1;
 			   this.actions[0] = "Vigor";
 			   this.actions[1] = "Heal";
 			   this.passiveActions[0]= "Move";
@@ -810,6 +825,42 @@ class Ally{
 			   this.strong="The cleric magnifies the useful of the units she's with.";
 			   this.weak="Ranged enemies hurt her since she has low defense.";
 		}
+		if(type=="Monk"){
+			   this.maxhealth=90;
+			   this.attack=30;
+			   this.defense=10;
+			   this.resistance=10;
+			   this.accuracy=1;
+			   this.evasion=4;
+			   this.actions[0] = "Attack";
+			   this.actions[1] = "Transfer";
+			   this.passiveActions[0]= "Inspire";
+			   this.passiveActions[1]= "Herbalist";
+			   this.passiveActions[2]= "Off Balance";
+			   this.passiveActions[3]= "Enlightment";
+			   this.abilities[0] = "Attack";
+			   this.abilities[1] = "Inspire";
+			   this.abilities[2] = "Transfer";
+			   this.abilities[3] = "Herbalist";
+			   this.abilities[4] = "Off Balance";
+			   this.abilities[5] = "Enlightenment";
+			   this.actionsActive["Attack"]=true;
+			   this.actionDes1["Attack"] = "Standard Attack";
+			   this.actionDes2["Attack"]  = "Deals damage equal to your Monk's attack to an adjacent enemy";
+			   this.actionDes1["Inspire"] = "Inspire your allies to focus";
+			   this.actionDes2["Inspire"]  = "Allies adjacent to the monk can't miss";
+			   this.actionDes1["Transfer"] = "Monk gives his life for others";
+			   this.actionDes2["Transfer"]  = "Heals a unit for 30 life at a cost of 30 life";
+			   this.actionDes1["Herbalist"] = "Gather more ingrediants";
+			   this.actionDes2["Herbalist"]  = "Ingrediants dropped by enemies are doubled";
+			   this.actionDes1["Off Balance"] = "Dodge and Knock-Out";
+			   this.actionDes2["Off Balance"]  = "If an adjacent enemy misses the monk, it is inflicted by sleep for 1 turn";
+			   this.actionDes1["Enlightenment"] = "Protect your group";
+			   this.actionDes2["Enlightenment"]  = "The Monk and his allies take no damage from near-misses";
+			   this.description="Highly evasive, this low-damage fighter can't kill enemies, but can aid in other ways";
+			   this.strong="Enemies with low accuracy.";
+			   this.weak="Enemies with high accuracy.";
+		}
 		   this.health=this.maxhealth;
    		   this.index = indexNum;
 		   this.vert=0;
@@ -825,7 +876,7 @@ class Enemy{
    var defense:int=5;
    var resistance:int=5;
    var accuracy:int=3;
-   var evasion:int=2;
+   var evasion:int=1;
    var immobolized:int=0;
    var charge:int=-1;
    var maxcharge:int=-1;
@@ -835,6 +886,7 @@ class Enemy{
    var silenced:int=0;
    var poison:int=0;
    var ailmentBody= {};
+   var isAlly:boolean=false;
 
    var elemental = {};
    var index:int;
@@ -857,6 +909,7 @@ class Enemy{
    var description:String;
    var strong:String;
    var weak:String;
+   var enemyHit:String="Hit";
 
    function Enemy(curindexNum:int,type:String,level:int){
 		if(type=="Goblin"){
@@ -919,8 +972,7 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
-			 this.accuracy=2;
-			 this.evasion=3;
+			 this.accuracy=1;
 			 this.description="These ranged monsters will spit venom across the way that does physical damage and enfeebles your unit, which reduces their defenses to 0.";
 			 this.strong="Any unit with low defense and health. Can dodge attacks with units with low accuracy.";
 			 this.weak="Units with high health and defense, and immunity to enfeeble. Evasive units can dodge it's attacks. Also, ranged units can help in support if they have good accuracy.";
@@ -1358,7 +1410,7 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
-			 this.evasion=3;
+			 this.evasion=4;
 			 this.description="These close-range monsters with high resistance can only attack units next to it. It heals every turn.";
 			 this.strong="Any close-range unit with a low defense or magic users";
 			 this.weak="Any long-ranged unit";
@@ -1392,8 +1444,6 @@ class Enemy{
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=2;
 			 this.height=10;
-			 this.accuracy=2;
-			 this.evasion=3;
 			 this.description="These flying machines can immediately move to any location and attack. They prevent all offensive magic from your untis.";
 			 this.strong="Any long-range units, especially magic users.";
 			 this.weak="Any close-ranged unit. Thieves can instantly kill machines if they steal from it.";
@@ -1429,6 +1479,7 @@ class Enemy{
 			 this.description="These close-range monsters can only attack units next to it. Every attack returns that health to the vampire.";
 			 this.strong="Any close-range unit with a low defense.";
 			 this.weak="Any long-ranged unit";
+			 this.accuracy=1;
 		};//done
 		if(type=="Cannon"){
 			if (level == 1) {
@@ -1558,8 +1609,6 @@ class Enemy{
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
 			 this.height=10;
-			 this.accuracy=2;
-			 this.evasion=3;
 			 this.description="These flying creatures can immediately move to any location and attack.";
 			 this.strong="Any long-range units with low defenses";
 			 this.weak="Any close-ranged unit";
@@ -1800,6 +1849,7 @@ class Enemy{
 			 }
 			 this.defense = 20;
 			 this.resistance = 20;
+			 this.accuracy=1;
 			 this.attackType="AssassinAttack";
 			 this.moveType="Afraid";
 			 this.elemental["Fire"]=1;
@@ -1940,8 +1990,6 @@ class Enemy{
 			 this.elemental["Lightning"]=1;
 			 this.charge=0;
 			 this.maxcharge=3;
-			 this.accuracy=2;
-			 this.evasion=3;
 			 this.description="These flying creatures can instantly move to attack any unit. At a cost of 3 charge, will heal itself.";
 			 this.strong="Units with low defense.";
 			 this.weak="Units with high defense.";
@@ -2123,8 +2171,6 @@ class Enemy{
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
-			 this.accuracy=2;
-			 this.evasion=3;
 			 this.description="These long-range fighters can attack any unit regardless of location.";
 			 this.strong="Units with low defense.";
 			 this.weak="Units with high defense.";
@@ -2162,7 +2208,7 @@ class Enemy{
 			 this.strong="Any mid-range enemy with low resistance.";
 			 this.weak="Any unit with high resistance.";
 		};
-		if(type=="Rouge"){
+		if(type=="Rogue"){
 			if (level == 1) {
              this.attack = 10;
              this.health = 50;
@@ -2185,13 +2231,11 @@ class Enemy{
 			 }
 			 this.defense = 5;
 			 this.resistance = 5;
-			 this.attackType="RougeAttack";
+			 this.attackType="RogueAttack";
 			 this.moveType="Scroll";
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
-			 this.accuracy=2;
-			 this.evasion=3;
 			 this.description="This long-range fighter can attack any unit in a straight line and poisons it.";
 			 this.strong="Any enemy with low defense.";
 			 this.weak="Any enemy with high defense.";
@@ -2227,8 +2271,6 @@ class Enemy{
 			 this.defenseType="resistance";
 			 this.charge=0;
 			 this.maxcharge=2;
-			 this.accuracy=2;
-			 this.evasion=3;
 			 this.description="This powerful long-range fighter can attack any unit at a cost of 2 charge.";
 			 this.strong="Any enemy with low resistance.";
 			 this.weak="Any enemy with high resistance and long-range units that do physical damage.";
@@ -2499,7 +2541,7 @@ function startBattle(location,groupNum,EgroupNum){
 				units[j].arrows["Immobolize"]=units[j].arrowCapacity;
 				units[j].arrows["Titan"]=units[j].arrowCapacity;
 			}
-			if(units[j].type=="Rouge"){
+			if(units[j].type=="Rogue"){
 				units[j].arrows["Poison"]=units[j].arrowCapacity;
 				units[j].arrows["Blindness"]=units[j].arrowCapacity;
 				units[j].arrows["Sleep"]=units[j].arrowCapacity;

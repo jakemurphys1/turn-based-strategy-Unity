@@ -451,7 +451,6 @@ function enemyAttack(){
 
 
 //Attacks
-var enemyHit;
 function closeAttack(enemy,eslots,slots){
 		var waittime=0;
 		if(!enemy.body || enemy.blind>0){
@@ -468,7 +467,7 @@ function closeAttack(enemy,eslots,slots){
 			isSpecial=true;
 		}
 		if(attackThis!=-1){
-			enemyHit = main.GetComponent("combat").hitResult(slots[attackThis].evasion,enemy.accuracy);
+			enemy.enemyHit = main.GetComponent("combat").hitResult(enemy, slots[attackThis].evasion,enemy.accuracy);
 			enemy.hasMoved=true;
 			enemy.didAction=true;
 			yield WaitForSeconds(waittime);
@@ -528,7 +527,7 @@ function arrowAttack(enemy){
 	}
 	var target = lowestDefense(slots,enemy.defenseType);
 	lookAt(enemy,target);
-
+	enemy.enemyHit = main.GetComponent("combat").hitResult(enemy, target.evasion,enemy.accuracy);
 	yield WaitForSeconds(waittime);
 	lookAt(enemy,target);
 	enemy.body.GetComponent("EnemyClick").attack =1;
@@ -546,7 +545,7 @@ function arrowAttack(enemy){
 }
 function IceAttack(enemy,eslots,slots){
 	var attackThis = isTwoAway(enemy.hor,enemy.vert,slots);
-
+	enemy.enemyHit = main.GetComponent("combat").hitResult(enemy, slots[attackThis].evasion,enemy.accuracy);
 	if(attackThis==-1){
 		return;
 	}
@@ -604,6 +603,7 @@ function SpitterAttack(enemy,eslots,slots){
 		waittime=1;
 	}
 	var target = lowestDefense(options,enemy.defenseType);
+	enemy.enemyHit = main.GetComponent("combat").hitResult(enemy,target.evasion,enemy.accuracy);
 	lookAt(enemy,target);
 
 	yield WaitForSeconds(waittime);
@@ -647,10 +647,10 @@ function SpitterAttack(enemy,eslots,slots){
 	yield WaitForSeconds(0.5);
 	
 	if(enemy.type=="Spitter"){
-		doAilment(target,"Enfeebled");
+		doAilment(enemy,target,"Enfeebled");
 	}
 	if(enemy.type=="GreenOoze"){
-		doAilment(target,"Poison");
+		doAilment(enemy,target,"Poison");
 	}
 	if(enemy.type=="BlueOoze"){
 		if(!spaceFilled(target.hor,target.vert-1)){
@@ -676,6 +676,7 @@ function FireAttack(enemy){
 
 	yield WaitForSeconds(waittime);
 	lookAt(enemy,target);
+	enemy.enemyHit = main.GetComponent("combat").hitResult(enemy,target.evasion,enemy.accuracy);
 	enemy.body.GetComponent("EnemyClick").attack =1;
 	var damage = enemy.attack-main.GetComponent("combat").getdefense(target,enemy.defenseType);
 	main.GetComponent("combat").damageAlly(target.index,damage,enemy,1);
@@ -710,6 +711,7 @@ function LightningAttack(enemy){
 
 	yield WaitForSeconds(waittime);
 	lookAt(enemy,target);
+	enemy.enemyHit = main.GetComponent("combat").hitResult(enemy,target.evasion,enemy.accuracy);
 	enemy.body.GetComponent("EnemyClick").attack =1;
 	var damage = enemy.attack-main.GetComponent("combat").getdefense(target,enemy.defenseType);
 	main.GetComponent("combat").damageAlly(target.index,damage,enemy,1);
@@ -744,6 +746,7 @@ function BlueOozeAttack(enemy){
 		waittime=1;
 	}
 	var target = lowestDefense(options,enemy.defenseType);
+	enemy.enemyHit = main.GetComponent("combat").hitResult(enemy,target.evasion,enemy.accuracy);
 	lookAt(enemy,target);
 
 	yield WaitForSeconds(waittime);
@@ -774,10 +777,10 @@ function BlueOozeAttack(enemy){
 	yield WaitForSeconds(0.5);
 	
 	if(enemy.type=="Spitter"){
-		doAilment(target,"Enfeebled");
+		doAilment(enemy,target,"Enfeebled");
 	}
 	if(enemy.type=="GreenOoze"){
-		doAilment(target,"Poison");
+		doAilment(enemy,target,"Poison");
 	}
 
 	counter(enemy,target);
@@ -832,6 +835,7 @@ function WaterwraithAttack(enemy,eslots,slots){
 	enemy.body.GetComponent("EnemyClick").animator.SetInteger("special",0);
 	for(var i = 0;i<slots.length;i++){
 		var damage = enemy.secondaryAttack-main.GetComponent("combat").getdefense(slots[i],"resistance");
+		enemy.enemyHit = main.GetComponent("combat").hitResult(enemy,slots[i].evasion,enemy.accuracy);
 		main.GetComponent("combat").damageAlly(slots[i].index,damage,enemy,1);
 	}
 }
@@ -854,7 +858,7 @@ function SpiderAttack(enemy){
 		waittime=1;
 	}
 	var target = lowestDefense(options,enemy.defenseType);
-
+	enemy.enemyHit = main.GetComponent("combat").hitResult(enemy,target.evasion,enemy.accuracy);
 	yield WaitForSeconds(waittime);
 	lookAt(enemy,target);
 	if(enemy.type=="Spider"){
@@ -933,7 +937,7 @@ function SpiderAttack(enemy){
 			 Destroy(rope);
 
 	if(enemy.type=="Spider"){
-		doAilment(target,"Poison");
+		doAilment(enemy,target,"Poison");
 	}
 		
 
@@ -1186,7 +1190,6 @@ function move(body,x,z){
  function lookAt(enemy,ally){
 	var body = enemy.body;
 	var abody = ally.body;
-	Debug.Log(body);
 	enemybody = body.transform.position;
 	allybody= abody.transform.position;
 	var _direction = (allybody - enemybody).normalized;
@@ -1357,8 +1360,8 @@ function shootObject(instance,target){
 		 Destroy(instance);
  }
 
- function doAilment(target,type){
-	if(enemyHit==false){
+ function doAilment(enemy, target,type){
+	if(enemy.enemyHit=="Miss"){
 		return;
 	}
 	if(target.actionsActive["Immunity"]){
