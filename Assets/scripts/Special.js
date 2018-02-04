@@ -67,7 +67,6 @@ function placeEnemies(location, count){
 }
 
 function SpecialFunction(curName){
-	Debug.Log("special-" + curName);
 	//if(GetComponent("special_" + GetComponent("Main").curname).SpecialFunction){
 		GetComponent("special_" + GetComponent("Main").curname).SpecialFunction(curName);
 	//}

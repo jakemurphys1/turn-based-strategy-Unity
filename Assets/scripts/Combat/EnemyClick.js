@@ -55,7 +55,6 @@ function OnRightClick(){
          if (hitPoint.collider == this.GetComponent.<Collider>())
          {
              // Add code for the right click event
-			 
 				main.GetComponent("combat").unitAction(eindex);
 				
          }
@@ -126,7 +125,6 @@ function OnMouseOver(){
 		spotlight=instance;
 		enemy = main.GetComponent("Main").Eunits[eindex];
 		instance.transform.position = enemy.body.transform.position;
-		instance.transform.position.y+=10;
 		instance.transform.SetParent(enemy.body.transform,true);
 	}
 }

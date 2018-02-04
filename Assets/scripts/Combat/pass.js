@@ -336,11 +336,9 @@ function giveEnemySlot(number,group){
 function enemyMove(){
 	for(var j =0;j<eslots.length;j++){
 		if(eslots[j].immobolized>0){
-			eslots[j].immobolized-=1;
 			continue;
 		}
 		if(eslots[j].sleep>0){
-			eslots[j].sleep-=1;
 			continue;
 		}
 		if(eslots[j].hasMoved){
@@ -514,11 +512,22 @@ function closeAttack(enemy,eslots,slots){
 			if(enemy.type=="Vampire"){
 				heal(enemy,damage);
 			}
+			if(enemy.type=="Pixie"){
+				doAilment(enemy,slots[attackThis],"Poison");
+				doAilment(enemy,slots[attackThis],"Enfeeble");
+			}
+			if(enemy.type=="Plague"){
+				doAilment(enemy,slots[attackThis],"Sleep");
+				doAilment(enemy,slots[attackThis],"Enfeebled");
+			}
 			move(enemy.body,reverseX,reverseY);
-				counter(enemy,slots[attackThis]);
+			counter(enemy,slots[attackThis]);
 		}
 }
 function arrowAttack(enemy){
+	if(!enemy.body || enemy.blind>0){
+		return;
+	}
 	enemy.didAction=true;
 	enemy.hasMoved=true;
 	var waittime=0;
@@ -538,10 +547,21 @@ function arrowAttack(enemy){
 	yield WaitForSeconds(1);
 	enemy.body.GetComponent("EnemyClick").attack =0;
 	main.GetComponent("sounds").playSound("arrow");
-
+	if(enemy.type=="Assassin"){
+		var rand = Random.Range(1,5);
+		if(rand==1){
+			doAilment(enemy,target,"Enfeebled");
+		}else if(rand==2){
+			doAilment(enemy,target,"Sleep");
+		}else if(rand==3){
+			doAilment(enemy,target,"Poison");
+		}else if(rand==4){
+			doAilment(enemy,target,"Immobolized");
+		}
+	}
 		 
 		 
-		counter(enemy,target);
+	counter(enemy,target);
 }
 function IceAttack(enemy,eslots,slots){
 	var attackThis = isTwoAway(enemy.hor,enemy.vert,slots);
@@ -662,6 +682,9 @@ function SpitterAttack(enemy,eslots,slots){
 	counter(enemy,target);
 }
 function FireAttack(enemy){
+	if(!enemy.body || enemy.silenced>0){
+			return;
+	}
 	enemy.didAction=true;
 	enemy.hasMoved=true;
 	enemy.charge-=enemy.maxcharge;
@@ -684,7 +707,12 @@ function FireAttack(enemy){
 	yield WaitForSeconds(0.5);
 
 	main.GetComponent("sounds").playSound("shootFire");
-	magic = Resources.Load("effects/FireBall", GameObject);
+	if(enemy.type=="FireElemental"){
+		magic = Resources.Load("effects/FireBall", GameObject);
+	}
+	if(enemy.type=="Dryad" || enemy.type=="Wisp"){
+		magic = Resources.Load("effects/Ice", GameObject);
+	}
 	instance = Instantiate(magic);
 	instance.transform.position = enemy.body.transform.position;
 	shootObject(instance,target);
@@ -1151,7 +1179,48 @@ function counter(enemy,ally){
 		if(enemy.vert == ally.vert){
 			if((enemy.hor==ally.vert+1)||(enemy.vert==ally.hor-1)){
 				main.GetComponent("combat").swordattack(ally, enemy);
+				ally.didAction=false;
 			}
+		}
+	}
+	if(enemy.enemyHit=="Miss"){
+		if(enemy.hor == ally.hor){
+			if((enemy.vert==ally.vert+1)||(enemy.vert==ally.vert-1)){
+			 if(ally.actionsActive["Bulk"]){
+				enemy.enfeebled=2;
+				main.GetComponent("combat").showAilment("Enfeebled", enemy);
+				main.GetComponent("combat").wordPopup(enemy,"Enfeebled");
+			 }
+			 if(ally.actionsActive["Off Balance"]){
+				enemy.sleep=2;
+				main.GetComponent("combat").showAilment("Sleep", enemy);
+				main.GetComponent("combat").wordPopup(enemy,"Sleep");
+			 }
+			 if(ally.actionsActive["Respond"]){
+				main.GetComponent("combat").swordattack(ally, enemy);
+				ally.didAction=false;
+			 }
+			}
+		}
+		if(enemy.vert == ally.vert){
+			if((enemy.hor==ally.vert+1)||(enemy.vert==ally.hor-1)){
+				if((enemy.vert==ally.vert+1)||(enemy.vert==ally.vert-1)){
+					 if(ally.actionsActive["Bulk"]){
+						enemy.enfeebled=2;
+						main.GetComponent("combat").showAilment("Enfeebled", enemy);
+						main.GetComponent("combat").wordPopup(enemy,"Enfeebled");
+					 }
+					 if(ally.actionsActive["Off Balance"]){
+						enemy.sleep=2;
+						main.GetComponent("combat").showAilment("Sleep", enemy);
+						main.GetComponent("combat").wordPopup(enemy,"Sleep");
+					 }
+					 if(ally.actionsActive["Respond"]){
+						main.GetComponent("combat").swordattack(ally, enemy);
+						ally.didAction=false;
+					 }
+				}
+			}	
 		}
 	}
 }
@@ -1255,13 +1324,13 @@ function lowestDefense(options,type){
 	var option = options[0];
 	if(type=="defense"){
 		for(var j = 1;j<options.length;j++){
-			if(options[j].defense<option.defense){
+			if(options[j].defense<option.defense && options[j].invisible==false){
 				option= options[j];
 			}
 		}
 	}else{
 		for(var k = 1;k<options.length;k++){
-			if(options[k].resistance<option.resistance){
+			if(options[k].resistance<option.resistance && options[k].invisible==false){
 				option= options[k];
 			}
 		}

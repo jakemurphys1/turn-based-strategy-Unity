@@ -346,7 +346,6 @@ function switchUnits(){
 		spotlight=instance;
 		ally = main.GetComponent("Main").units[index];
 		instance.transform.position = ally.body.transform.position;
-		instance.transform.position.y+=10;
 		instance.transform.SetParent(ally.body.transform,true);
 	}
 }

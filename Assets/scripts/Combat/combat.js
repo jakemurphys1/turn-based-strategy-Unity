@@ -16,6 +16,8 @@
 		amount=amount/2;
 	}
 
+
+
 	if(enemy.phasedout){
 		if(element!="None"){
 			enemy.phasedout=false;
@@ -80,10 +82,6 @@
 
 	if(enemy.enemyHit=="Miss"){
 		wordPopup(ally,"Miss");
-		if(ally.actionsActive["Off Balance"]){
-			enemy.sleep=2;
-			showAilment("Sleep", enemy);
-		}
 		return;
 	}
 	if(enemy.enemyHit=="Near-Miss"){
@@ -172,13 +170,13 @@
 	instance.transform.position = unit.body.transform.position;
 	instance.transform.position.y+=12-unit.height;
 	instance.transform.position.x+=2;
-	instance.transform.position.z-=wordPopupAlter+1;
-	wordPopupAlter+=2;
+	instance.transform.position.z-=unit.wordPopupAlter+1;
+	unit.wordPopupAlter+=2;
 	var childtext = instance.transform.GetChild(0);
 	childtext.GetComponent("Text").text=word;
 	instance.transform.SetParent(unit.body.transform, true);
-	yield WaitForSeconds(2);
-	wordPopupAlter=0;
+	yield WaitForSeconds(3);
+	unit.wordPopupAlter-=0;
 	Destroy(instance);
  }
 
@@ -289,6 +287,7 @@
 		 GetComponent("Main").inCombat=false;
 		 group.location = nulllocation;
 		 group.alive=false;
+
 		 var eslots = pass.GetComponent("pass").eslots;
 		 var spaces = pass.GetComponent("pass").spaces;
 		for(var i =0;i<eslots.length;i++){
@@ -556,7 +555,7 @@
  }
 
  var hit;
- function unitAction(eindex){
+ function unitAction(eindex){;
 	if(usedAction){
 		return;
 	}
@@ -581,6 +580,7 @@
 	}
 
 	var damage:int;
+	
 	if(thisUnit.type == "Archer"){
 		GetComponent("Special").SpecialFunction("archerAttack");
 		shootarrow(thisUnit,curEnemy);
@@ -1030,7 +1030,7 @@
 	if(thisUnit.type == "Thief"){
 		if(curAction=="Attack" && isAdjacent(curEnemy,thisUnit)){
 			
-			steal(thisUnit,curEnemy);
+			
 			if(thisUnit.actionsActive["FirstBlow"]){
 				if(curEnemy.health==curEnemy.maxhealth && hit=="Hit"){
 					curEnemy.blind=2;
@@ -1044,9 +1044,10 @@
 				thisUnit.body.GetComponent("Thief").turnVisible();
 				GetComponent("combat").wordPopup(thisUnit,"Visible");
 			}
+			steal(thisUnit,curEnemy);
 		}
 		if(curAction=="Steal" && isAdjacent(curEnemy,thisUnit)){
-			
+			steal(thisUnit,curEnemy);
 		}
 		if(curAction=="Phase" && isAdjacent(curEnemy,thisUnit)){
 			curEnemy.enfeebled=2;
@@ -1276,6 +1277,7 @@
 			}else{
 				magicAttack(thisUnit,curEnemy);
 				yield WaitForSeconds(0.5);
+				hit="Hit";
 
 				thisUnit.energy-=30;
 				setEnergyBar(thisUnit);
@@ -1399,6 +1401,7 @@
 		}
 		menu.GetComponent("Menu").hideAll();
 	}
+	returnUnits(slots);
  }
 
  function hitResult(unit, evasion,accuracy){
@@ -1416,6 +1419,7 @@
 	}
 
 	var randnum = Random.Range(0,4);
+	Debug.Log(randnum);
 	accuracy+=randnum;
 	if(accuracy>=evasion){
 		return "Hit";
@@ -1502,6 +1506,7 @@
  function swordattack(ally, enemy){
 	lookAt(enemy,ally);
 	ally.body.GetComponent("AllyClick").attack=1;
+	ally.didAction=true;
 	yield WaitForSeconds(0.5);
 	GetComponent("sounds").playSound("hit");
 	ally.body.GetComponent("AllyClick").attack=0;
@@ -1517,7 +1522,6 @@
 		}
 	}
 	damageEnemy(enemy,damage,"None");
-	ally.didAction=true;
  }
 
  function magicAttack(ally, enemy){
@@ -1606,10 +1610,8 @@
  }
  function magicAilments(ally,enemy,type){
 	if(ally.actionsActive["Ailments"]){
-		var allyAcc = ally.accuracy;
-		 var enemyEv = enemy.evasion;
 		 var randnum = Random.Range(1,4);
-		 if((allyAcc+randnum)>=(enemyEv+3)){
+		 if(randnum==3){
 			GetComponent("sounds").playSound("poison");
 			if(type=="Sleep"){
 				enemy.sleep=2;
@@ -1799,6 +1801,10 @@ function steal(ally,enemy){
 
 	GetComponent("Main").increaseItems(item,amount);
 	wordPopup(ally,"Stole " + item);
+	if(enemy.isRobot){
+		wordPopup(enemy,"Battery Stolen");
+		damageEnemy(enemy,enemy.health,"None");
+	}
 }
 
 //Guard
@@ -1977,10 +1983,25 @@ function showElementalArrow(enemy,element){
 		if(unit.ailmentBody[type]){
 			return;
 		}
+		var eslots = pass.GetComponent("pass").eslots;
+		for(var i =0;i<eslots.length;i++){
+			if(eslots[i].type=="Dryad"){
+			 unit.sleep=0;
+			 unit.immobolized=0;
+			 unit.enfeebled=0;
+			 unit.poison=0;
+			 unit.blind=0;
+			 unit.silenced=0;
+			 wordPopup(eslots[i],"Stops Ailments");
+			 return;
+			}
+		}
+
 		ailment = Resources.Load("ailments/" + type, GameObject);
 		var instance = Instantiate(ailment);
+		instance.transform.SetParent(unit.body.transform, true);
 		instance.transform.position = unit.body.transform.position;
 		instance.transform.position.y+=5;
-		instance.transform.SetParent(unit.body.transform, true);
+		
 		unit.ailmentBody[type]=instance;
  }
