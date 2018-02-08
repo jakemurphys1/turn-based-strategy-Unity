@@ -966,6 +966,7 @@ function SpiderAttack(enemy){
 
 	if(enemy.type=="Spider"){
 		doAilment(enemy,target,"Poison");
+		enemy.body.GetComponent("EnemyClick").attack =0;
 	}
 		
 
@@ -1025,25 +1026,26 @@ function flyMove(enemy){
 	for(var i = 0;i<slots.length;i++){
 		if(!spaceFilled(slots[i].hor,slots[i].vert-1) || !spaceFilled(slots[i].hor,slots[i].vert+1) || !spaceFilled(slots[i].hor-1,slots[i].vert) || !spaceFilled(slots[i].hor+1,slots[i].vert)){
 			options.push(slots[i]);
+
 		}
 	}
 	var target = lowestDefense(options,"defense");
-	if(!spaceFilled(target.hor,target.vert-1)){
+	if(!spaceFilled(target.hor,target.vert-1) && !spaceInvisible(target.hor,target.vert-1)){
 		enemy.body.GetComponent("EnemyClick").moveTo(spaces[target.vert-1][target.hor]);
 		enemy.vert = target.vert-1;
 		enemy.hor = target.hor;
 	}
-	if(!spaceFilled(target.hor,target.vert+1)){
+	if(!spaceFilled(target.hor,target.vert+1) && !spaceInvisible(target.hor,target.vert+1)){
 		enemy.body.GetComponent("EnemyClick").moveTo(spaces[target.vert+1][target.hor]);
 		enemy.vert = target.vert+1;
 		enemy.hor = target.hor;
 	}
-	if(!spaceFilled(target.hor-1,target.vert)){
+	if(!spaceFilled(target.hor-1,target.vert) && !spaceInvisible(target.hor-1,target.vert)){
 		enemy.body.GetComponent("EnemyClick").moveTo(spaces[target.vert][target.hor-1]);
 		enemy.vert = target.vert;
 		enemy.hor = target.hor-1;
 	}
-	if(!spaceFilled(target.hor+1,target.vert)){
+	if(!spaceFilled(target.hor+1,target.vert) && !spaceInvisible(target.hor +1,target.vert)){
 		enemy.body.GetComponent("EnemyClick").moveTo(spaces[target.vert][target.hor+1]);
 		enemy.vert = target.vert;
 		enemy.hor = target.hor+1;
@@ -1372,6 +1374,14 @@ function spaceFilled(hor,vert){
 	}
 	for(var j = 0;j<slots.length;j++){
 		if(slots[j].vert ==vert && slots[j].hor == hor && slots[j].invisible==false){
+			return true;
+		}
+	}
+	return false;
+}
+function spaceInvisible(hor,vert){
+	for(var i=0;i<slots.length;i++){
+		if(slots[i].invisible && slots[i].hor == hor && slots[i].vert==vert){
 			return true;
 		}
 	}

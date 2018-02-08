@@ -92,22 +92,23 @@ function Start () {
 
 function tempStart(){
 	
-	units[0].actionsActive["Off Balance"]=true;
+	units[0].actionsActive["Double Vigor"]=true;
 	units[0].actionsActive["Respond"]=true;
 	//units[0].actionsActive["Enlightenment"]=true;
 	units[0].actionsActive["Herbalist"]=true;
 	units[0].actionsActive["Off Balance"]=true;
 
-	units[1].actionsActive["FireBlast"]=true;
+	units[1].actionsActive["Invisible"]=true;
 	//units[1].actionsActive["Flying"]=true;
-	//units[1].actionsActive["Immunity"]=true;
+	units[1].actionsActive["Double Vigor"]=true;
 	units[1].actionsActive["Push"]=true;
-	units[1].actionsActive["Drain"]=true;
+	units[1].actionsActive["Scout"]=true;
 	units[1].actionsActive[""]=true;
 
-	units[2].actionsActive["Scout"]=true;
+	units[2].actionsActive["Double Vigor"]=true;
+	units[2].attack=200000;
 
-	createEGroup("","Skeleton","Goblin","Goblin","",ship, 1000);
+	createEGroup("","Spitter","","","",ship, 1000);
 
 	createGroup(0,1,2,ship);
 	yield WaitForSeconds(2);

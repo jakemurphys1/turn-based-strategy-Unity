@@ -80,11 +80,11 @@
 	}
 	yield WaitForSeconds(delay);
 
-	if(enemy.enemyHit=="Miss"){
+	if(enemy && enemy.enemyHit=="Miss"){
 		wordPopup(ally,"Miss");
 		return;
 	}
-	if(enemy.enemyHit=="Near-Miss"){
+	if(enemy && enemy.enemyHit=="Near-Miss"){
 		var slots = pass.GetComponent("pass").slots;
 		var enlightenedpresent=false;
 		for(var q = 0;q<slots.length;q++){
@@ -399,6 +399,7 @@
  }
  
  function levelup(){
+	GetComponent("Main").pass.SetActive(false);
 	GetComponent("Main").moveGrid.SetActive(false);
 	victoryScreen.SetActive(false);
 	var unit = findlevelup();
@@ -420,6 +421,7 @@
 		unit.actionsActive[newability]=true;
 	}else{
 		GetComponent("Main").moveGrid.SetActive(true);
+		GetComponent("Main").pass.SetActive(true);
 		GetComponent("Main").checkBattle(curlocation);
 	}
  }

@@ -36,6 +36,8 @@ function Start () {
 	}
 	if(dodgePotionOn){
 		dodgePotion.SetActive(true);
+	}else{
+		dodgePotion.SetActive(false);
 	}
 }
 
