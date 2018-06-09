@@ -33,6 +33,7 @@ var defenseButton: GameObject;
 var resistanceButton: GameObject;
 var attackButton: GameObject;
 var healthButton: GameObject;
+var teleportButton: GameObject;
 
 
 function makePotions(){
@@ -82,6 +83,17 @@ function updateColors(){
 		colors.highlightedColor=Color.grey;
 	}
 	reviveButton.GetComponent("Button").colors = colors;
+
+	//teleport
+	colors = reviveButton.GetComponent("Button").colors;
+	if( int.Parse(herbs.GetComponent("Text").text)>=4 && int.Parse(extract.GetComponent("Text").text)>=4){
+		colors.normalColor = Color.black;
+		colors.highlightedColor=Color.black;
+	}else{
+		colors.normalColor = Color.grey;
+		colors.highlightedColor=Color.grey;
+	}
+	teleportButton.GetComponent("Button").colors = colors;
 
 	//defense
 	colors = defenseButton.GetComponent("Button").colors;

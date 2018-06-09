@@ -101,6 +101,10 @@
 		}
 	}
 
+			if(enemy && enemy.type=="Vampire"){
+				pass.GetComponent("pass").heal(enemy,amount);
+			}
+
 	ally.body.GetComponent("AllyClick").hit=1;
 	yield WaitForSeconds(0.1);
 	ally.body.GetComponent("AllyClick").hit=0;
@@ -176,7 +180,7 @@
 	childtext.GetComponent("Text").text=word;
 	instance.transform.SetParent(unit.body.transform, true);
 	yield WaitForSeconds(3);
-	unit.wordPopupAlter-=0;
+	unit.wordPopupAlter-=2;
 	Destroy(instance);
  }
 
@@ -281,6 +285,7 @@
  function loseBattle(group){
 	menu.GetComponent("Menu").hideAll();
 	GetComponent("Main").hideEntries();
+	GetComponent("Main").showTeleport();
 	resetSpaces();
 	GetComponent("Main").menu.SetActive(false);
 	if(GetComponent("Main").inCombat==true){
@@ -320,6 +325,7 @@
 	Egroup.location = null;
 	menu.GetComponent("Menu").hideAll();
 	GetComponent("Main").hideEntries();
+	GetComponent("Main").showTeleport();
 	resetSpaces();
 	DestroyShields();
 	GetComponent("Main").moveGrid.SetActive(true);
@@ -635,7 +641,7 @@
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
 			if(hit=="Hit"){
 				curEnemy.immobolized=2;
-				showAilment("Immobolized", thisUnit);
+				showAilment("Immobolized", curEnemy);
 				GetComponent("sounds").playSound("poison");
 				wordPopup(curEnemy,"Immobolized");
 			}
@@ -894,7 +900,7 @@
 				thisUnit.energy-=30;
 				setEnergyBar(thisUnit);
 				lookAt(curEnemy,thisUnit);
-
+				thisUnit.didAction=true;
 				thisUnit.body.GetComponent("AllyClick").animator.SetInteger("special",2);
 				GetComponent("sounds").playSound("gust");
 				yield WaitForSeconds(0.1);
@@ -924,6 +930,7 @@
 			}else{
 				thisUnit.energy-=30;
 				setEnergyBar(thisUnit);
+				thisUnit.didAction=true;
 				thisUnit.body.GetComponent("AllyClick").animator.SetInteger("special",1);
 				yield WaitForSeconds(0.7);
 				thisUnit.body.GetComponent("AllyClick").animator.SetInteger("special",0);
@@ -968,6 +975,7 @@
 			}else{
 				thisUnit.energy-=30;
 				setEnergyBar(thisUnit);
+				thisUnit.didAction=true;
 				thisUnit.body.GetComponent("AllyClick").animator.SetInteger("special",3);
 				lookAt(curEnemy,thisUnit);
 				yield WaitForSeconds(0.1);
@@ -1421,7 +1429,6 @@
 	}
 
 	var randnum = Random.Range(0,4);
-	Debug.Log(randnum);
 	accuracy+=randnum;
 	if(accuracy>=evasion){
 		return "Hit";
@@ -1616,17 +1623,17 @@
 		 if(randnum==3){
 			GetComponent("sounds").playSound("poison");
 			if(type=="Sleep"){
-				enemy.sleep=2;
+				enemy.sleep=1;
 				showAilment("Sleep", enemy);
 				wordPopup(enemy,"Sleep");
 			}
 			if(type=="Blind"){
-				enemy.blind=3;
+				enemy.blind=2;
 				showAilment("Blind", enemy);
 				wordPopup(enemy,"Blinded");
 			}
 			if(type=="Immobolized"){
-				enemy.immobolized=3;
+				enemy.immobolized=2;
 				showAilment("Immobolized", enemy);
 				wordPopup(enemy,"Immobolized");
 			}
@@ -1724,7 +1731,7 @@ function steal(ally,enemy){
 	var maxhealth = enemy.maxhealth;
 	var healthCheck = Random.Range(1,maxhealth);
 
-	if(healthCheck<health){
+	if(healthCheck<health-20){
 		wordPopup(enemy,"Failed To Steal");
 		return;
 	}

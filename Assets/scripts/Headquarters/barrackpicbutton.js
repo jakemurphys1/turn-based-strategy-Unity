@@ -189,6 +189,14 @@ function makeSwitch(){
 		 unit2.body.transform.rotation=_lookRotation;
 		 unit2.body.GetComponent("AllyClick").Run=1;
 
+		 if(main.GetComponent("Main").istransporting){
+		 	 Debug.Log("transporting");
+			 main.GetComponent("Main").returnMagic(unit1.body,unit2.body);
+			 main.GetComponent("Main").returnMagic(unit2.body,unit1.body);
+			 unit1.body.SetActive(false);
+			 unit2.body.SetActive(false);
+		 }
+
 		var t = 0.0;
 		 while (t < 1.0)
 		 {
@@ -200,6 +208,12 @@ function makeSwitch(){
 			 unit1.body.transform.position = Vector3.Lerp(startPosition,endPosition,t);
 			 unit2.body.transform.position = Vector3.Lerp(startPosition2,endPosition2,t);
 			 yield;
+		 }
+
+		 if(main.GetComponent("Main").istransporting){
+		 	 Debug.Log("transporting");
+			 unit1.body.SetActive(true);
+			 unit2.body.SetActive(true);
 		 }
 }
 

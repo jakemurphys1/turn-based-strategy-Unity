@@ -29,9 +29,9 @@ function gotobarracks(){
          
 
 		var units = main.GetComponent("Main").units;
+		Debug.Log(units.length);
 		for(var i = 0;i<units.length;i++){
 			if(units[i].group==-1){
-					Debug.Log(units[i].type);
 					unit = Instantiate(Resources.Load("alliesPics/" + units[i].type + "_prefab"));
 					unit.transform.SetParent(listField.transform,false);
 					if(addX>=375){

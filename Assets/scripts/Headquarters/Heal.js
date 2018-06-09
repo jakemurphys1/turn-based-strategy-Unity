@@ -10,4 +10,6 @@ function heal(){
 	unit.healing=5;
 	unit.health=unit.maxhealth;
 	main.GetComponent("Main").barrackButton.GetComponent("goToBarracks").gotobarracks();
+		unit.arrows["Heal"]=5;
+		unit.arrows["Medkit"]=1;
 }

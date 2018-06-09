@@ -40,6 +40,8 @@ var allyMoves= new Array();
 
 var enemyMove1:GameObject;
 var enemyMove2:GameObject;
+var enemyMove3:GameObject;
+var enemyMove4:GameObject;
 var enemyMoves= new Array();
 
 var entry: GameObject;
@@ -50,7 +52,6 @@ var itself: GameObject;
 var Grid: GameObject;
 
 function Start(){
-	main = GameObject.Find("Main");
 	row1 = [space00,space10,space20,space30,space40];
 	row2 = [space01,space11,space21,space31,space41];
 	row3 = [space02,space12,space22,space32,space42];
@@ -83,16 +84,25 @@ function Start(){
 	if(enemyMove2){
 		enemyMoves.push(enemyMove2);
 	}
+	if(enemyMove3){
+		enemyMoves.push(enemyMove3);
+	}
+	if(enemyMove4){
+		enemyMoves.push(enemyMove4);
+	}
 }
 
 function OnMouseOver(){
 	if(Input.GetMouseButtonDown(1)){
-	moveActive();
+		moveActive();
 	};
 }
 
 
  function moveActive(){
+	//if(!main){
+		main= GameObject.Find("Main");
+	//}
 	 main.GetComponent.<Main>().hideEntries();
  	 main.GetComponent.<Main>().moveGroup(space10.transform.position,space20.transform.position,space30.transform.position,locIndex, itself);
 	 main.GetComponent("Special").SpecialFunction("moveGroup");

@@ -227,11 +227,16 @@ function switchUnits(){
 	var location1 = group1.location;
 	var location2 = group2.location;
 	var isAdjacent = false;
+	main.GetComponent("Main").istransporting=false;
 	if(location1.GetComponent("locations").allyMove1==location2 || location1.GetComponent("locations").allyMove2==location2 || location1.GetComponent("locations").allyMove3==location2 || location1.GetComponent("locations").allyMove4==location2 || location1.GetComponent("locations").allyMove5==location2 || location1.GetComponent("locations").allyMove6==location2){
 		isAdjacent=true;
 	}
 	if(location2.GetComponent("locations").allyMove1==location1 || location2.GetComponent("locations").allyMove2==location1 || location2.GetComponent("locations").allyMove3==location1 || location2.GetComponent("locations").allyMove4==location1 || location2.GetComponent("locations").allyMove5==location1 || location2.GetComponent("locations").allyMove6==location1){
 		isAdjacent=true;
+	}
+	if(location1.GetComponent("locations").entry.GetComponent("entry").teleporter && location2.GetComponent("locations").entry.GetComponent("entry").teleporter){
+		isAdjacent=true;
+		main.GetComponent("Main").istransporting=true;
 	}
 	if(location1==location2){
 		isAdjacent=true;
@@ -348,10 +353,17 @@ function switchUnits(){
 		instance.transform.position = ally.body.transform.position;
 		instance.transform.SetParent(ally.body.transform,true);
 	}
+	if(main.GetComponent("Main").inCombat==false){
+		main.GetComponent("Main").groups[thisAlly.group].circle.GetComponent("CircleScript").pics.SetActive(true);
+		main.GetComponent("Main").groups[thisAlly.group].circle.GetComponent("CircleScript").UpdateDisplay();
+	}
 }
 
 function OnMouseExit(){
 	if(spotlight){
 		Destroy(spotlight);
+	}
+	if(main.GetComponent("Main").inCombat==false){
+		main.GetComponent("Main").groups[thisAlly.group].circle.GetComponent("CircleScript").pics.SetActive(false);
 	}
 }

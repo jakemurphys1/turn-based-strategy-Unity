@@ -23,6 +23,8 @@ var brew: AudioClip;
 var water:AudioClip;
 var wallCollapse:AudioClip;
 var returnEnergy:AudioClip;
+var crystalOn:AudioClip;
+var crystalOff:AudioClip;
 
 function playSound(name){
 	var audio: AudioSource = GetComponent.<AudioSource>();
@@ -76,6 +78,10 @@ function playSound(name){
 		audio.clip = wallCollapse;
 	}else if(name =="returnEnergy"){
 		audio.clip = returnEnergy;
+	}else if(name =="crystalOn"){
+		audio.clip = crystalOn;
+	}else if(name =="crystalOff"){
+		audio.clip = crystalOff;
 	}
 	audio.Play();
 }

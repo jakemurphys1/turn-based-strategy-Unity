@@ -48,6 +48,11 @@ var options:GameObject;
 var musicText:GameObject;
 var StoreInfo:GameObject;
 var loading:GameObject;
+var headquarters:GameObject;
+var daysleft:GameObject;
+var canvas:GameObject;
+var istransporting:boolean=false;
+var entries;
 
 function Awake(){
 	StoreInfo = GameObject.Find("StoreInfo");
@@ -61,6 +66,7 @@ function Awake(){
 
 
 function Start () {
+
 	if(GetComponent("Special").PotionOn){
 		GetComponent("Special").Potion.SetActive(true);
 	}else{
@@ -88,28 +94,31 @@ function Start () {
 	items["Evasion Potion"]=0;
 
 	Cursor.lockState = CursorLockMode.Confined;
+
+	entries= GameObject.FindGameObjectsWithTag("Entry");
 }
 
 function tempStart(){
 	
-	units[0].actionsActive["Double Vigor"]=true;
-	units[0].actionsActive["Respond"]=true;
+	units[0].actionsActive["Invisible"]=true;
+	//units[0].actionsActive["Respond"]=true;
 	//units[0].actionsActive["Enlightenment"]=true;
-	units[0].actionsActive["Herbalist"]=true;
-	units[0].actionsActive["Off Balance"]=true;
+	units[0].actionsActive["Heal"]=true;
 
-	units[1].actionsActive["Invisible"]=true;
+	units[1].actionsActive["Sweep"]=true;
 	//units[1].actionsActive["Flying"]=true;
-	units[1].actionsActive["Double Vigor"]=true;
+	units[1].actionsActive["Swirl"]=true;
 	units[1].actionsActive["Push"]=true;
 	units[1].actionsActive["Scout"]=true;
 	units[1].actionsActive[""]=true;
+	units[1].attack=0;
 
-	units[2].actionsActive["Double Vigor"]=true;
-	units[2].attack=200000;
+	units[2].actionsActive["Immobolize"]=true;
 
-	createEGroup("","Spitter","","","",ship, 1000);
 
+	createEGroup("","Goblin","","","",ship, 1000);
+	Eunits[0].attack=0;
+	
 	createGroup(0,1,2,ship);
 	yield WaitForSeconds(2);
 	checkBattle(ship);
@@ -120,7 +129,7 @@ function tempStart(){
 
 //unit creation
 function createUnit(name){
-	units[indexNum]= new Ally(indexNum,name);
+	units[indexNum]= new Ally(indexNum,name,units);
 	indexNum+=1;
 }
  function createEUnit(name){
@@ -142,7 +151,7 @@ function createGroup(slot1:int,slot2:int,slot3:int,curlocation){
 	circle = Instantiate(Resources.Load("GroupCircle", GameObject));
 	groups[groupIndex].circle = circle;
 	circle.transform.position=curlocation.GetComponent("locations").space20.transform.position;
-	circle.transform.GetChild(0).GetComponent("UsePotions").groupIndex=groupIndex;
+	circle.GetComponent("CircleScript").circle.transform.GetChild(0).GetComponent("UsePotions").groupIndex=groupIndex;
 
 	returnMagic(nexus,curlocation.GetComponent("locations").space10);
 	createUnitBody(slot1,curlocation.GetComponent("locations").space10,groupIndex,1);
@@ -171,9 +180,10 @@ function createUnitBody(slot,space,groupIndex,hor){
 	var unit1 = Instantiate(Resources.Load("allies3D/" + units[slot].type, GameObject));
 	unit1.transform.position=space.transform.position;
 	unit1.transform.position.z=-1000;
-	unit1.transform.SetParent(Terrain.transform,false);
+	unit1.transform.SetParent(Terrain.transform,true);
 	unit1.GetComponent("AllyClick").index=slot;
 	units[slot].hor = hor;
+	units[slot].vert = 0;
 	units[slot].body = unit1;
 	GetComponent("combat").setEnergyBar(units[slot]);
 	var healthbar=units[slot].body.GetComponent("AllyClick").healthbar;
@@ -196,7 +206,7 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 		unit1.transform.position=location.GetComponent.<locations>().space04.transform.position;
 		unit1.transform.position.y=Eunits[EindexNum-1].height;
 	
-		unit1.transform.SetParent(Terrain.transform,false);
+		unit1.transform.SetParent(Terrain.transform,true);
 		unit1.GetComponent("EnemyClick").eindex = EindexNum-1;
 		//Egroups[EgroupIndex].slot1Object = unit1;
 		unit1.GetComponent("EnemyClick").groupnum=EgroupIndex;
@@ -204,15 +214,13 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 		Eunits[EindexNum-1].hor = 0;
 		quickMessage(Eunits[EindexNum-1].type + " has appeared!");
 	}
-	
-
 	if(slot2){
 			createEUnit(slot2);
 			Eunits[EindexNum-1].group = EgroupIndex;
 			unit2 = Instantiate(Resources.Load("enemy3D/" + Eunits[EindexNum-1].type, GameObject));
 			unit2.transform.position=location.GetComponent.<locations>().space14.transform.position;
 			unit2.transform.position.y=1;
-			unit2.transform.SetParent(Terrain.transform,false);
+			unit2.transform.SetParent(Terrain.transform,true);
 			unit2.GetComponent("EnemyClick").eindex = EindexNum-1;
 			unit2.GetComponent("EnemyClick").groupnum=EgroupIndex;
 			//Egroups[EgroupIndex].slot2Object = unit2;
@@ -226,7 +234,7 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			unit3 = Instantiate(Resources.Load("enemy3D/" + Eunits[EindexNum-1].type, GameObject));
 			unit3.transform.position=location.GetComponent.<locations>().space24.transform.position;
 			unit3.transform.position.y=1;
-			unit3.transform.SetParent(Terrain.transform,false);
+			unit3.transform.SetParent(Terrain.transform,true);
 			unit3.GetComponent("EnemyClick").eindex = EindexNum-1;
 			unit3.GetComponent("EnemyClick").groupnum=EgroupIndex;
 			//Egroups[EgroupIndex].slot3Object = unit3;
@@ -240,7 +248,7 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			unit4 = Instantiate(Resources.Load("enemy3D/" + Eunits[EindexNum-1].type, GameObject));
 			unit4.transform.position=location.GetComponent.<locations>().space34.transform.position;
 			unit4.transform.position.y=1;
-			unit4.transform.SetParent(Terrain.transform,false);
+			unit4.transform.SetParent(Terrain.transform,true);
 			unit4.GetComponent("EnemyClick").eindex = EindexNum-1;
 			unit4.GetComponent("EnemyClick").groupnum=EgroupIndex;
 			//Egroups[EgroupIndex].slot4Object = unit4;
@@ -254,7 +262,7 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			unit5 = Instantiate(Resources.Load("enemy3D/" + Eunits[EindexNum-1].type, GameObject));
 			unit5.transform.position=location.GetComponent.<locations>().space44.transform.position;
 			unit5.transform.position.y=1;
-			unit5.transform.SetParent(Terrain.transform,false);
+			unit5.transform.SetParent(Terrain.transform,true);
 			unit5.GetComponent("EnemyClick").eindex = EindexNum-1;
 			unit5.GetComponent("EnemyClick").groupnum=EgroupIndex;
 			//Egroups[EgroupIndex].slot5Object = unit5;
@@ -313,6 +321,7 @@ class EGroup{
 	//var slot1Object: GameObject;
 	//var slot2Object: GameObject;
 	//var slot3Object: GameObject;
+	var circle:GameObject;
 	var slot4Object: GameObject;
 	var slot5Object: GameObject;
 	var experience: int;
@@ -392,7 +401,7 @@ class Ally{
    var weak:String;
    var wordPopupAlter:int=0;
 
-   function Ally(indexNum:int,type:String){
+   function Ally(indexNum:int,type:String,units){
 		if(type=="Archer"){
 			   this.maxhealth=80;
 			   this.attack=40;
@@ -774,7 +783,7 @@ class Ally{
 			   this.actionDes1["Protect"] = "Protect your Allies";
 			   this.actionDes2["Protect"]  = "Protects an ally. All damage to that ally is redirected to the guard.";
 			   this.actionDes1["Immunity"] = "Ailments Can't Stop Him";
-			   this.actionDes2["Immunity"]  = "Guard and whoever he is protecting can't be inflicted by ailments";
+			   this.actionDes2["Immunity"]  = "Guard can't be inflicted by ailments";
 			   this.actionDes1["Scout"] = "Always Good to Plan Ahead";
 			   this.actionDes2["Scout"]  = "The group with this guard always goes first.";
 			   this.actionDes1["Reshield"] = "Recharge the Guard's shield";
@@ -859,7 +868,7 @@ class Ally{
 			   this.actionDes2["Off Balance"]  = "If an adjacent enemy misses the monk, it is inflicted by sleep for 1 turn";
 			   this.actionDes1["Enlightenment"] = "Protect your group";
 			   this.actionDes2["Enlightenment"]  = "The Monk and his allies take no damage from near-misses";
-			   this.description="Highly evasive, this low-damage fighter can't kill enemies, but can aid in other ways";
+			   this.description="Highly evasive, this low-damage fighter is best against enemies will low accuracy.";
 			   this.strong="Enemies with low accuracy.";
 			   this.weak="Enemies with high accuracy.";
 		}
@@ -2281,12 +2290,12 @@ class Enemy{
 			 this.resistance = 10;
 			 this.attackType="FireAttack";
 			 this.moveType="Afraid";
-			 this.elemental["Fire"]=0.5;
-			 this.elemental["Ice"]=2;
+			 this.elemental["Fire"]=1;
+			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
 			 this.defenseType="resistance";
 			 this.charge=0;
-			 this.maxcharge=1;
+			 this.maxcharge=2;
 			 this.evasion=4;
 			 this.description="These close-range creatures prevent any ailments from being inflicted on any enemies. High evasion.";
 			 this.strong="Units with low accuracy or low defense, or units that use abilities that inflict ailments.";
@@ -2328,24 +2337,24 @@ class Enemy{
 		};//done
 		if(type=="Werewolf"){
 			if (level == 1) {
-             this.attack = 40;
+             this.attack = 35;
              this.health = 70;
-             this.maxhealth = 70;
+             this.maxhealth = 50;
 			 }
 			 if (level == 2) {
-				 this.attack = 60;
-				 this.health = 110;
-				 this.maxhealth = 110;
+				 this.attack = 55;
+				 this.health = 90;
+				 this.maxhealth = 90;
 			 }
 			 if (level == 3) {
-				 this.attack = 80;
-				 this.health = 150;
-				 this.maxhealth = 150;
+				 this.attack = 75;
+				 this.health = 130;
+				 this.maxhealth = 130;
 			 }
 			 if (level == 4) {
-				 this.attack = 100;
-				 this.health = 185;
-				 this.maxhealth = 185;
+				 this.attack = 95;
+				 this.health = 150;
+				 this.maxhealth=150;
 			 }
 			 this.defense = 20;
 			 this.resistance = 40;
@@ -2381,8 +2390,8 @@ class Enemy{
 				 this.maxhealth = 125;
 			 }
 			 this.evasion=4;
-			 this.defense = 25;
-			 this.resistance = 25;
+			 this.defense = 10;
+			 this.resistance = 10;
 			 this.attackType="CloseAttack";
 			 this.moveType="Agressive";
 			 this.elemental["Fire"]=1;
@@ -2603,7 +2612,7 @@ class Enemy{
 	hideCircles();
 
 	var circle = groups[activeGroup].circle;
-	circle.SetActive(true);
+	circle.GetComponent("CircleScript").showCircle();
 
 	var location = groups[activeGroup].location;
 	var moveLocations=location.GetComponent("locations").allyMoves;
@@ -2615,6 +2624,14 @@ class Enemy{
 
 	if(groups[activeGroup].hasMoved){
 		return;
+	}
+	if(location.GetComponent("locations").entry.GetComponent("entry").teleporter){
+		for(i =0;i<objects.length;i++){
+			if(objects[i].GetComponent("entry").teleporter){
+
+				objects[i].GetComponent("entry").readyMove=true;
+			}
+		}
 	}
 
 	for(i =0;i<moveLocations.length;i++){
@@ -2628,7 +2645,7 @@ class Enemy{
  function hideCircles(){
 	for(var j = 0;j<groups.length;j++){
 		if(groups[j].circle){
-			groups[j].circle.SetActive(false);
+			groups[j].circle.GetComponent("CircleScript").hideCircle();
 		}
 	}
  }
@@ -2636,8 +2653,16 @@ class Enemy{
 			if(inCombat || groups[activeGroup].hasMoved || checkGroup(location)){
  				return;
 			}
+			var teleport=false;
+			if(groups[activeGroup].location.GetComponent("locations").entry.GetComponent("entry").teleporter && location.GetComponent("locations").entry.GetComponent("entry").teleporter){
+				teleport=true;
+			}
+
+			
+
 			groups[activeGroup].hasMoved=true;
 			groups[activeGroup].location = location;
+			GetComponent("Special").SpecialFunction("allyMove");
 			var curCircle = groups[activeGroup].circle;
 			slot1.y=1;
 			slot2.y=1;
@@ -2648,16 +2673,22 @@ class Enemy{
 			var curObject3 = giveUnitSlot(3,activeGroup);
 			
 			if(curObject1){
+				if(teleport){
+					curObject1.SetActive(false);
+					returnMagic(curObject1,location.GetComponent("locations").space10);
+				}
 				curObject1.GetComponent("AllyClick").Run=1;
-
 				var startPosition1 = curObject1.transform.position;
-
 				_direction1 = (slot1 - startPosition1).normalized;
 				_lookRotation1 = Quaternion.LookRotation(_direction1);
 				startDirection1 = curObject1.transform.GetChild(0).transform.rotation;
 				curObject1.transform.rotation=_lookRotation1;
 			}
 			if(curObject2){
+				if(teleport){
+					curObject2.SetActive(false);
+					returnMagic(curObject1,location.GetComponent("locations").space20);
+				}
 				curObject2.GetComponent("AllyClick").Run=1;
 				var startPosition2 = curObject2.transform.position;
 
@@ -2667,6 +2698,10 @@ class Enemy{
 					curObject2.transform.rotation=_lookRotation2;
 			}
 			if(curObject3){
+				if(teleport){
+					curObject3.SetActive(false);
+					returnMagic(curObject1,location.GetComponent("locations").space30);
+				}
 				curObject3.GetComponent("AllyClick").Run=1;
 				var startPosition3 = curObject3.transform.position;
 
@@ -2675,6 +2710,8 @@ class Enemy{
 					startDirection3 = curObject3.transform.GetChild(0).transform.rotation;
 					curObject3.transform.rotation=_lookRotation3;
 			}
+
+			
 
 					var startPositionC = groups[activeGroup].circle.transform.position;
 
@@ -2705,16 +2742,25 @@ class Enemy{
 						 yield;
 					 }
 					 curCircle.transform.position.y=1;
-					 curCircle.SetActive(false);
+					 curCircle.GetComponent("CircleScript").hideCircle();
 
 					 if(curObject1){
 						curObject1.transform.rotation=startDirection1;
+						if(teleport){
+							curObject1.SetActive(true);
+						}
 					 }
 					 if(curObject2){
 						curObject2.transform.rotation=startDirection2;
+						if(teleport){
+							curObject2.SetActive(true);
+						}
 					 }
 					 if(curObject3){
 						curObject3.transform.rotation=startDirection3;
+						if(teleport){
+							curObject3.SetActive(true);
+						}
 					 } 
 					checkBattle(location);
  }
@@ -2744,7 +2790,7 @@ function startBattle(location,groupNum,EgroupNum){
 	if(groups[groupNum].circle==null){
 		return;
 	}
-	groups[groupNum].circle.SetActive(false);
+	groups[groupNum].circle.GetComponent("CircleScript").hideCircle();
 	menu.SetActive(true);
 	activeGroup=groupNum;
 	moveGrid.SetActive(false);
@@ -2754,7 +2800,8 @@ function startBattle(location,groupNum,EgroupNum){
 	}else{
 		return;
 	}
-	hideEntries();
+	
+	hideTeleport();
 	inCombat=true;
 	GetComponent("combat").resetSpaces();
 	//set active slots
@@ -2846,7 +2893,7 @@ function startBattle(location,groupNum,EgroupNum){
 		curCamera.transform.position = Vector3.Lerp(startPosition,endPosition,t);
 		yield;
 	}
-
+	hideEntries();
 	GetComponent("combat").returnUnits(slots);
 
 	//enemy goes first?
@@ -2857,11 +2904,24 @@ function startBattle(location,groupNum,EgroupNum){
 }
 
 function hideEntries(){
-	var objects = GameObject.FindGameObjectsWithTag("Entry");
-	for(var i = 0;i<objects.length;i++){
-		objects[i].GetComponent("entry").readyMove=false;
+	for(var i = 0;i<entries.length;i++){
+		entries[i].GetComponent("entry").readyMove=false;
 	}
 	groupScreen.SetActive(false);
+}
+function hideTeleport(){
+	for(var i = 0;i<entries.length;i++){
+		if(entries[i].GetComponent("entry").teleporter){
+			entries[i].SetActive(false);
+		}	
+	}
+}
+function showTeleport(){
+	for(var i = 0;i<entries.length;i++){
+		if(entries[i].GetComponent("entry").teleporter){
+			entries[i].SetActive(true);
+		}	
+	}
 }
 
 function checkGroup(location){
@@ -2875,8 +2935,10 @@ function checkGroup(location){
 
 function Update(){
 	if(inCombat){
+		menu.SetActive(true);
 		return;
 	}
+	menu.SetActive(false);
 	moveGrid.SetActive(true);
 	var d = Input.GetAxis("Mouse ScrollWheel");
 	 if (d < 0f && curCamera.transform.position.y<285)
@@ -2959,7 +3021,7 @@ function Update(){
 			t = 0.0;
 			 while (t < 1.0)
 			 {
-				 t += 0.02;
+				 t += 0.03;
 				 instance.transform.position = Vector3.Lerp(startPosition,endPosition,t);
 				 yield;
 			 }

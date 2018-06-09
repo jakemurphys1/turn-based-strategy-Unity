@@ -2,12 +2,10 @@
 var main: GameObject;
 
 function OnMouseDown(){
+	Debug.Log("check");
 	menu.SetActive(true);
 	//tutorial
 	main.GetComponent("Special").SpecialFunction("nexus");
-}
-function Start(){
-	main = GameObject.Find("Main");
 }
 
 function Update(){

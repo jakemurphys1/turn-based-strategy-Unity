@@ -1,39 +1,15 @@
-﻿var Entrance1: GameObject;
-var Entrance2: GameObject;
-var Entrance3: GameObject;
-var Entrance4: GameObject;
-var Entrance5: GameObject;
-var Entrance6: GameObject;
-var Potion:GameObject;
+﻿var Potion:GameObject;
 var PotionOn:boolean=true;
 var dodgePotion:GameObject;
 var dodgePotionOn:boolean=true;
-var Entrances = new Array();
 var specialItem:GameObject;
 var description:String;
+var curSpecial: GameObject;
 
 
 function Start () {
 	GetComponent("Main").other.GetComponent("Music").playMusic("mainMusic");
 	MakeEnemies();
-	if(Entrance1){
-		Entrances.push(Entrance1);
-	}
-	if(Entrance2){
-		Entrances.push(Entrance2);
-	}
-	if(Entrance3){
-		Entrances.push(Entrance3);
-	}
-	if(Entrance4){
-		Entrances.push(Entrance4);
-	}
-	if(Entrance5){
-		Entrances.push(Entrance5);
-	}
-	if(Entrance6){
-		Entrances.push(Entrance6);
-	}
 	if(dodgePotionOn){
 		dodgePotion.SetActive(true);
 	}else{
@@ -42,15 +18,15 @@ function Start () {
 }
 
 function Pass(){
-	GetComponent("special_" + GetComponent("Main").curname).Pass(Entrances);
+	curSpecial.GetComponent("special_" + GetComponent("Main").curname).Pass();
 }
 
 function MakeEnemies(){
-	GetComponent("special_" + GetComponent("Main").curname).MakeEnemies();
+	curSpecial.GetComponent("special_" + GetComponent("Main").curname).MakeEnemies();
 }
 
 function groupPass(Egroup){
-	GetComponent("special_" + GetComponent("Main").curname).groupPass(Egroup);
+	curSpecial.GetComponent("special_" + GetComponent("Main").curname).groupPass(Egroup);
 }
 
 function isEmpty(location){
@@ -65,11 +41,15 @@ function isEmpty(location){
 }
 
 function placeEnemies(location, count){
-	GetComponent("special_" + GetComponent("Main").curname).placeEnemies(location,count);
+	curSpecial.GetComponent("special_" + GetComponent("Main").curname).placeEnemies(location,count);
 }
 
 function SpecialFunction(curName){
 	//if(GetComponent("special_" + GetComponent("Main").curname).SpecialFunction){
-		GetComponent("special_" + GetComponent("Main").curname).SpecialFunction(curName);
+		curSpecial.GetComponent("special_" + GetComponent("Main").curname).SpecialFunction(curName);
 	//}
+}
+
+function setCurSpecial(object){
+	curSpecial=object;
 }

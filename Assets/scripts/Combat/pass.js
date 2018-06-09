@@ -74,22 +74,22 @@ function enemyturn(){
 	for(var k =0;k<eslots.length;k++){
 		if(eslots[k].immobolized>0){
 			eslots[k].immobolized-=1;
-			main.GetComponent("combat").wordPopup(eslots[k],"Immobolized - " + eslots[k].immobolized);
+			main.GetComponent("combat").wordPopup(eslots[k],"Immobolized: " + eslots[k].immobolized);
 		}
 		if(eslots[k].sleep>0){
 			eslots[k].sleep-=1;
-			main.GetComponent("combat").wordPopup(eslots[k],"Sleep - " + eslots[k].sleep);
+			main.GetComponent("combat").wordPopup(eslots[k],"Sleep: " + eslots[k].sleep);
 		}
 		if(eslots[k].enfeebled>0){
 			eslots[k].enfeebled-=1;
 		}
 		if(eslots[k].blind>0){
 			eslots[k].blind-=1;
-			main.GetComponent("combat").wordPopup(eslots[k],"Blind - " + eslots[k].blind);
+			main.GetComponent("combat").wordPopup(eslots[k],"Blind: " + eslots[k].blind);
 		}
 		if(eslots[k].silenced>0){
 			eslots[k].silenced-=1;
-			main.GetComponent("combat").wordPopup(eslots[k],"Silenced - " + eslots[k].silenced);
+			main.GetComponent("combat").wordPopup(eslots[k],"Silenced: " + eslots[k].silenced);
 		}
 		if(eslots[k].poison>0){
 			eslots[k].poison-=1;
@@ -102,6 +102,7 @@ function enemyturn(){
 		}
 		if(slots[q].sleep>0){
 			slots[q].sleep-=1;
+			main.GetComponent("combat").wordPopup(slots[q],"Sleep: " + slots[q].sleep);
 		}
 		if(slots[q].enfeebled>0){
 			slots[q].enfeebled-=1;
@@ -121,6 +122,7 @@ function enemyturn(){
 			slots[q].poison-=1;
 		}
 	}
+	returnUnits();
 }
 function worldturn(){
 	var groups = main.GetComponent("Main").groups;
@@ -499,7 +501,6 @@ function closeAttack(enemy,eslots,slots){
 				enemy.body.GetComponent("EnemyClick").attack =1;
 			}
 			
-			
 			main.GetComponent("combat").damageAlly(slots[attackThis].index,damage,enemy,1);
 			yield WaitForSeconds(1);
 			if(isSpecial){
@@ -509,9 +510,7 @@ function closeAttack(enemy,eslots,slots){
 			enemy.body.GetComponent("EnemyClick").animator.SetInteger("special",0);
 			main.GetComponent("sounds").playSound("hit");
 			yield WaitForSeconds(0.5);
-			if(enemy.type=="Vampire"){
-				heal(enemy,damage);
-			}
+			
 			if(enemy.type=="Pixie"){
 				doAilment(enemy,slots[attackThis],"Poison");
 				doAilment(enemy,slots[attackThis],"Enfeeble");
@@ -963,6 +962,10 @@ function SpiderAttack(enemy){
 				 yield;
 			 }
 			 Destroy(rope);
+			 if(enemy.type=="Vacuum"){
+				closeAttack(enemy,eslots,slots);
+			 }
+			 
 
 	if(enemy.type=="Spider"){
 		doAilment(enemy,target,"Poison");
@@ -1026,10 +1029,12 @@ function flyMove(enemy){
 	for(var i = 0;i<slots.length;i++){
 		if(!spaceFilled(slots[i].hor,slots[i].vert-1) || !spaceFilled(slots[i].hor,slots[i].vert+1) || !spaceFilled(slots[i].hor-1,slots[i].vert) || !spaceFilled(slots[i].hor+1,slots[i].vert)){
 			options.push(slots[i]);
-
 		}
 	}
 	var target = lowestDefense(options,"defense");
+	if(target == null){
+		return;
+	}
 	if(!spaceFilled(target.hor,target.vert-1) && !spaceInvisible(target.hor,target.vert-1)){
 		enemy.body.GetComponent("EnemyClick").moveTo(spaces[target.vert-1][target.hor]);
 		enemy.vert = target.vert-1;
@@ -1205,8 +1210,7 @@ function counter(enemy,ally){
 			}
 		}
 		if(enemy.vert == ally.vert){
-			if((enemy.hor==ally.vert+1)||(enemy.vert==ally.hor-1)){
-				if((enemy.vert==ally.vert+1)||(enemy.vert==ally.vert-1)){
+			if((enemy.hor==ally.hor+1)||(enemy.hor==ally.hor-1)){
 					 if(ally.actionsActive["Bulk"]){
 						enemy.enfeebled=2;
 						main.GetComponent("combat").showAilment("Enfeebled", enemy);
@@ -1221,8 +1225,7 @@ function counter(enemy,ally){
 						main.GetComponent("combat").swordattack(ally, enemy);
 						ally.didAction=false;
 					 }
-				}
-			}	
+			}
 		}
 	}
 }
@@ -1321,9 +1324,16 @@ function charge(enemy){
 }
 function lowestDefense(options,type){
 	if(options.length==0){
-		return;
+		return null;
 	}
 	var option = options[0];
+	if(option.invisible){
+		if(options.length==1){
+			return null;
+		}else{
+			option = options[1];
+		}
+	}
 	if(type=="defense"){
 		for(var j = 1;j<options.length;j++){
 			if(options[j].defense<option.defense && options[j].invisible==false){
@@ -1537,3 +1547,12 @@ function summon(enemy,hor,vert,type){
 	yield WaitForSeconds(2);
 	Destroy(instance);
 }
+
+function returnUnits(){
+	var spaces = GetComponent("pass").spaces;
+ 	 for(var i=0;i<eslots.length;i++){
+		var x =eslots[i].hor;
+		var y =eslots[i].vert;
+	 	 eslots[i].body.transform.position = spaces[y][x].transform.position;
+	 }
+ }

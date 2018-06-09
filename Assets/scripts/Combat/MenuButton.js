@@ -43,7 +43,6 @@ function clickit(){
 			ally.charge+=1;
 			ally.body.GetComponent("AllyClick").item.GetComponent("Text").text=ally.charge.ToString();
 			ally.didAction=true;
-			main.GetComponent("sounds").playSound("charge");
 			charge(ally);
 	}
 	if(clickButton=="Reshield"){

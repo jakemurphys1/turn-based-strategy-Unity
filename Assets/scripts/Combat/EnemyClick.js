@@ -127,10 +127,29 @@ function OnMouseOver(){
 		instance.transform.position = enemy.body.transform.position;
 		instance.transform.SetParent(enemy.body.transform,true);
 	}
+	if(main.GetComponent("Main").inCombat==false){
+		enemy = main.GetComponent("Main").Eunits[eindex];
+		var curgroup = main.GetComponent("Main").Egroups[enemy.group];
+		if(!curgroup.circle){
+			var circle = Instantiate(Resources.Load("EGroupCircle", GameObject));
+			enemy = main.GetComponent("Main").Eunits[eindex];
+			curgroup.circle = circle;
+			circle.transform.position=enemy.body.transform.position;
+			circle.transform.position.x-=250;
+			circle.transform.position.z+=20;
+		}
+	}
 }
 
 function OnMouseExit(){
 	if(spotlight){
 		Destroy(spotlight);
+	}
+	if(main.GetComponent("Main").inCombat==false){
+		enemy = main.GetComponent("Main").Eunits[eindex];
+		var curgroup = main.GetComponent("Main").Egroups[enemy.group];
+		if(curgroup.circle){
+			Destroy(curgroup.circle);
+		}
 	}
 }

@@ -5,6 +5,7 @@ var main: GameObject;
 var menu:GameObject;
 
 function Start(){
+	yield WaitForSeconds(2);
 	main = GameObject.Find("Main");
 	menu = GameObject.Find("Canvas/MenuB");
 }
@@ -45,6 +46,7 @@ function Update()
 	var thisposition = transform.position;
 	
 	if(readyMove==true){
+
 		main.GetComponent("Special").SpecialFunction("moveUnit");
 		var selectedUnit = main.GetComponent("Main").selectedUnit;
 		var curIndex = selectedUnit.GetComponent("AllyClick").index;
@@ -52,6 +54,10 @@ function Update()
 
 		if(ally.sleep){
 			main.GetComponent("combat").wordPopup(ally,"Sleeping");
+			return;
+		}
+		if(ally.immobolized){
+			main.GetComponent("combat").wordPopup(ally,"Immobolized");
 			return;
 		}
 
@@ -120,7 +126,6 @@ function Update()
 		activeScript.hor=hor;
 		
 	}
-	
  }
 
  function resetSpaces(){

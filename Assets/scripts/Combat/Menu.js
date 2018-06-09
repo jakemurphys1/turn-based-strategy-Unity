@@ -12,7 +12,6 @@ var elements:GameObject;
 var curAlly;
 var confirmPanel:GameObject;
 
-
 function setMenu(x,y,actions,type,actionsActive,ally){
 	transform.position.x = x+ 50;
 	transform.position.y = y;

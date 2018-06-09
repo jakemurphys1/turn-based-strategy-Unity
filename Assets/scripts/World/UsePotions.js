@@ -44,12 +44,18 @@ function OnMouseDown(){
 
 	if(slot1){
 		givePotions.GetComponent("GivePotions").slot1=slot1;
+	}else{
+		givePotions.GetComponent("GivePotions").slot1=null;
 	}
 	if(slot2){
 		givePotions.GetComponent("GivePotions").slot2=slot2;
+	}else{
+		givePotions.GetComponent("GivePotions").slot2=null;
 	}
 	if(slot3){
 		givePotions.GetComponent("GivePotions").slot3=slot3;
+	}else{
+		givePotions.GetComponent("GivePotions").slot3=null;
 	}
 	
 	givePotions.GetComponent("GivePotions").updateIcons();

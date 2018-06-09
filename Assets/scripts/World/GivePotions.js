@@ -148,7 +148,10 @@ function givePotion(){
 			main.GetComponent("Main").items["Attack Potion"]-=1;
 			curUnit.attackBoost=true;
 			var increase = (curUnit.attack*0.3);
-			curUnit.attack += (curUnit.attack*0.3);
+			if(increase<5){
+				increase=5;
+			}
+			curUnit.attack += (increase);
 			AttackIcon.SetActive(true);
 			potionEffect(curUnit,"Attack",increase);
 		}else{
@@ -164,7 +167,10 @@ function givePotion(){
 			main.GetComponent("Main").items["Defense Potion"]-=1;
 			curUnit.defenseBoost=true;
 			increase = (curUnit.defense*0.3);
-			curUnit.defense += (curUnit.defense*0.3);
+			if(increase<5){
+				increase=5;
+			}
+			curUnit.defense += (increase);
 			DefenseIcon.SetActive(true);
 			potionEffect(curUnit,"Defense",increase);
 		}else{
@@ -180,7 +186,10 @@ function givePotion(){
 			main.GetComponent("Main").items["Resistance Potion"]-=1;
 			curUnit.resistanceBoost=true;
 			increase = (curUnit.resistance*0.3);
-			curUnit.resistance += (curUnit.resistance*0.3);
+			if(increase<5){
+				increase=5;
+			}
+			curUnit.resistance += (increase);
 			ResistanceIcon.SetActive(true);
 			potionEffect(curUnit,"Resistance",increase);
 		}else{
@@ -196,7 +205,10 @@ function givePotion(){
 			main.GetComponent("Main").items["Health Potion"]-=1;
 			curUnit.healthBoost=true;
 			increase = (curUnit.maxhealth*0.3);
-			curUnit.health += (curUnit.maxhealth*0.3);
+			if(increase<5){
+				increase=5;
+			}
+			curUnit.health += (increase);
 			curUnit.maxhealth += (curUnit.maxhealth*0.3);
 			HealthIcon.SetActive(true);
 			potionEffect(curUnit,"Max Health",increase);

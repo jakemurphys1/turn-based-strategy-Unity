@@ -1,6 +1,6 @@
 ﻿var thisCamera: GameObject;
 var direction: String;
-var speed:int;
+var speed:int=2;
 var maxleft:int;
 var maxright:int;
 var maxtop:int;
@@ -61,4 +61,12 @@ function Update(){
 		
 		thisCamera.transform.position.z -=speed;
 	}
+}
+
+function setlimits(left,top,right,bottom, curCamera){
+	maxleft=left;
+	maxright=right;
+	maxtop=top;
+	maxbottom=bottom;
+	thisCamera=curCamera;
 }

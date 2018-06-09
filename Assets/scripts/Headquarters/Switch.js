@@ -55,7 +55,6 @@ function takeSpace(){
 		 unit1.body.transform.rotation=_lookRotation;
 		 unit1.body.GetComponent("AllyClick").Run=1;
 
-
 		var t = 0.0;
 		 while (t < 1.0)
 		 {
