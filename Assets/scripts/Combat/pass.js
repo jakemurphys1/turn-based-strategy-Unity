@@ -94,6 +94,9 @@ function enemyturn(){
 		if(eslots[k].poison>0){
 			eslots[k].poison-=1;
 		}
+		if(eslots[k].vulnerable>0){
+			eslots[k].vulnerable-=1;
+		}
 	}
 	for(var q =0;q<slots.length;q++){
 		turnVisible(slots[q]);
@@ -122,6 +125,7 @@ function enemyturn(){
 			slots[q].poison-=1;
 		}
 	}
+	
 	returnUnits();
 }
 function worldturn(){
@@ -437,6 +441,12 @@ function enemyAttack(){
 			}
 			if(eslots[n].attackType=="ArrowAttack"){
 				arrowAttack(eslots[n]);
+			}
+			if(eslots[n].attackType=="ShamanAttack"){
+				ShamanAttack(eslots[n]);
+			}
+			if(eslots[n].attackType=="CannonAttack"){
+				CannonAttack(eslots[n]);
 			}
 			if(eslots[n].maxcharge>-1 && eslots[n].chargeAfterAttack && eslots[n].didAction==false){
 				if(eslots[n].charge<eslots[n].maxcharge){
@@ -975,6 +985,46 @@ function SpiderAttack(enemy){
 
 	counter(enemy,target);
 }
+function ShamanAttack(enemy){
+	if(!enemy.body || enemy.silenced>0){
+			return;
+	}
+	enemy.didAction=true;
+	enemy.hasMoved=true;
+	enemy.charge-=enemy.maxcharge;
+	enemy.body.GetComponent("EnemyClick").chargeText.GetComponent("Text").text=enemy.charge.ToString();
+
+	var waittime=0;
+	if(enemy.body.GetComponent("EnemyClick").Run>0){
+		waittime=1;
+	}
+	var target = eslots[0];
+	lookAt(enemy,target);
+
+	yield WaitForSeconds(waittime);
+	lookAt(enemy,target);
+	enemy.body.GetComponent("EnemyClick").attack =1;
+
+	yield WaitForSeconds(0.5);
+
+	main.GetComponent("sounds").playSound("heal");
+	heal(target,50);
+	magic = Resources.Load("effects/Charge", GameObject);
+
+	instance = Instantiate(magic);
+	instance.transform.position = enemy.body.transform.position;
+	shootObject(instance,target);
+	enemy.body.GetComponent("EnemyClick").attack =0;
+}
+function CannonAttack(enemy){
+	for(i = 0;i<slots.length;i++){
+		main.GetComponent("combat").damageAlly(slots[i].index,slots[i].health,"None",0);
+	}
+	var explosion = Resources.Load("effects/Explode", GameObject);
+	var instance = Instantiate(explosion);
+	instance.transform.position = enemy.body.transform.position;
+	main.GetComponent("sounds").playSound("explosion");
+}
 
 //moves
 function aggressiveMove(enemy){
@@ -1312,7 +1362,9 @@ function charge(enemy){
 	yield WaitForSeconds(waittime);
 	
 	enemy.charge+=1;
-	enemy.body.GetComponent("EnemyClick").animator.SetInteger("Run",0);
+	if(enemy.moveType!="None"){
+		enemy.body.GetComponent("EnemyClick").animator.SetInteger("Run",0);
+	}
 	enemy.body.GetComponent("EnemyClick").animator.SetInteger("special",1);
 	magic = Resources.Load("effects/Charge", GameObject);
 	instance = Instantiate(magic);
@@ -1549,6 +1601,7 @@ function summon(enemy,hor,vert,type){
 }
 
 function returnUnits(){
+	yield WaitForSeconds(3);
 	var spaces = GetComponent("pass").spaces;
  	 for(var i=0;i<eslots.length;i++){
 		var x =eslots[i].hor;

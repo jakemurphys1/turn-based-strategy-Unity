@@ -100,10 +100,10 @@ function Start () {
 
 function tempStart(){
 	
-	units[0].actionsActive["Invisible"]=true;
+	units[0].actionsActive["Flying"]=true;
 	//units[0].actionsActive["Respond"]=true;
 	//units[0].actionsActive["Enlightenment"]=true;
-	units[0].actionsActive["Heal"]=true;
+	units[0].attack=100;
 
 	units[1].actionsActive["Sweep"]=true;
 	//units[1].actionsActive["Flying"]=true;
@@ -116,8 +116,7 @@ function tempStart(){
 	units[2].actionsActive["Immobolize"]=true;
 
 
-	createEGroup("","Goblin","","","",ship, 1000);
-	Eunits[0].attack=0;
+	createEGroup("","","Cannon","","",ship, 1000);
 	
 	createGroup(0,1,2,ship);
 	yield WaitForSeconds(2);
@@ -313,14 +312,6 @@ class Group{
 }
 class EGroup{
 	var location:GameObject;
-	//var slot1: int;
-	//var slot2: int;
-	//var slot3: int;
-	//var slot4: int;
-	//var slot5: int;
-	//var slot1Object: GameObject;
-	//var slot2Object: GameObject;
-	//var slot3Object: GameObject;
 	var circle:GameObject;
 	var slot4Object: GameObject;
 	var slot5Object: GameObject;
@@ -329,11 +320,6 @@ class EGroup{
 
 	function EGroup(slot1:int,slot2:int,slot3:int,slot4:int,slot5:int,location:GameObject,experience:int,EgroupIndex:int){
 		this.location=location;
-		//this.slot1=slot1;
-		//this.slot2=slot2;
-		//this.slot3=slot3;
-		//this.slot4=slot4;
-		//this.slot5=slot5;
 		this.experience=experience;
 		this.index=EgroupIndex;
 	}
@@ -536,8 +522,8 @@ class Ally{
 			   this.attack=60;
 			   this.defense=20;
 			   this.resistance=0;
-			   this.accuracy=3;
-			   this.evasion=1;
+			   this.accuracy=1;
+			   this.evasion=4;
 			   this.actions[0] = "Attack";
 			   this.actions[1] = "Medkit";
 			   this.passiveActions[0]= "Dash";
@@ -610,27 +596,31 @@ class Ally{
 			   this.attack=40;
 			   this.defense=10;
 			   this.resistance=10;
-			   this.accuracy=1;
-			   this.evasion=4;
+			   this.accuracy=3;
+			   this.evasion=1;
 			   this.actions[0] = "Attack";
-			   this.actions[1] = "Steal";
-			   this.actions[2] = "Phase";
+			   this.actions[1] = "Detect";
+			   this.actions[2] = "Hobble";
+			   this.actions[3] = "Phase";
 			   this.passiveActions[0]= "Invisible";
-			   this.passiveActions[1]= "BackStab";
-			   this.passiveActions[2]= "FirstBlow";
-			   this.passiveActions[3]= "Better Steal";
-			   this.abilities[0] = "Steal";
-			   this.abilities[1] = "Invisible";
-			   this.abilities[2] = "BackStab";
-			   this.abilities[3] = "Phase";
+			   this.passiveActions[1]= "Steal";
+			   this.passiveActions[2]= "BackStab";
+			   this.passiveActions[3]= "FirstBlow";
+			   this.abilities[0] = "Invisible";
+			   this.abilities[1] = "Steal";
+			   this.abilities[2] = "Hobble";
+			   this.abilities[3] = "BackStab";
 			   this.abilities[4] = "FirstBlow";
-			   this.abilities[5] = "Better Steal";
+			   this.abilities[5] = "Phase";
 			   this.actionsActive["Attack"]=true;
-			   this.actionsActive["Steal"]=true;
+			   this.actionsActive["Invisible"]=true;
+			   this.actionsActive["Detect"]=true;
 			   this.actionDes1["Attack"] = "Standard Sword Attack";
-			   this.actionDes2["Attack"]  = "Deals damage equal to your thief's attack to an adjacent enemy, and may steal from the enemy. Lower the health, more likely the success.";
+			   this.actionDes2["Attack"]  = "Deals damage equal to your thief's attack to an adjacent enemy.";
+			   this.actionDes1["Detect"] = "Detects enemy's weaknesses";
+			   this.actionDes2["Detect"]  = "Makes the enemy vunerable to crits. Crit's likelihood based on accuracy/evasion.";
 			   this.actionDes1["Steal"] = "Steal From the Enemy";
-			   this.actionDes2["Steal"]  = "Attempt to steal from the enemy. Lower the health, more likely the success. Thief can stay invisible";
+			   this.actionDes2["Steal"]  = "Theif will now steal whenever she attacks or uses detect.";
 			   this.actionDes1["Invisible"] = "Enemy's Can't Attack What They Can't See";
 			   this.actionDes2["Invisible"]  = "Enemy's can't attack the thief while invisible. Attacking causes the thief to become visible for a turn.";
 			   this.actionDes1["BackStab"] = "Strike from the shadows";
@@ -639,10 +629,10 @@ class Ally{
 			   this.actionDes2["Phase"]  = "The thief and an enemy switches places, and the enemy becomes enfeebled for a turn, reducing it's defense and resistance to 0";
 			   this.actionDes1["FirstBlow"] = "Speedy Attack to the Eyes";
 			   this.actionDes2["FirstBlow"]  = "If the enemy is undamaged, this attack blinds it for 2 turns";
-			   this.actionDes1["Better Steal"] = "Master of Thievery";
-			   this.actionDes2["Better Steal"]  = "Stealing has a 100% success rate.";
-			   this.description="This close-range fighter can turn attack only units near to him. While having a lower attack, he can do many tricks to weaker the enemy or protect himself.";
-			   this.strong="Any enemy close-range enemy with low defense. He can protect himself against ranged or flying enemies.";
+			   this.actionDes1["Hobble"] = "Slow the Enemy Down";
+			   this.actionDes2["Hobble"]  = "Permanently reduces the enemy's evasion by 1.";
+			   this.description="This close-range fighter can't do a lot of damage, but can make enemy's vulnerable to crits. She also has a high accuracy.";
+			   this.strong="Any enemy close-range enemy with low defense or high evasion. She can protect himself against ranged or flying enemies.";
 			   this.weak="Any close-range enemy with high defense is tough.";
 		}
 		if(type=="Mage"){
@@ -896,6 +886,8 @@ class Enemy{
    var blind:int=0;
    var silenced:int=0;
    var poison:int=0;
+   var vulnerable:int=0;
+   var critType:String="None";
    var ailmentBody= {};
    var isAlly:boolean=false;
 
@@ -1156,6 +1148,7 @@ class Enemy{
 			 this.description="These slow warriors have high attack and defense. If they attack before they move, they do double damage.";
 			 this.strong="Any close-range unit.";
 			 this.weak="Magic users";
+			 this.critType="Treasure";
 		};//done
 		if(type=="Clunker"){
 			if (level == 1) {
@@ -1189,6 +1182,7 @@ class Enemy{
 			 this.strong="Any close-range unit.";
 			 this.weak="Lightning attacks. Thieves can instantly kill machines if they steal from it.";
 			 this.isRobot=true;
+			 this.critType="Death";
 		};//done
 		if(type=="Vacuum"){
 			if (level == 1) {
@@ -1222,6 +1216,7 @@ class Enemy{
 			 this.strong="Any unit with low defense.";
 			 this.weak="Any close-range fighter with high defense. Also, lightning attacks. Thieves can instantly kill machines if they steal from it.";
 			 this.isRobot=true;
+			 this.critType="Death";
 		};//done
 		if(type=="Magnet"){
 			if (level == 1) {
@@ -1255,6 +1250,7 @@ class Enemy{
 			 this.strong="Any unit that uses arrows";
 			 this.weak="Any close-range fighter with high defense. Also, lightning attacks. Thieves can instantly kill machines if they steal from it.";
 			 this.isRobot=true;
+			 this.critType="Death";
 		};//done
 		if(type=="FireElemental"){
 			if (level == 1) {
@@ -1361,6 +1357,40 @@ class Enemy{
 			 this.strong="Any close-range unit with low resistance or non-magic users";
 			 this.weak="Magic users, especially fire.";
 		};//done
+		if(type=="Wisp"){
+			if (level == 1) {
+             this.attack = 40;
+             this.health = 40; //40
+             this.maxhealth = 40; //40
+			 }
+			 if (level == 2) {
+				 this.attack = 60;
+				 this.health = 60;
+				 this.maxhealth = 60;
+			 }
+			 if (level == 3) {
+				 this.attack = 80;
+				 this.health = 80;
+				 this.maxhealth = 80;
+			 }
+			 if (level == 4) {
+				 this.attack = 100;
+				 this.health = 100;
+				 this.maxhealth = 100;
+			 }
+			 this.charge=0;
+			 this.maxcharge=1;
+			 this.defense = 0;
+			 this.resistance = 30;
+			 this.attackType="FireAttack";
+			 this.moveType="Random";
+			 this.elemental["Fire"]=2;
+			 this.elemental["Ice"]=0.5;
+			 this.elemental["Lightning"]=1;
+			 this.description="These creatures fly randomly around the area. At a cost of one charge, it can attack any unit with an ice attack.";
+			 this.strong="Any unit with low resistance.";
+			 this.weak="Long random attackers with physical attacks and fire.";
+		}//done
 		if(type=="Silencer"){
 			if (level == 1) {
              this.attack = 20;
@@ -1394,6 +1424,7 @@ class Enemy{
 			 this.strong="Any long-range units, especially magic users.";
 			 this.weak="Any close-ranged unit. Thieves can instantly kill machines if they steal from it.";
 			 this.isRobot=true;
+			 this.critType="Death";
 		};//done
 		if(type=="Cannon"){
 			if (level == 1) {
@@ -1419,16 +1450,18 @@ class Enemy{
 			 this.defense = 20;
 			this.resistance = 60;
 			this.attackType="CannonAttack";
-			 this.moveType="";
+			 this.moveType="None";
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=2;
 			 this.charge=0;
-			 this.description="The cannon charges every turn. Everyone time a unit moves in it's line of sight, it will fire a blast equal to it's charge. If it reaches 5, it will kill everyone in the area.";
+			 this.maxcharge=4;
+			 this.description="The cannon charges every turn. Everyone time a unit moves in it's line of sight, it will fire a blast equal to it's charge. If it reaches 4, it will kill all allies in the area.";
 			 this.strong="Any close-range unit that has to move to get to it.";
 			 this.weak="Thieves can instantly kill machines if they steal from it. Also, lightning attacks.";
 			 this.isRobot=true;
-		};
+			 this.critType="Death";
+		};//done
 		if(type=="Beekeeper"){
 			if (level == 1) {
              this.attack = 0;
@@ -1559,6 +1592,7 @@ class Enemy{
 			 this.description="These creatures can instantly draw an unit to itself and poison it.";
 			 this.strong="Any ranged unit.";
 			 this.weak="Any close-range fighter with high attack.";
+			 this.critType="Double";
 		};//done
 		if(type=="Flamewraith"){
 			if (level == 1) {
@@ -1596,6 +1630,7 @@ class Enemy{
 			 this.description="Wraiths phase out every turn, making them imperious to damage. To phase them in, hit them with an elemental attack. Ice attacks will phase them in and still do damage. They can do a physical attack to any unit beside it, or if it has 2 charge, deals magic damage to any unit.";
 			 this.strong="Close range unit with low resistance. Resistant to Fire.";
 			 this.weak="Any long-range unit, especially ice attacks.";
+			 this.critType="Treasure";
 		};//done
 		if(type=="Necromancer"){
 			 if (level == 1) {
@@ -1703,6 +1738,7 @@ class Enemy{
 			 this.description="Wraiths phase out every turn, making them imperious to damage. To phase them in, hit them with an elemental attack. Lightning attacks will phase them in and still do damage. They can do a physical attack to any unit beside it, or if it has 1 charge, deals magic damage to all units equal to half it's attack.";
 			 this.strong="Units with low resistance.";
 			 this.weak="Lightning Attacks.";
+			 this.critType="Treasure";
 		};//done
 		if(type=="Frostwraith"){
 			if (level == 1) {
@@ -1740,40 +1776,40 @@ class Enemy{
 			 this.description="Wraiths phase out every turn, making them imperious to damage. To phase them in, hit them with an elemental attack. Fire attacks will phase them in and still do damage. They can do a physical attack to any unit beside it, or if it has 2 charge, deals magic damage to any unit two spaces away.";
 			 this.strong="Units with low resistance and ice attacks.";
 			 this.weak="Fire Attacks.";
+			 this.critType="Treasure";
 		};//done
 		if(type=="Assassin"){
 			if (level == 1) {
-             this.attack = 30;
-             this.health = 80;
-             this.maxhealth = 80;
+             this.attack = 10;
+             this.health = 60;
+             this.maxhealth = 60;
 			 }
 			 if (level == 2) {
-				 this.attack = 50;
+				 this.attack = 15;
+				 this.health = 80;
+				 this.maxhealth = 80;
+			 }
+			 if (level == 3) {
+				 this.attack = 25;
 				 this.health = 100;
 				 this.maxhealth = 100;
 			 }
-			 if (level == 3) {
-				 this.attack = 70;
+			 if (level == 4) {
+				 this.attack = 35;
 				 this.health = 120;
 				 this.maxhealth = 120;
 			 }
-			 if (level == 4) {
-				 this.attack = 85;
-				 this.health = 150;
-				 this.maxhealth = 150;
-			 }
-			 this.defense = 20;
-			 this.resistance = 20;
-			 this.accuracy=1;
-			 this.attackType="AssassinAttack";
+			 this.defense = 10;
+			 this.resistance = 10;
+			 this.attackType="ArrowAttack";
 			 this.moveType="Afraid";
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
-			 this.description="These long-range fighters can attack any unit regardless of location.";
+			 this.description="These long-range fighters can attack any unit regardless of location. May cause a random ailment.";
 			 this.strong="Units with low defense.";
 			 this.weak="Units with high defense.";
-		};
+		};//,done
 		if(type=="Shaman"){
 			if (level == 1) {
              this.attack = 0;
@@ -1804,42 +1840,10 @@ class Enemy{
 			 this.elemental["Lightning"]=1;
 			 this.charge=0;
 			 this.maxcharge=2;
-			 this.description="These summoners will create golems at a charge of 2.";
-			 this.strong="No particular strengthes of weaknesses";
-			 this.weak="No particular strengthes of weaknesses";
-		};
-		if(type=="Golem"){
-			if (level == 1) {
-             this.attack = 50;
-             this.health = 160; //40
-             this.maxhealth = 160; //40
-			 }
-			 if (level == 2) {
-				 this.attack = 60;
-				 this.health = 200;
-				 this.maxhealth = 200;
-			 }
-			 if (level == 3) {
-				 this.attack = 70;
-				 this.health = 240;
-				 this.maxhealth = 240;
-			 }
-			 if (level == 4) {
-				 this.attack = 85;
-				 this.health = 300;
-				 this.maxhealth = 300;
-			 }
-			 this.defense = 60;
-			 this.resistance = 50;
-			 this.attackType="CloseAttack";
-			 this.moveType="Agressive";
-			 this.elemental["Fire"]=1;
-			 this.elemental["Ice"]=1;
-			 this.elemental["Lightning"]=1;
-			 this.description="These creatures with attack any adjacent units. Has a very high defense and resistance.";
-			 this.strong="Most things";
-			 this.weak="Enfeebling attacks";
-		};
+			 this.description="These summoners will heal their golems at a charge of 2.";
+			 this.strong="No particular strengthes or weaknesses";
+			 this.weak="No particular strengthes or weaknesses";
+		};//done
 		if(type=="Frostlord"){
 			if (level == 1) {
              this.attack = 50;
@@ -1992,41 +1996,7 @@ class Enemy{
 		
 		}
 
-
-		//can miss
-		if(type=="Assassin"){
-			if (level == 1) {
-             this.attack = 15;
-             this.health = 60;
-             this.maxhealth = 60;
-			 }
-			 if (level == 2) {
-				 this.attack = 25;
-				 this.health = 80;
-				 this.maxhealth = 80;
-			 }
-			 if (level == 3) {
-				 this.attack = 35;
-				 this.health = 100;
-				 this.maxhealth = 100;
-			 }
-			 if (level == 4) {
-				 this.attack = 45;
-				 this.health = 120;
-				 this.maxhealth = 120;
-			 }
-			 this.accuracy=1;
-			 this.defense = 10;
-			 this.resistance = 10;
-			 this.attackType="ArrowAttack";
-			 this.moveType="Afraid";
-			 this.elemental["Fire"]=1;
-			 this.elemental["Ice"]=1;
-			 this.elemental["Lightning"]=1;
-			 this.description="These long-range fighters can attack any unit regardless of location. May cause a random ailment. Has low accuracy.";
-			 this.strong="Units with low defense.";
-			 this.weak="Units with high defense or high evasion.";
-		};//,done
+		
 		if(type=="Troll"){
 			if (level == 1) {
              this.attack = 50;
@@ -2093,7 +2063,7 @@ class Enemy{
 			 this.description="These flying enemies can move anywhere and can cause sleep and enfeeble. Has low accuracy.";
 			 this.strong="Units with low accuracy and low defense.";
 			 this.weak="Units with high accuracy and high defense.";
-		}//done
+		}//done---REMOVE
 		if(type=="Vampire"){
 			if (level == 1) {
              this.attack = 60;
@@ -2160,41 +2130,39 @@ class Enemy{
 			 this.strong="Any unit with low defense and health. Can dodge attacks with units with low accuracy.";
 			 this.weak="Units with high health and defense, and immunity to enfeeble. Evasive units can dodge it's attacks. Also, ranged units can help in support if they have good accuracy.";
 		};//done
-		if(type=="Wisp"){
+		if(type=="Golem"){
 			if (level == 1) {
-             this.attack = 40;
-             this.health = 40; //40
-             this.maxhealth = 40; //40
+             this.attack = 50;
+             this.health = 160;
+             this.maxhealth = 160;
 			 }
 			 if (level == 2) {
 				 this.attack = 60;
-				 this.health = 60;
-				 this.maxhealth = 60;
+				 this.health = 200;
+				 this.maxhealth = 200;
 			 }
 			 if (level == 3) {
-				 this.attack = 80;
-				 this.health = 80;
-				 this.maxhealth = 80;
+				 this.attack = 70;
+				 this.health = 240;
+				 this.maxhealth = 240;
 			 }
 			 if (level == 4) {
-				 this.attack = 100;
-				 this.health = 100;
-				 this.maxhealth = 100;
+				 this.attack = 85;
+				 this.health = 300;
+				 this.maxhealth = 300;
 			 }
-			 this.charge=0;
-			 this.maxcharge=1;
-			 this.defense = 0;
-			 this.resistance = 30;
+			 this.defense = 60;
+			 this.resistance = 50;
 			 this.accuracy=1;
-			 this.attackType="FireAttack";
-			 this.moveType="Random";
-			 this.elemental["Fire"]=2;
-			 this.elemental["Ice"]=0.5;
+			 this.attackType="CloseAttack";
+			 this.moveType="Agressive";
+			 this.elemental["Fire"]=1;
+			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
-			 this.description="These creatures fly randomly around the area. At a cost of one charge, it can attack any unit with an ice attack. High Evasion";
-			 this.strong="Any unit with low resistance, magic users, or units with low accuracy.";
-			 this.weak="Long random attackers with physical attacks and fire.";
-		}//done
+			 this.description="These creatures with attack any adjacent units. Has a very high defense and resistance.";
+			 this.strong="Most things";
+			 this.weak="Enfeebling attacks";
+		};//done
 		
 
 		//will dodge
@@ -2231,6 +2199,7 @@ class Enemy{
 			 this.description="These evasive enemies can move twice a turn. High evasion.";
 			 this.strong="Units with low accuracy or low defense.";
 			 this.weak="Units with high accuracy.";
+			 this.critType="Double";
 		}//done
 		if(type=="Sprite"){
 			if (level == 1) {
@@ -2264,6 +2233,7 @@ class Enemy{
 			 this.description="These flying creatures can immediately move to a random location and attack. High evasion.";
 			 this.strong="Units with low accuracy.";
 			 this.weak="Units with high accuracy.";
+			 this.critType="Double";
 		};//done
 		if(type=="Dryad"){
 			if (level == 1) {
@@ -2300,6 +2270,7 @@ class Enemy{
 			 this.description="These close-range creatures prevent any ailments from being inflicted on any enemies. High evasion.";
 			 this.strong="Units with low accuracy or low defense, or units that use abilities that inflict ailments.";
 			 this.weak="Units with high accuracy.";
+			 this.critType="Double";
 		};//done
 		if(type=="Creature"){
 			if (level == 1) {
@@ -2334,7 +2305,7 @@ class Enemy{
 			 this.description="These enemies attack adjacent units. High evasion. If a units misses this creature, the unit is put to sleep for one turn.";
 			 this.strong="Units with low accuracy.";
 			 this.weak="Units with high accuracy.";
-		};//done
+		};//done---REMOVE
 		if(type=="Werewolf"){
 			if (level == 1) {
              this.attack = 35;
@@ -2367,6 +2338,7 @@ class Enemy{
 			 this.description="These close-range monsters with high resistance can only attack units next to it. It heals every turn.";
 			 this.strong="Any close-range unit with a low defense or magic users";
 			 this.weak="Any long-ranged unit";
+			 this.critType="Sleep";
 		};//done
 		if(type=="Skeleton"){
 			if (level == 1) {
@@ -2400,6 +2372,7 @@ class Enemy{
 			 this.description="These creatures have high attack, but low accuracy.";
 			 this.strong="Any units with low defense.";
 			 this.weak="Any units with high evasion.";
+			 this.critType="Double";
 		}//done
 		
 

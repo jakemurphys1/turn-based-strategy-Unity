@@ -158,7 +158,7 @@
 
 	yield WaitForSeconds(1);
 	
-	if(enemy){
+	if(enemy && enemy.body){
 		enemy.body.GetComponent("EnemyClick").attack =0;
 	}
 
@@ -1039,8 +1039,6 @@
 	}
 	if(thisUnit.type == "Thief"){
 		if(curAction=="Attack" && isAdjacent(curEnemy,thisUnit)){
-			
-			
 			if(thisUnit.actionsActive["FirstBlow"]){
 				if(curEnemy.health==curEnemy.maxhealth && hit=="Hit"){
 					curEnemy.blind=2;
@@ -1056,8 +1054,19 @@
 			}
 			steal(thisUnit,curEnemy);
 		}
-		if(curAction=="Steal" && isAdjacent(curEnemy,thisUnit)){
+		if(curAction=="Detect" && isAdjacent(curEnemy,thisUnit)){
+			curEnemy.vulnerable+=5;
+			showAilment("Vulnerable", curEnemy);
+			wordPopup(curEnemy,"Vulnerable");
 			steal(thisUnit,curEnemy);
+		}
+		if(curAction=="Hobble" && isAdjacent(curEnemy,thisUnit)){
+			if(curEnemy.evasion>0){
+				curEnemy.evasion-=1;
+				wordPopup(curEnemy,"Evasion reduced");
+			}else{
+				wordPopup(curEnemy,"Evasion Minimized");
+			}
 		}
 		if(curAction=="Phase" && isAdjacent(curEnemy,thisUnit)){
 			curEnemy.enfeebled=2;
@@ -1530,6 +1539,7 @@
 			}
 		}
 	}
+	critCheck(ally, enemy);
 	damageEnemy(enemy,damage,"None");
  }
 
@@ -1722,6 +1732,9 @@
 
 //Thief
 function steal(ally,enemy){
+	if(!ally.actionsActive["Steal"]){
+		return;
+	}
 
 	if(enemy.hasItem==false){
 		wordPopup(enemy,"Nothing To Steal");
@@ -1731,10 +1744,10 @@ function steal(ally,enemy){
 	var maxhealth = enemy.maxhealth;
 	var healthCheck = Random.Range(1,maxhealth);
 
-	if(healthCheck<health-20){
-		wordPopup(enemy,"Failed To Steal");
-		return;
-	}
+	//if(healthCheck<health-20){
+	//	wordPopup(enemy,"Failed To Steal");
+	//	return;
+	//}
 	enemy.hasItem=false;
 
 	var randnum = Random.Range(1,17);
@@ -1810,10 +1823,10 @@ function steal(ally,enemy){
 
 	GetComponent("Main").increaseItems(item,amount);
 	wordPopup(ally,"Stole " + item);
-	if(enemy.isRobot){
-		wordPopup(enemy,"Battery Stolen");
-		damageEnemy(enemy,enemy.health,"None");
-	}
+	//if(enemy.isRobot){
+	//	wordPopup(enemy,"Battery Stolen");
+	//	damageEnemy(enemy,enemy.health,"None");
+	//}
 }
 
 //Guard
@@ -2001,11 +2014,12 @@ function showElementalArrow(enemy,element){
 			 unit.poison=0;
 			 unit.blind=0;
 			 unit.silenced=0;
+			 unit.vulnerable=0;
 			 wordPopup(eslots[i],"Stops Ailments");
 			 return;
 			}
 		}
-
+		Debug.Log(type);
 		ailment = Resources.Load("ailments/" + type, GameObject);
 		var instance = Instantiate(ailment);
 		instance.transform.SetParent(unit.body.transform, true);
@@ -2013,4 +2027,109 @@ function showElementalArrow(enemy,element){
 		instance.transform.position.y+=5;
 		
 		unit.ailmentBody[type]=instance;
+ }
+
+ function critCheck(ally, enemy){
+	if(enemy.vulnerable==0){
+		return;
+	}
+	var randnum = enemy.evasion - Random.Range(1,4) + 2;
+	ally.accuracy=100;
+	if(ally.accuracy>=randnum){
+		if(enemy.critType=="None"){
+			wordPopup(enemy,"Crit: None");
+		}
+		if(enemy.critType=="Death"){
+			wordPopup(enemy,"Crit: Death");
+			damageEnemy(enemy,enemy.health,"None");
+		}
+		if(enemy.critType=="Treasure"){
+			
+			wordPopup(enemy,"Crit: Treasure");
+			var randnum2 = Random.Range(1,17);
+			var item;
+			var amount = 0;
+			enemy.critType="None";
+			
+			switch(randnum2){
+				case 1:
+					item = "Flowers";
+					amount=5;
+					break;
+				case 2:
+					item = "Mushrooms";
+					amount=5;
+					break;
+				case 3:
+					item = "Honey";
+					amount=5;
+					break;
+				case 4:
+					item = "Roots";
+					amount=5;
+					break;
+				case 5:
+					item = "Powder";
+					amount=5;
+					break;
+				case 6:
+					item = "Sap";
+					amount=5;
+					break;
+				case 7:
+					item = "Extract";
+					amount=5;
+					break;
+				case 8:
+					item = "Berries";
+					amount=5;
+					break;
+				case 9:
+					item = "Herbs";
+					amount=5;
+					break;
+				case 10:
+					item = "Essence";
+					amount=5;
+					break;
+				case 11:
+					item = "Revive Potion";
+					amount=2;
+					break;
+				case 12:
+					item = "Recover Potion";
+					amount=2;
+					break;
+				case 13:
+					item = "Defense Potion";
+					amount=2;
+					break;
+				case 14:
+					item = "Resistance Potion";
+					amount=2;
+					break;
+				case 15:
+					item = "Attack Potion";
+					amount=2;
+					break;
+				case 16:
+					item = "Health Potion";
+					amount=2;
+					break;
+			}
+			GetComponent("Main").increaseItems(item,amount);
+			wordPopup(enemy,"Dropped " + amount + " " + item);
+		}
+		if(enemy.critType=="Double"){
+			wordPopup(enemy,"Crit: X2 Damage");
+			damage = ally.attack-getdefense(enemy,"defense");
+			damageEnemy(enemy,damage,"None");
+		}
+		if(enemy.critType=="Sleep"){
+			wordPopup(enemy,"Crit: Sleep");
+			enemy.sleep=2;
+			showAilment("Sleep", enemy);
+			GetComponent("sounds").playSound("poison");
+		}
+	}
  }

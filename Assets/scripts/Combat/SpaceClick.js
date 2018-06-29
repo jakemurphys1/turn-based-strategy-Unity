@@ -61,6 +61,8 @@ function Update()
 			return;
 		}
 
+		
+
 		//Soldier
 		if(main.GetComponent("Main").units[curIndex].hasMoved==true){
 			if((main.GetComponent("Main").units[curIndex].actionsActive["Dash"] && main.GetComponent("Main").units[curIndex].didAction==false)){
@@ -102,6 +104,47 @@ function Update()
 		 main.GetComponent("Main").units[curIndex].hasMoved=true;
 		 main.GetComponent("Main").units[curIndex].vert=vert;
 		 main.GetComponent("Main").units[curIndex].hor=hor;
+
+		 //check for cannon
+		var Eunits = main.GetComponent("Main").Eunits;
+		var cannon;
+		var curUnit=main.GetComponent("Main").units[curIndex];
+		for(var i =0;i<Eunits.length;i++){
+			if(Eunits[i].type=="Cannon"){
+				cannon=Eunits[i];
+			}
+		}
+		if(cannon && curUnit.invisible==false){
+			if(curUnit.vert==cannon.vert || curUnit.hor==cannon.hor){
+				var damage = (cannon.attack-main.GetComponent("combat").getdefense(curUnit,cannon.defenseType))*(cannon.charge +1);
+				cannon.charge=0;
+				cannon.body.GetComponent("EnemyClick").chargeText.GetComponent("Text").text=cannon.charge.ToString();
+				main.GetComponent("combat").damageAlly(curUnit.index,damage,"None",0);
+				magic = Resources.Load("effects/missile", GameObject);
+				instance = Instantiate(magic);
+				instance.transform.position = cannon.body.transform.position;
+				if(curUnit.hor!=cannon.hor){
+					if(curUnit.hor<cannon.hor){
+						instance.transform.Rotate(new Vector3(0,90,0));
+						Debug.Log(cannon.body);
+						Debug.Log(cannon.body.transform.rotation);
+						Debug.Log(cannon.body.transform.rotation.eulerAngles);
+						Debug.Log(cannon.body.transform.rotation.eulerAngles.y);
+						cannon.body.transform.rotation.eulerAngles.y=-90;
+					}else{
+						instance.transform.Rotate(new Vector3(0,-90,0));
+						cannon.body.transform.rotation.eulerAngles.y=90;
+					}
+				}else{
+					if(curUnit.vert<cannon.vert){
+						cannon.body.transform.rotation.eulerAngles.y=180;
+					}else{
+						cannon.body.transform.rotation.eulerAngles.y=0;
+					}
+				}
+				main.GetComponent("sounds").playSound("missiles");
+			}
+		}
 
 		 		 //hide menu
 		 main.GetComponent("Main").menu.GetComponent("Menu").hideAll();

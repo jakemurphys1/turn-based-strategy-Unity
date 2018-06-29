@@ -137,6 +137,7 @@ function OnMouseOver(){
 			circle.transform.position=enemy.body.transform.position;
 			circle.transform.position.x-=250;
 			circle.transform.position.z+=20;
+			circle.GetComponent("CircleScript").UpdateDisplay(main.GetComponent("Main").Eunits,enemy.group);
 		}
 	}
 }
