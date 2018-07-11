@@ -51,6 +51,8 @@ var locIndex:int;
 var itself: GameObject;
 var Grid: GameObject;
 
+var MapPic:GameObject;
+
 function Start(){
 	row1 = [space00,space10,space20,space30,space40];
 	row2 = [space01,space11,space21,space31,space41];

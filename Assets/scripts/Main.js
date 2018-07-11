@@ -53,6 +53,9 @@ var daysleft:GameObject;
 var canvas:GameObject;
 var istransporting:boolean=false;
 var entries;
+var mapCamera;
+var updateMap;
+var UpdateIcons;
 
 function Awake(){
 	StoreInfo = GameObject.Find("StoreInfo");
@@ -63,7 +66,6 @@ function Awake(){
 		//level=1;
 	}
 }
-
 
 function Start () {
 
@@ -93,6 +95,7 @@ function Start () {
 	items["Accuracy Potion"]=0;
 	items["Evasion Potion"]=0;
 
+
 	Cursor.lockState = CursorLockMode.Confined;
 
 	entries= GameObject.FindGameObjectsWithTag("Entry");
@@ -116,7 +119,7 @@ function tempStart(){
 	units[2].actionsActive["Immobolize"]=true;
 
 
-	createEGroup("","","Cannon","","",ship, 1000);
+	createEGroup("","Goblin","Cannon","","",ship, 1000);
 	
 	createGroup(0,1,2,ship);
 	yield WaitForSeconds(2);
@@ -165,7 +168,6 @@ function createGroup(slot1:int,slot2:int,slot3:int,curlocation){
 		createUnitBody(slot3,curlocation.GetComponent("locations").space30,groupIndex,3);
 		returnMagic(nexus,curlocation.GetComponent("locations").space30);
 	}
-
 	
 
 	groups[groupIndex].location = curlocation;
@@ -2922,6 +2924,10 @@ function Update(){
 	 {
 		 curCamera.transform.position.y-=15;
 	 }
+	 if (Input.GetKeyDown ("m")){
+		updateMap();
+	 }
+        
 }
  
  function increaseItems(item, amount){
@@ -3000,4 +3006,7 @@ function Update(){
 			 }
 			 yield WaitForSeconds(1);
 			 Destroy(instance);
+ }
+ function UpdateIconsMain(){
+ 	 UpdateIcons();
  }

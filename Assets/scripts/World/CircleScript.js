@@ -33,7 +33,7 @@ function UpdateDisplay(units,groupNum){
 	
 
 	if(units[0].isAlly){
-		pic1.GetComponent("SpriteRenderer").sprite=Resources.Load("alliesPics/" + curUnits[0].type,Sprite);
+		pic1.GetComponent("Renderer").sprite=Resources.Load("alliesPics/" + curUnits[0].type,Sprite);
 		pic1text.GetComponent("Text").text=curUnits[0].type;
 		if(curUnits.length>1){
 			pic2.GetComponent("SpriteRenderer").sprite=Resources.Load("alliesPics/" + curUnits[1].type,Sprite);
