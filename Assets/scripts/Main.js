@@ -52,6 +52,7 @@ var headquarters:GameObject;
 var daysleft:GameObject;
 var canvas:GameObject;
 var istransporting:boolean=false;
+var mapPicPopup:GameObject;
 var entries;
 var mapCamera;
 var updateMap;
