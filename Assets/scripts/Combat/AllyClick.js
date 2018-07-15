@@ -217,10 +217,14 @@ function zoomin(){
 }
 
 function switchUnits(){
-
-
+	var activeGroup=main.GetComponent("Main").activeGroup;
+	
 	var group1 = main.GetComponent("Main").groups[main.GetComponent("Main").units[index].group];
-	var group2 = main.GetComponent("Main").groups[main.GetComponent("Main").activeGroup];
+	if(activeGroup==-1){
+		activeGroup=group1.index;
+		main.GetComponent("Main").activeGroup=activeGroup;
+	}
+	var group2 = main.GetComponent("Main").groups[activeGroup];
 	var groupScreen = main.GetComponent("Main").groupScreen;
 
 	//see if units are beside each other
@@ -352,11 +356,12 @@ function switchUnits(){
 		ally = main.GetComponent("Main").units[index];
 		instance.transform.position = ally.body.transform.position;
 		instance.transform.SetParent(ally.body.transform,true);
+		instance.transform.position.y+=0.5;
 	}
-	if(main.GetComponent("Main").inCombat==false && curcamera.enabled==false){
-		main.GetComponent("Main").groups[thisAlly.group].circle.GetComponent("CircleScript").pics.SetActive(true);
-		main.GetComponent("Main").groups[thisAlly.group].circle.GetComponent("CircleScript").UpdateDisplay(main.GetComponent("Main").units,main.GetComponent("Main").units[index].group);
-	}
+	//if(main.GetComponent("Main").inCombat==false && curcamera.enabled==false){
+		//main.GetComponent("Main").groups[thisAlly.group].circle.GetComponent("CircleScript").pics.SetActive(true);
+		//main.GetComponent("Main").groups[thisAlly.group].circle.GetComponent("CircleScript").UpdateDisplay(main.GetComponent("Main").units,main.GetComponent("Main").units[index].group);
+	//}
 }
 
 function OnMouseExit(){

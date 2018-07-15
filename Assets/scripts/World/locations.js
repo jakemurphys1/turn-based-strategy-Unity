@@ -102,9 +102,9 @@ function OnMouseOver(){
 
 
  function moveActive(){
-	//if(!main){
+	if(!main){
 		main= GameObject.Find("Main");
-	//}
+	}
 	 main.GetComponent.<Main>().hideEntries();
  	 main.GetComponent.<Main>().moveGroup(space10.transform.position,space20.transform.position,space30.transform.position,locIndex, itself);
 	 main.GetComponent("Special").SpecialFunction("moveGroup");

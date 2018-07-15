@@ -126,20 +126,21 @@ function OnMouseOver(){
 		enemy = main.GetComponent("Main").Eunits[eindex];
 		instance.transform.position = enemy.body.transform.position;
 		instance.transform.SetParent(enemy.body.transform,true);
+		instance.transform.position.y+=0.5;
 	}
-	if(main.GetComponent("Main").inCombat==false){
-		enemy = main.GetComponent("Main").Eunits[eindex];
-		var curgroup = main.GetComponent("Main").Egroups[enemy.group];
-		if(!curgroup.circle){
-			var circle = Instantiate(Resources.Load("EGroupCircle", GameObject));
-			enemy = main.GetComponent("Main").Eunits[eindex];
-			curgroup.circle = circle;
-			circle.transform.position=enemy.body.transform.position;
-			circle.transform.position.x-=250;
-			circle.transform.position.z+=20;
-			circle.GetComponent("CircleScript").UpdateDisplay(main.GetComponent("Main").Eunits,enemy.group);
-		}
-	}
+	//if(main.GetComponent("Main").inCombat==false){
+		//enemy = main.GetComponent("Main").Eunits[eindex];
+		//var curgroup = main.GetComponent("Main").Egroups[enemy.group];
+		//if(!curgroup.circle){
+		//	var circle = Instantiate(Resources.Load("EGroupCircle", GameObject));
+		//	enemy = main.GetComponent("Main").Eunits[eindex];
+		//	curgroup.circle = circle;
+		///	circle.transform.position=enemy.body.transform.position;
+		//	circle.transform.position.x-=250;
+		//	circle.transform.position.z+=20;
+		//	circle.GetComponent("CircleScript").UpdateDisplay(main.GetComponent("Main").Eunits,enemy.group);
+		//}
+	//}
 }
 
 function OnMouseExit(){

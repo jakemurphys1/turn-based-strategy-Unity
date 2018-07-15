@@ -202,9 +202,9 @@ function worldturn(){
 				moveEnemies(Egroups[i], moveLocation);
 			}
 		}
-	
 	}
 	main.GetComponent("Special").Pass();
+	main.GetComponent("Main").UpdateIconsMain();
 	yield WaitForSeconds(2);
 	main.GetComponent("Main").checkBattle(location);
 }

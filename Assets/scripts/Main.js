@@ -115,12 +115,11 @@ function tempStart(){
 	units[1].actionsActive["Push"]=true;
 	units[1].actionsActive["Scout"]=true;
 	units[1].actionsActive[""]=true;
-	units[1].attack=0;
 
 	units[2].actionsActive["Immobolize"]=true;
 
 
-	createEGroup("","Goblin","Cannon","","",ship, 1000);
+	createEGroup("","Goblin","","","",ship, 1000);
 	
 	createGroup(0,1,2,ship);
 	yield WaitForSeconds(2);
@@ -471,9 +470,9 @@ class Ally{
 			   this.arrows["Blindness"]=arrowCapacity;
 			   this.arrows["Sleep"]=arrowCapacity;
 			   this.arrows["Enfeeble"]=arrowCapacity;
-			   this.description="This ranged unit can shoot any enemy in a straight line. He also has plenty of unique arrows that can only be used once per fight. These arrows inflict unique poisons.";
+			   this.description="This ranged unit can shoot any enemy in a straight line. She also has plenty of unique arrows that can only be used once per fight. These arrows inflict unique poisons.";
 			   this.strong="Any enemy that has low defense. Especially useful against long-range magic users that have to charge. It's toxins can also be used effectively against enemies if used right.";
-			   this.weak="Any enemy with high defense. Also, any enemy that can quickly attack in the close range like flyers are dangerous since he has low defense.";
+			   this.weak="Any enemy with high defense. Also, any enemy that can quickly attack in the close range like flyers are dangerous since she has low defense.";
 		}
 		if(type=="Templar"){
 			   this.maxhealth=80;
@@ -623,9 +622,9 @@ class Ally{
 			   this.actionDes1["Detect"] = "Detects enemy's weaknesses";
 			   this.actionDes2["Detect"]  = "Makes the enemy vunerable to crits. Crit's likelihood based on accuracy/evasion.";
 			   this.actionDes1["Steal"] = "Steal From the Enemy";
-			   this.actionDes2["Steal"]  = "Theif will now steal whenever she attacks or uses detect.";
-			   this.actionDes1["Invisible"] = "Enemy's Can't Attack What They Can't See";
-			   this.actionDes2["Invisible"]  = "Enemy's can't attack the thief while invisible. Attacking causes the thief to become visible for a turn.";
+			   this.actionDes2["Steal"]  = "Thief will now steal whenever he attacks or uses detect.";
+			   this.actionDes1["Invisible"] = "Enemies Can't Attack What They Can't See";
+			   this.actionDes2["Invisible"]  = "Enemies can't attack the thief while invisible. Attacking causes the thief to become visible for a turn.";
 			   this.actionDes1["BackStab"] = "Strike from the shadows";
 			   this.actionDes2["BackStab"]  = "Attacks from behind deals double damage.";
 			   this.actionDes1["Phase"] = "Phase Through the Enemy's Armor";
@@ -634,8 +633,8 @@ class Ally{
 			   this.actionDes2["FirstBlow"]  = "If the enemy is undamaged, this attack blinds it for 2 turns";
 			   this.actionDes1["Hobble"] = "Slow the Enemy Down";
 			   this.actionDes2["Hobble"]  = "Permanently reduces the enemy's evasion by 1.";
-			   this.description="This close-range fighter can't do a lot of damage, but can make enemy's vulnerable to crits. She also has a high accuracy.";
-			   this.strong="Any enemy close-range enemy with low defense or high evasion. She can protect himself against ranged or flying enemies.";
+			   this.description="This close-range fighter can't do a lot of damage, but can make enemy's vulnerable to crits. He also has a high accuracy.";
+			   this.strong="Any enemy close-range enemy with low defense or high evasion. He can protect himself against ranged or flying enemies.";
 			   this.weak="Any close-range enemy with high defense is tough.";
 		}
 		if(type=="Mage"){
@@ -2586,7 +2585,6 @@ class Enemy{
   if(inCombat==false && units[index].alive){
 	activeGroup = units[index].group;
 	hideCircles();
-
 	var circle = groups[activeGroup].circle;
 	circle.GetComponent("CircleScript").showCircle();
 
@@ -2780,6 +2778,8 @@ function startBattle(location,groupNum,EgroupNum){
 	hideTeleport();
 	inCombat=true;
 	GetComponent("combat").resetSpaces();
+	mapPicPopup.SetActive(false);
+	mapCamera.SetActive(false);
 	//set active slots
 	eslots=[];
 	for(var i =0;i<Eunits.length;i++){
@@ -3011,3 +3011,4 @@ function Update(){
  function UpdateIconsMain(){
  	 UpdateIcons();
  }
+ 
