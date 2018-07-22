@@ -5,8 +5,13 @@
  var nulllocation:GameObject;
  
  function damageEnemy(enemy,amount,element){
+	var isCrit=false;
+	if(element=="critType"){
+		isCrit=true;
+		element="None";
+	}
 	amount=amount*enemy.elemental[element];
-
+	var ally = GetComponent("Main").units[GetComponent("Main").activeIndex];
 	if(hit=="Miss"){
 		wordPopup(enemy,"Miss");
 		return;
@@ -15,7 +20,8 @@
 		wordPopup(enemy,"Near-Miss");
 		amount=amount/2;
 	}
-
+	
+	
 
 
 	if(enemy.phasedout){
@@ -42,6 +48,7 @@
 		amount=0;
 	}
 	enemy.health-=amount;
+	print("Health " + amount);
 	if(enemy.health<0){
 		enemy.health=0;
 	}
@@ -66,6 +73,9 @@
 	childtext.GetComponent("Text").text=damage;
 
 	yield WaitForSeconds(1);
+	if(isCrit==false){
+		critCheck(ally, enemy);
+	}
 	Destroy(instance);
  }
 
@@ -578,7 +588,7 @@
 	var num;
 
 	hit = hitResult(thisUnit, curEnemy.evasion,thisUnit.accuracy);
-	
+	print(hit);
 	if(thisUnit.didAction==true){
 		return;
 	}
@@ -1054,11 +1064,10 @@
 			}
 			steal(thisUnit,curEnemy);
 		}
-		if(curAction=="Detect" && isAdjacent(curEnemy,thisUnit)){
+		if(curAction=="Detect"){
 			curEnemy.vulnerable+=5;
 			showAilment("Vulnerable", curEnemy);
 			wordPopup(curEnemy,"Vulnerable");
-			steal(thisUnit,curEnemy);
 		}
 		if(curAction=="Hobble" && isAdjacent(curEnemy,thisUnit)){
 			if(curEnemy.evasion>0){
@@ -1108,6 +1117,7 @@
 				if(hit=="Hit"){
 					magicAilments(thisUnit,curEnemy,"Blind");
 				}
+					
 			}
 		}
 		if(curAction=="Zap"){
@@ -1438,6 +1448,7 @@
 	}
 
 	var randnum = Random.Range(0,4);
+	print(randnum);
 	accuracy+=randnum;
 	if(accuracy>=evasion){
 		return "Hit";
@@ -1539,7 +1550,6 @@
 			}
 		}
 	}
-	critCheck(ally, enemy);
 	damageEnemy(enemy,damage,"None");
  }
 
@@ -1732,7 +1742,7 @@
 
 //Thief
 function steal(ally,enemy){
-	if(!ally.actionsActive["Steal"]){
+	if(!ally.actionsActive["Steal"] || enemy.vulnerable==0){
 		return;
 	}
 
@@ -2019,7 +2029,6 @@ function showElementalArrow(enemy,element){
 			 return;
 			}
 		}
-		Debug.Log(type);
 		ailment = Resources.Load("ailments/" + type, GameObject);
 		var instance = Instantiate(ailment);
 		instance.transform.SetParent(unit.body.transform, true);
@@ -2033,15 +2042,15 @@ function showElementalArrow(enemy,element){
 	if(enemy.vulnerable==0){
 		return;
 	}
-	var randnum = enemy.evasion - Random.Range(1,4) + 2;
-	ally.accuracy=100;
-	if(ally.accuracy>=randnum){
+	var randnum = enemy.evasion - Random.Range(1,4) + 3;
+	if(ally.accuracy>randnum){
+		GetComponent("sounds").playSound("crit");
 		if(enemy.critType=="None"){
 			wordPopup(enemy,"Crit: None");
 		}
 		if(enemy.critType=="Death"){
-			wordPopup(enemy,"Crit: Death");
-			damageEnemy(enemy,enemy.health,"None");
+			wordPopup(enemy,"Crit: ShutDown");
+			damageEnemy(enemy,enemy.health,"critType");
 		}
 		if(enemy.critType=="Treasure"){
 			
@@ -2123,7 +2132,8 @@ function showElementalArrow(enemy,element){
 		if(enemy.critType=="Double"){
 			wordPopup(enemy,"Crit: X2 Damage");
 			damage = ally.attack-getdefense(enemy,"defense");
-			damageEnemy(enemy,damage,"None");
+			damageEnemy(enemy,damage,"critType");
+			
 		}
 		if(enemy.critType=="Sleep"){
 			wordPopup(enemy,"Crit: Sleep");

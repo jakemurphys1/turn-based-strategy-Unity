@@ -2,6 +2,7 @@
 var teleporter: boolean=false;
 var teleporterMode: boolean=false;
 var readyMove: boolean=false;
+var main:GameObject;
 
 function Update () {
 	if(teleporter==false){
@@ -33,6 +34,12 @@ function OnRightClick(){
          if (hitPoint.collider == this.GetComponent.<Collider>())
          {
              // Add code for the right click event
+			 if(!main){
+				main= GameObject.Find("Main");
+			}
+			if(main.GetComponent("Main").mapCamera.activeSelf){
+				return;
+			}
              location.GetComponent("locations").moveActive();
          }
      }

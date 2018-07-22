@@ -5,8 +5,8 @@ var WeakText:GameObject;
 var main: GameObject;
 
 
-function updateInfo(){
-	var active = main.GetComponent("Main").activeEnemy;
+function updateInfo(curActive){
+	var active = curActive;
 	NameText.GetComponent("Text").text = active.type.ToString();
 	DesText.GetComponent("Text").text = active.description.ToString();
 	StrongText.GetComponent("Text").text = active.strong.ToString();

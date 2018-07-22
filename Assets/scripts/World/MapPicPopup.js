@@ -13,6 +13,12 @@ var health2:GameObject;
 var health3:GameObject;
 var health4:GameObject;
 var health5:GameObject;
+var level1:GameObject;
+var level2:GameObject;
+var level3:GameObject;
+var level4:GameObject;
+var level5:GameObject;
+var levels=[];
 var pics=[];
 var names=[];
 var healths=[];
@@ -25,6 +31,7 @@ function Start(){
 	pics=[pic1,pic2,pic3,pic4,pic5];
 	names=[name1,name2,name3,name4,name5];
 	healths=[health1,health2,health3,health4,health5];
+	levels=[level1,level2,level3,level4,level5];
 }
 
 function updatePics(curType,location,curGroupNum){
@@ -66,13 +73,20 @@ function updatePics(curType,location,curGroupNum){
 
 			pics[i].GetComponent("Image").sprite=Resources.Load(folderName+"/"+activeUnits[i].type,typeof(Sprite));
 			names[i].GetComponent("Text").text=activeUnits[i].type;
+			if(activeUnits[i].level){
+				print(activeUnits[i].level);
+				levels[i].GetComponent("Text").text=activeUnits[i].level.ToString();
+			}else{
+				levels[i].GetComponent("Text").text="";
+			}
+			
 
-			if(curType=="AllyActive" || curType=="AllyUsed"){
+			//if(curType=="AllyActive" || curType=="AllyUsed"){
 				var health = activeUnits[i].health + 0.0f;
 				var maxhealth = activeUnits[i].maxhealth + 0.0f;
 				var percentage= health/maxhealth;
 				healths[i].transform.localScale = Vector3(percentage,1,0.02);
-			}	
+			//}	
 		}else{
 			pics[i].SetActive(false);
 		}
@@ -81,14 +95,14 @@ function updatePics(curType,location,curGroupNum){
 
 function clickPic(num){
 	var statBox = main.GetComponent("Main").statBox;
-
-	if(activeType=="Ally"){
+	print(activeType);
+	if(activeType=="Ally" || activeType=="AllyActive"){
 		var active = main.GetComponent("Main").units[unitNums[num]];
 		statBox.SetActive(true);
 		statBox.GetComponent("stats").updateText(active,active.health,active.maxhealth,active.attack,active.defense,active.resistance,active.accuracy,active.type,active.evasion, active.passiveActions);
 	}
-	if(activeType=="Enemy"){
-		print(EunitNums[num]);
+	if(activeType=="Enemy" || activeType=="EnemyActive"){
+		main.GetComponent("Main").activeEnemy=EunitNums[num];
 		var Eactive = main.GetComponent("Main").Eunits[EunitNums[num]];
 		statBox.SetActive(true);
 		statBox.GetComponent("stats").updateText(Eactive,Eactive.health,Eactive.maxhealth,Eactive.attack,Eactive.defense,Eactive.resistance,Eactive.accuracy,Eactive.type,Eactive.evasion, Eactive.passiveActions);

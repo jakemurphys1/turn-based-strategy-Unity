@@ -100,6 +100,7 @@ function switchGroup(){
 			moveBodies(TopSlotUnits[i],location2.GetComponent("locations").allspaces[0][1+i]);
 			moveBodies(BottomSlotUnits[i],location1.GetComponent("locations").allspaces[0][1+i]);
 		}
+		main.GetComponent("Main").UpdateIconsMain();
 }
 
 function moveBodies(unit,space){

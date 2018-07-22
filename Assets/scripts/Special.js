@@ -15,6 +15,7 @@ function Start () {
 	}else{
 		dodgePotion.SetActive(false);
 	}
+	curSpecial.GetComponent("special_" + GetComponent("Main").curname).setItem(GetComponent("Main").tutorial);
 }
 
 function Pass(){

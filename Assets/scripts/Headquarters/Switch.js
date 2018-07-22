@@ -79,6 +79,7 @@ function takeSpace(){
 			main.GetComponent("Main").hideEntries();
 			main.GetComponent("Main").hideCircles();
 			groupScreen.SetActive(false);
+			main.GetComponent("Main").UpdateIconsMain();
 			main.GetComponent("Special").SpecialFunction("combine");
 			
 		 }

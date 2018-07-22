@@ -442,8 +442,8 @@ function enemyAttack(){
 			if(eslots[n].attackType=="ArrowAttack"){
 				arrowAttack(eslots[n]);
 			}
-			if(eslots[n].attackType=="ShamanAttack"){
-				ShamanAttack(eslots[n]);
+			if(eslots[n].attackType=="Healer"){
+				Healer(eslots[n]);
 			}
 			if(eslots[n].attackType=="CannonAttack"){
 				CannonAttack(eslots[n]);
@@ -985,7 +985,7 @@ function SpiderAttack(enemy){
 
 	counter(enemy,target);
 }
-function ShamanAttack(enemy){
+function Healer(enemy){
 	if(!enemy.body || enemy.silenced>0){
 			return;
 	}
@@ -999,6 +999,16 @@ function ShamanAttack(enemy){
 		waittime=1;
 	}
 	var target = eslots[0];
+	print(eslots.length);
+	for(var i = 0;i<eslots.length;i++){
+		print(target.maxhealth);
+		print(target.health);
+		var diffold=target.maxhealth-target.health;
+		var diffnew=eslots[i].maxhealth-eslots[i].health;
+		if(diffold<diffnew){
+			target=eslots[i];
+		}
+	}
 	lookAt(enemy,target);
 
 	yield WaitForSeconds(waittime);
@@ -1077,6 +1087,9 @@ function aggressiveMove(enemy){
 function flyMove(enemy){
 	var options = new Array();
 	for(var i = 0;i<slots.length;i++){
+		if(slots[i].invisible){
+			continue;
+		}
 		if(!spaceFilled(slots[i].hor,slots[i].vert-1) || !spaceFilled(slots[i].hor,slots[i].vert+1) || !spaceFilled(slots[i].hor-1,slots[i].vert) || !spaceFilled(slots[i].hor+1,slots[i].vert)){
 			options.push(slots[i]);
 		}
@@ -1386,6 +1399,7 @@ function lowestDefense(options,type){
 			option = options[1];
 		}
 	}
+	print(options.length);
 	if(type=="defense"){
 		for(var j = 1;j<options.length;j++){
 			if(options[j].defense<option.defense && options[j].invisible==false){

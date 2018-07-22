@@ -17,7 +17,7 @@ var message2:GameObject;
 var showMessage: boolean=false;
 var self:GameObject;
 var details:GameObject;
-
+var curActive;
 function Start(){
 	allAbilities=[ability1,ability2,ability3,ability4,ability5];
 }
@@ -27,6 +27,7 @@ function storeAbilities(){
 }
 
 function updateText(active,health,maxhealth,attack,defense,resistance,accuracy,type,evasion, passiveActions){
+	curActive = active;
 	allAbilities=[ability1,ability2,ability3,ability4,ability5];
 	healthbox.GetComponent("Text").text = health.ToString();
 	maxhealthbox.GetComponent("Text").text = maxhealth.ToString();
@@ -78,5 +79,5 @@ function showIt(){
 
 function showdetails(){
 	details.SetActive(true);
-	details.GetComponent("Details").updateInfo();
+	details.GetComponent("Details").updateInfo(curActive);
 }

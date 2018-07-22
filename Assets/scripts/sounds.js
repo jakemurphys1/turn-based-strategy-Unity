@@ -25,6 +25,8 @@ var wallCollapse:AudioClip;
 var returnEnergy:AudioClip;
 var crystalOn:AudioClip;
 var crystalOff:AudioClip;
+var crit:AudioClip;
+var startBattle:AudioClip;
 
 function playSound(name){
 	var audio: AudioSource = GetComponent.<AudioSource>();
@@ -82,6 +84,10 @@ function playSound(name){
 		audio.clip = crystalOn;
 	}else if(name =="crystalOff"){
 		audio.clip = crystalOff;
+	}else if(name =="crit"){
+		audio.clip = crit;
+	}else if(name =="startBattle"){
+		audio.clip = startBattle;
 	}
 	audio.Play();
 }

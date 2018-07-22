@@ -53,6 +53,7 @@ var daysleft:GameObject;
 var canvas:GameObject;
 var istransporting:boolean=false;
 var mapPicPopup:GameObject;
+var tutorial:GameObject;
 var entries;
 var mapCamera;
 var updateMap;
@@ -107,7 +108,6 @@ function tempStart(){
 	units[0].actionsActive["Flying"]=true;
 	//units[0].actionsActive["Respond"]=true;
 	//units[0].actionsActive["Enlightenment"]=true;
-	units[0].attack=100;
 
 	units[1].actionsActive["Sweep"]=true;
 	//units[1].actionsActive["Flying"]=true;
@@ -119,7 +119,7 @@ function tempStart(){
 	units[2].actionsActive["Immobolize"]=true;
 
 
-	createEGroup("","Goblin","","","",ship, 1000);
+	createEGroup("","Goblin","Dryad","Goblin","",ship, 1000);
 	
 	createGroup(0,1,2,ship);
 	yield WaitForSeconds(2);
@@ -174,6 +174,7 @@ function createGroup(slot1:int,slot2:int,slot3:int,curlocation){
 	groups[groupIndex].index = groupIndex;
 
 	groupIndex+=1;
+	UpdateIconsMain();
 }
 function createUnitBody(slot,space,groupIndex,hor){
 	
@@ -622,7 +623,7 @@ class Ally{
 			   this.actionDes1["Detect"] = "Detects enemy's weaknesses";
 			   this.actionDes2["Detect"]  = "Makes the enemy vunerable to crits. Crit's likelihood based on accuracy/evasion.";
 			   this.actionDes1["Steal"] = "Steal From the Enemy";
-			   this.actionDes2["Steal"]  = "Thief will now steal whenever he attacks or uses detect.";
+			   this.actionDes2["Steal"]  = "Thief will now steal whenever he attacks if the enemy is vunerable.";
 			   this.actionDes1["Invisible"] = "Enemies Can't Attack What They Can't See";
 			   this.actionDes2["Invisible"]  = "Enemies can't attack the thief while invisible. Attacking causes the thief to become visible for a turn.";
 			   this.actionDes1["BackStab"] = "Strike from the shadows";
@@ -1835,7 +1836,7 @@ class Enemy{
 			 }
 			 this.defense = 25;
 			 this.resistance = 35;
-			 this.attackType="ShamanAttack";
+			 this.attackType="Healer";
 			 this.moveType="Afraid";
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
@@ -2260,16 +2261,16 @@ class Enemy{
 			 }
 			 this.defense = 10;
 			 this.resistance = 10;
-			 this.attackType="FireAttack";
+			 this.attackType="Healer";
 			 this.moveType="Afraid";
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=1;
 			 this.defenseType="resistance";
 			 this.charge=0;
-			 this.maxcharge=2;
+			 this.maxcharge=1;
 			 this.evasion=4;
-			 this.description="These close-range creatures prevent any ailments from being inflicted on any enemies. High evasion.";
+			 this.description="These creatures prevent any ailments from being inflicted on any enemies, and can heal for charge of one. High evasion.";
 			 this.strong="Units with low accuracy or low defense, or units that use abilities that inflict ailments.";
 			 this.weak="Units with high accuracy.";
 			 this.critType="Double";
@@ -2593,7 +2594,9 @@ class Enemy{
 
 	var objects = GameObject.FindGameObjectsWithTag("Entry");
 	for(i =0;i<objects.length;i++){
-		objects[i].GetComponent("entry").readyMove=false;;
+		if(objects[i]){
+			objects[i].GetComponent("entry").readyMove=false;
+		}
 	}
 
 	if(groups[activeGroup].hasMoved){
@@ -2798,6 +2801,7 @@ function startBattle(location,groupNum,EgroupNum){
 			if(!units[j].body){
 				continue;
 			}
+			units[j].body.SetActive(true);
 			units[j].didAction=false;
 			units[j].hasMoved=false;
 			units[j].protectedBy=-1;
@@ -3009,6 +3013,8 @@ function Update(){
 			 Destroy(instance);
  }
  function UpdateIconsMain(){
- 	 UpdateIcons();
+	if(UpdateIcons){
+		UpdateIcons();
+	}
  }
  
