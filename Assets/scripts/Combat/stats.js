@@ -34,9 +34,9 @@ function updateText(active,health,maxhealth,attack,defense,resistance,accuracy,t
 	attackbox.GetComponent("Text").text = attack.ToString();
 	defensebox.GetComponent("Text").text = defense.ToString();
 	resistancebox.GetComponent("Text").text = resistance.ToString();
-	accuracybox.GetComponent("Text").text = accuracy.ToString();
+	accuracybox.GetComponent("Text").text = translateAccuracy(active,accuracy).ToString();
 	typebox.GetComponent("Text").text = type.ToString();
-	evasionbox.GetComponent("Text").text = evasion.ToString();
+	evasionbox.GetComponent("Text").text = translateEvasion(evasion).ToString();
 
 	if(active.attackType){
 		return;
@@ -55,8 +55,72 @@ function updateText(active,health,maxhealth,attack,defense,resistance,accuracy,t
 		};
 		
 	}
-	
-	
+}
+function translateEvasion(num){
+		switch(num){
+			case 0:
+				return "Awful";
+				break;
+			case 1:
+				return "Normal";
+				break;
+			case 2: 
+				return "Good";
+				break;
+			case 3:
+				return "Great";
+				break;
+			case 4:
+				return "Excellent";
+				break;
+			case 5:
+				return "Perfect";
+				break;
+		}
+}
+function translateAccuracy(active, num){
+		if(active.isAlly){
+			switch(num){
+				case 0:
+					return "Awful";
+					break;
+				case 1:
+					return "Normal";
+					break;
+				case 2: 
+					return "Good";
+					break;
+				case 3:
+					return "Great";
+					break;
+				case 4:
+					return "Excellent";
+					break;
+				case 5:
+					return "Perfect";
+					break;
+			}
+		}else{
+			switch(num){
+				case 0:
+					return "Awful";
+					break;
+				case 1:
+					return "Bad";
+					break;
+				case 2: 
+					return "Poor";
+					break;
+				case 3:
+					return "Normal";
+					break;
+				case 4:
+					return "Good";
+					break;
+				case 5:
+					return "Great";
+			}
+		}
 }
 
 function ShowDescription(){

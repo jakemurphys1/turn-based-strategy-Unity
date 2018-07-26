@@ -588,7 +588,10 @@
 	var num;
 
 	hit = hitResult(thisUnit, curEnemy.evasion,thisUnit.accuracy);
-	print(hit);
+	if(curEnemy.sleep>0 || curEnemy.immobolized>0){
+		hit="Hit";
+	}
+
 	if(thisUnit.didAction==true){
 		return;
 	}
@@ -1448,7 +1451,6 @@
 	}
 
 	var randnum = Random.Range(0,4);
-	print(randnum);
 	accuracy+=randnum;
 	if(accuracy>=evasion){
 		return "Hit";
@@ -2135,7 +2137,9 @@ function showElementalArrow(enemy,element){
 			damageEnemy(enemy,damage,"critType");
 			
 		}
+		print(enemy.critType);
 		if(enemy.critType=="Sleep"){
+			print("got here");
 			wordPopup(enemy,"Crit: Sleep");
 			enemy.sleep=2;
 			showAilment("Sleep", enemy);

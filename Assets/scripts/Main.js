@@ -119,7 +119,7 @@ function tempStart(){
 	units[2].actionsActive["Immobolize"]=true;
 
 
-	createEGroup("","Goblin","Dryad","Goblin","",ship, 1000);
+	createEGroup("","Plague","","","",ship, 1000);
 	
 	createGroup(0,1,2,ship);
 	yield WaitForSeconds(2);
@@ -472,8 +472,9 @@ class Ally{
 			   this.arrows["Sleep"]=arrowCapacity;
 			   this.arrows["Enfeeble"]=arrowCapacity;
 			   this.description="This ranged unit can shoot any enemy in a straight line. She also has plenty of unique arrows that can only be used once per fight. These arrows inflict unique poisons.";
-			   this.strong="Any enemy that has low defense. Especially useful against long-range magic users that have to charge. It's toxins can also be used effectively against enemies if used right.";
+			   this.strong="Any enemy that has low defense. Especially useful against long-range magic users that have to charge. It's toxins can also be used effectively against enemies if used right. High accuracy.";
 			   this.weak="Any enemy with high defense. Also, any enemy that can quickly attack in the close range like flyers are dangerous since she has low defense.";
+			   this.accuracy=3;
 		}
 		if(type=="Templar"){
 			   this.maxhealth=80;
@@ -562,7 +563,6 @@ class Ally{
 			   this.attack=80;
 			   this.defense=20;
 			   this.resistance=0;
-			   this.accuracy=3;
 			   this.evasion=1;
 			   this.actions[0] = "Attack";
 			   this.actions[1] = "Swirl";
@@ -1360,40 +1360,6 @@ class Enemy{
 			 this.strong="Any close-range unit with low resistance or non-magic users";
 			 this.weak="Magic users, especially fire.";
 		};//done
-		if(type=="Wisp"){
-			if (level == 1) {
-             this.attack = 40;
-             this.health = 40; //40
-             this.maxhealth = 40; //40
-			 }
-			 if (level == 2) {
-				 this.attack = 60;
-				 this.health = 60;
-				 this.maxhealth = 60;
-			 }
-			 if (level == 3) {
-				 this.attack = 80;
-				 this.health = 80;
-				 this.maxhealth = 80;
-			 }
-			 if (level == 4) {
-				 this.attack = 100;
-				 this.health = 100;
-				 this.maxhealth = 100;
-			 }
-			 this.charge=0;
-			 this.maxcharge=1;
-			 this.defense = 0;
-			 this.resistance = 30;
-			 this.attackType="FireAttack";
-			 this.moveType="Random";
-			 this.elemental["Fire"]=2;
-			 this.elemental["Ice"]=0.5;
-			 this.elemental["Lightning"]=1;
-			 this.description="These creatures fly randomly around the area. At a cost of one charge, it can attack any unit with an ice attack.";
-			 this.strong="Any unit with low resistance.";
-			 this.weak="Long random attackers with physical attacks and fire.";
-		}//done
 		if(type=="Silencer"){
 			if (level == 1) {
              this.attack = 20;
@@ -1982,6 +1948,42 @@ class Enemy{
 			 this.strong="Fire Attacks.";
 			 this.weak="Ice Attacks";
 		};
+		if(type=="Dryad"){
+			if (level == 1) {
+             this.attack = 20;
+             this.health = 40;
+             this.maxhealth = 40;
+			 }
+			 if (level == 2) {
+				 this.attack = 30;
+				 this.health = 60;
+				 this.maxhealth = 60;
+			 }
+			 if (level == 3) {
+				 this.attack = 40;
+				 this.health = 80;
+				 this.maxhealth = 80;
+			 }
+			 if (level == 4) {
+				 this.attack = 50;
+				 this.health = 100;
+				 this.maxhealth = 100;
+			 }
+			 this.defense = 10;
+			 this.resistance = 10;
+			 this.attackType="Healer";
+			 this.moveType="Afraid";
+			 this.elemental["Fire"]=1;
+			 this.elemental["Ice"]=1;
+			 this.elemental["Lightning"]=1;
+			 this.defenseType="resistance";
+			 this.charge=0;
+			 this.maxcharge=1;
+			 this.description="These creatures prevent any ailments from being inflicted on any enemies, and can heal for charge of one. High evasion.";
+			 this.strong="Units with low accuracy or low defense, or units that use abilities that inflict ailments.";
+			 this.weak="Units with high accuracy.";
+			 this.critType="Double";
+		};//done
 		
 		if(type=="Wolf"){
 		
@@ -2066,7 +2068,7 @@ class Enemy{
 			 this.description="These flying enemies can move anywhere and can cause sleep and enfeeble. Has low accuracy.";
 			 this.strong="Units with low accuracy and low defense.";
 			 this.weak="Units with high accuracy and high defense.";
-		}//done---REMOVE
+		}//done
 		if(type=="Vampire"){
 			if (level == 1) {
              this.attack = 60;
@@ -2166,6 +2168,7 @@ class Enemy{
 			 this.strong="Most things";
 			 this.weak="Enfeebling attacks";
 		};//done
+
 		
 
 		//will dodge
@@ -2192,8 +2195,8 @@ class Enemy{
 			 }
 			 this.evasion=4;
 			 this.doubleAttack=2;
-			 this.defense = 15;
-			 this.resistance = 15;
+			 this.defense = 0;
+			 this.resistance = 0;
 			 this.attackType="CloseAttack";
 			 this.moveType="Agressive";
 			 this.elemental["Fire"]=1;
@@ -2237,44 +2240,7 @@ class Enemy{
 			 this.strong="Units with low accuracy.";
 			 this.weak="Units with high accuracy.";
 			 this.critType="Double";
-		};//done
-		if(type=="Dryad"){
-			if (level == 1) {
-             this.attack = 20;
-             this.health = 40;
-             this.maxhealth = 40;
-			 }
-			 if (level == 2) {
-				 this.attack = 30;
-				 this.health = 60;
-				 this.maxhealth = 60;
-			 }
-			 if (level == 3) {
-				 this.attack = 40;
-				 this.health = 80;
-				 this.maxhealth = 80;
-			 }
-			 if (level == 4) {
-				 this.attack = 50;
-				 this.health = 100;
-				 this.maxhealth = 100;
-			 }
-			 this.defense = 10;
-			 this.resistance = 10;
-			 this.attackType="Healer";
-			 this.moveType="Afraid";
-			 this.elemental["Fire"]=1;
-			 this.elemental["Ice"]=1;
-			 this.elemental["Lightning"]=1;
-			 this.defenseType="resistance";
-			 this.charge=0;
-			 this.maxcharge=1;
-			 this.evasion=4;
-			 this.description="These creatures prevent any ailments from being inflicted on any enemies, and can heal for charge of one. High evasion.";
-			 this.strong="Units with low accuracy or low defense, or units that use abilities that inflict ailments.";
-			 this.weak="Units with high accuracy.";
-			 this.critType="Double";
-		};//done
+		};//---REMOVE
 		if(type=="Creature"){
 			if (level == 1) {
              this.attack = 30;
@@ -2312,8 +2278,8 @@ class Enemy{
 		if(type=="Werewolf"){
 			if (level == 1) {
              this.attack = 35;
-             this.health = 70;
-             this.maxhealth = 50;
+             this.health = 80;
+             this.maxhealth = 80;
 			 }
 			 if (level == 2) {
 				 this.attack = 55;
@@ -2322,15 +2288,15 @@ class Enemy{
 			 }
 			 if (level == 3) {
 				 this.attack = 75;
-				 this.health = 130;
-				 this.maxhealth = 130;
+				 this.health = 100;
+				 this.maxhealth = 100;
 			 }
 			 if (level == 4) {
 				 this.attack = 95;
-				 this.health = 150;
-				 this.maxhealth=150;
+				 this.health = 110;
+				 this.maxhealth=110;
 			 }
-			 this.defense = 20;
+			 this.defense = 10;
 			 this.resistance = 40;
 			 this.attackType="CloseAttack";
 			 this.moveType="Agressive";
@@ -2376,6 +2342,41 @@ class Enemy{
 			 this.strong="Any units with low defense.";
 			 this.weak="Any units with high evasion.";
 			 this.critType="Double";
+		}//done---REMOVE
+		if(type=="Wisp"){
+			if (level == 1) {
+             this.attack = 40;
+             this.health = 40; //40
+             this.maxhealth = 40; //40
+			 }
+			 if (level == 2) {
+				 this.attack = 60;
+				 this.health = 60;
+				 this.maxhealth = 60;
+			 }
+			 if (level == 3) {
+				 this.attack = 80;
+				 this.health = 80;
+				 this.maxhealth = 80;
+			 }
+			 if (level == 4) {
+				 this.attack = 100;
+				 this.health = 100;
+				 this.maxhealth = 100;
+			 }
+			 this.charge=0;
+			 this.maxcharge=1;
+			 this.defense = 0;
+			 this.resistance = 30;
+			 this.attackType="FireAttack";
+			 this.moveType="Random";
+			 this.elemental["Fire"]=2;
+			 this.elemental["Ice"]=0.5;
+			 this.elemental["Lightning"]=1;
+			 this.description="These creatures fly randomly around the area. At a cost of one charge, it can attack any unit with an ice attack. High Evasion.";
+			 this.strong="Any unit with low resistance or low accuracy.";
+			 this.weak="Long random attackers with physical attacks and fire that have good accuracy.";
+			 this.evasion=4;
 		}//done
 		
 
