@@ -8,6 +8,7 @@ var self:GameObject;
 
 function enemyturn(){
 	DisablePass();
+	main.GetComponent("Main").removePotentialDamage();
 	if(main.GetComponent("Main").inCombat==false){
 		worldturn();
 		return;
@@ -133,6 +134,7 @@ function worldturn(){
 	var Egroups = main.GetComponent("Main").Egroups;
 	var units = main.GetComponent("Main").units;
 
+
 	main.GetComponent("Special").SpecialFunction("pass");
 
 	for(var i = 0;i<groups.length;i++){
@@ -225,14 +227,13 @@ function moveEnemies(Egroup, location:GameObject){
 			slot3.y=1;
 			slot4.y=1;
 			slot5.y=1;
-
 			var curObject1 = giveEnemySlot(0,Egroup.index);
 			var curObject2 = giveEnemySlot(1,Egroup.index);
 			var curObject3 = giveEnemySlot(2,Egroup.index);
 			var curObject4 = giveEnemySlot(3,Egroup.index);
 			var curObject5 = giveEnemySlot(4,Egroup.index);
-			
 			if(curObject1){
+				
 				curObject1.GetComponent("EnemyClick").Run=1;
 
 				var startPosition1 = curObject1.transform.position;
@@ -278,7 +279,7 @@ function moveEnemies(Egroup, location:GameObject){
 					startDirection5 = curObject3.transform.rotation;
 					curObject5.transform.rotation=_lookRotation5;
 			}
-
+					print(slot2);
 					var t = 0.0;
 					 while (t < 1.0)
 					 {
@@ -300,6 +301,7 @@ function moveEnemies(Egroup, location:GameObject){
 						 }
 						 yield;
 					 }
+					 print("here");
 
 					 if(curObject1){
 						curObject1.transform.rotation=startDirection1;
@@ -414,6 +416,12 @@ function enemyAttack(){
 			if(eslots[n].attackType=="SpiderAttack"){
 				SpiderAttack(eslots[n]);
 			}
+			if(eslots[n].attackType=="GuardAttack"){
+				closeAttack(eslots[n],eslots,slots);
+				if(eslots[n].didAction==false){
+					GuardAction(eslots[n]);
+				}
+			}
 			if(eslots[n].attackType=="VacuumAttack"){
 				closeAttack(eslots[n],eslots,slots);
 				if(eslots[n].didAction==false){
@@ -447,6 +455,9 @@ function enemyAttack(){
 			}
 			if(eslots[n].attackType=="CannonAttack"){
 				CannonAttack(eslots[n]);
+			}
+			if(eslots[n].attackType=="MageAttack"){
+				MageAttack(eslots[n],eslots,slots);
 			}
 			if(eslots[n].maxcharge>-1 && eslots[n].chargeAfterAttack && eslots[n].didAction==false){
 				if(eslots[n].charge<eslots[n].maxcharge){
@@ -530,6 +541,11 @@ function closeAttack(enemy,eslots,slots){
 				doAilment(enemy,slots[attackThis],"Enfeebled");
 			}
 			move(enemy.body,reverseX,reverseY);
+			if(enemy.type=="Thief"){
+				enemy.phasedout=false;
+				enemy.body.GetComponent("Thief").turnVisible();
+				main.GetComponent("combat").wordPopup(enemy,"Phased In!");
+			}
 			counter(enemy,slots[attackThis]);
 		}
 }
@@ -614,6 +630,50 @@ function IceAttack(enemy,eslots,slots){
 		Destroy(frozen);
 		counter(enemy,slots[attackThis]);
 }
+function MageAttack(enemy,eslots,slots){
+	var attackThis = isTwoAway(enemy.hor,enemy.vert,slots);
+	if(attackThis==-1){
+		for(var j = 0;j<slots.length;j++){
+			if(slots[j].invisible){
+				continue;
+			}
+			if(isDiagonal(enemy,slots[j])){
+				attackThis = j;
+			}
+		}
+	}
+	enemy.enemyHit = main.GetComponent("combat").hitResult(enemy, slots[attackThis].evasion,enemy.accuracy);
+	if(attackThis==-1){
+		return;
+	}
+	
+		var ally = slots[attackThis];
+		enemy.didAction=true;
+		enemy.hasMoved=true;
+		var waittime=0;
+		if(enemy.body.GetComponent("EnemyClick").Run>0){
+			waittime=1;
+		}
+		yield WaitForSeconds(waittime);
+		enemy.body.GetComponent("EnemyClick").attack =1;
+		lookAt(enemy,slots[attackThis]);
+		yield WaitForSeconds(0.5);
+		main.GetComponent("sounds").playSound("fire");
+		magic = Resources.Load("effects/FireBall", GameObject);
+		instance = Instantiate(magic);
+		instance.transform.position = enemy.body.transform.position;
+		shootObject(instance,ally);
+		yield WaitForSeconds(0.5);
+		 var damage = enemy.attack-main.GetComponent("combat").getdefense(slots[attackThis],"resistance");
+		 main.GetComponent("combat").damageAlly(slots[attackThis].index,damage,enemy,0);
+		 magic = Resources.Load("effects/Fire", GameObject);
+		instance = Instantiate(magic);
+		instance.transform.position = ally.body.transform.position;
+		instance.transform.position.y+=10;
+		enemy.body.GetComponent("EnemyClick").attack =0;	
+		yield WaitForSeconds(1);
+		counter(enemy,slots[attackThis]);
+}
 function SpitterAttack(enemy,eslots,slots){
 	var options = new Array();
 	for(var i = 0;i<slots.length;i++){
@@ -640,10 +700,13 @@ function SpitterAttack(enemy,eslots,slots){
 	enemy.body.GetComponent("EnemyClick").attack =1;
 	var damage = enemy.attack-main.GetComponent("combat").getdefense(target,enemy.defenseType);
 
-	
+	waittime=0;
 	if(enemy.type=="Spitter"){
 		magic = Resources.Load("effects/Tar", GameObject);
 		main.GetComponent("sounds").playSound("spit");
+	}
+	if(enemy.type=="Rogue" || enemy.type=="Templar"){
+		waittime=1.5;
 	}
 	if(enemy.type=="GreenOoze"){
 		magic = Resources.Load("effects/Poison", GameObject);
@@ -666,11 +729,19 @@ function SpitterAttack(enemy,eslots,slots){
 		enemy.body.GetComponent("EnemyClick").chargeText.GetComponent("Text").text=enemy.charge.ToString();
 		damage= damage * enemy.charge;
 	}
+	yield WaitForSeconds(waittime);
+	
 	main.GetComponent("combat").damageAlly(target.index,damage,enemy,1);
 	yield WaitForSeconds(0.5);
-	instance = Instantiate(magic);
-	instance.transform.position = enemy.body.transform.position;
-	shootObject(instance,target);
+	if(enemy.type=="Rogue" || enemy.type=="Templar"){
+		main.GetComponent("sounds").playSound("arrow");
+	}
+	if(magic){
+		instance = Instantiate(magic);
+		instance.transform.position = enemy.body.transform.position;
+		shootObject(instance,target);
+	}
+	
 	enemy.body.GetComponent("EnemyClick").attack =0;
 	
 	yield WaitForSeconds(0.5);
@@ -678,8 +749,13 @@ function SpitterAttack(enemy,eslots,slots){
 	if(enemy.type=="Spitter"){
 		doAilment(enemy,target,"Enfeebled");
 	}
-	if(enemy.type=="GreenOoze"){
+	print(enemy.type=="Rogue");
+	if(enemy.type=="GreenOoze" || enemy.type=="Rogue"){
+		print("here");
 		doAilment(enemy,target,"Poison");
+	}
+	if(enemy.type=="Templar"){
+		doAilment(enemy,target,"Silenced");
 	}
 	if(enemy.type=="BlueOoze"){
 		if(!spaceFilled(target.hor,target.vert-1)){
@@ -1026,6 +1102,50 @@ function Healer(enemy){
 	shootObject(instance,target);
 	enemy.body.GetComponent("EnemyClick").attack =0;
 }
+function GuardAction(enemy){
+	if(!enemy.body){
+			return;
+	}
+	var waittime=0;
+	if(enemy.body.GetComponent("EnemyClick").Run>0){
+		waittime=1;
+	}
+
+	var target = null;
+	for(var i = 0;i<eslots.length;i++){
+		if(eslots[i].protectedBy==-1 && eslots[i]!=enemy){
+			target=eslots[i];
+		}
+	}
+	if(target==null){
+		return;
+	}
+	enemy.didAction=true;
+	enemy.hasMoved=true;
+	lookAt(enemy,target);
+
+	yield WaitForSeconds(waittime);
+	lookAt(enemy,target);
+	enemy.body.GetComponent("EnemyClick").animator.SetInteger("special",1);
+
+	yield WaitForSeconds(0.5);
+
+	target.protectedBy=enemy.index;
+	main.GetComponent("combat").wordPopup(target,"Protected");
+	main.GetComponent("sounds").playSound("protect");
+	magic = Resources.Load("effects/Shield", GameObject);
+	instance2 = Instantiate(magic);
+	instance2.transform.position = target.body.transform.position;
+	instance2.transform.position.y+=5;
+	instance2.transform.position.z+=1;
+	instance2.transform.SetParent(target.body.transform);
+	if(enemy.shield1){
+		enemy.shield2=instance2;
+	}else{
+		enemy.shield1=instance2;
+	}
+	enemy.body.GetComponent("EnemyClick").animator.SetInteger("special",0);
+}
 function CannonAttack(enemy){
 	for(i = 0;i<slots.length;i++){
 		main.GetComponent("combat").damageAlly(slots[i].index,slots[i].health,"None",0);
@@ -1358,10 +1478,26 @@ function isTwoAway(hor,vert,slots){
 			if(((slots[j].vert + 2) ==vert && slots[j].hor == hor) || ((slots[j].vert-2) ==vert && slots[j].hor == hor) || (slots[j].vert ==vert && (slots[j].hor+2) == hor) || (slots[j].vert ==vert && (slots[j].hor-2) == hor)){
 				target = j;
 			}
+
 		}
 
 	return target;
 }
+ function isDiagonal(enemy,ally){
+	if(ally.vert==(enemy.vert+1) && ally.hor == (enemy.hor+1)){
+		return true;
+	}
+	if(ally.vert==(enemy.vert-1) && ally.hor == (enemy.hor+1)){
+		return true;
+	}
+	if(ally.vert==(enemy.vert+1) && ally.hor == (enemy.hor-1)){
+		return true;
+	}
+	if(ally.vert==(enemy.vert-1) && ally.hor == (enemy.hor-1)){
+		return true;
+	}
+	return false;
+ }
 function charge(enemy){
 	if(enemy.didAction || !enemy.body){
 		return;

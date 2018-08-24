@@ -58,6 +58,8 @@ var entries;
 var mapCamera;
 var updateMap;
 var UpdateIcons;
+var noNexus=false;
+var showEnemyOnCreate=true;
 
 function Awake(){
 	StoreInfo = GameObject.Find("StoreInfo");
@@ -65,7 +67,7 @@ function Awake(){
 		level = StoreInfo.GetComponent("StoreInfo").level;
 		stage = StoreInfo.GetComponent("StoreInfo").stage;
 	}else{
-		//level=1;
+		level=3;
 	}
 }
 
@@ -104,22 +106,18 @@ function Start () {
 }
 
 function tempStart(){
-	
 	units[0].actionsActive["Flying"]=true;
-	//units[0].actionsActive["Respond"]=true;
-	//units[0].actionsActive["Enlightenment"]=true;
+	units[0].actionsActive["Zap"]=true;
+	units[0].actionsActive["Freeze"]=true;
 
-	units[1].actionsActive["Sweep"]=true;
+	units[1].actionsActive["Elemental"]=true;
 	//units[1].actionsActive["Flying"]=true;
-	units[1].actionsActive["Swirl"]=true;
+	units[1].actionsActive["Flying"]=true;
 	units[1].actionsActive["Push"]=true;
 	units[1].actionsActive["Scout"]=true;
 	units[1].actionsActive[""]=true;
 
-	units[2].actionsActive["Immobolize"]=true;
-
-
-	createEGroup("","Plague","","","",ship, 1000);
+	createEGroup("","Guard","Soldier","","",ship, 1000);
 	
 	createGroup(0,1,2,ship);
 	yield WaitForSeconds(2);
@@ -175,6 +173,7 @@ function createGroup(slot1:int,slot2:int,slot3:int,curlocation){
 
 	groupIndex+=1;
 	UpdateIconsMain();
+	checkBattle(ship);
 }
 function createUnitBody(slot,space,groupIndex,hor){
 	
@@ -275,28 +274,31 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 
 	var curPos= curCamera.transform.position;
 	EgroupIndex+=1;
+	if(showEnemyOnCreate){
 		//zoom camera
-	var t = 0.0;
-	var startPosition = curCamera.transform.position;
-	var endPosition =location.transform.position;
-	endPosition.y = startPosition.y;
-	while (t < 1.0)
-	{
-		t += 0.05;
-		curCamera.transform.position = Vector3.Lerp(startPosition,endPosition,t);
-		yield;
-	}
+		var t = 0.0;
+		var startPosition = curCamera.transform.position;
+		var endPosition =location.transform.position;
+		endPosition.y = startPosition.y;
+		while (t < 1.0)
+		{
+			t += 0.05;
+			curCamera.transform.position = Vector3.Lerp(startPosition,endPosition,t);
+			yield;
+		}
 
-	yield WaitForSeconds(1);
-	if(inCombat){
-		return;
-	}
-	t = 0.0;
-	while (t < 1.0)
-	{
-		t += 0.05;
-		curCamera.transform.position = Vector3.Lerp(endPosition,startPosition,t);
-		yield;
+		yield WaitForSeconds(1);
+		if(inCombat){
+			return;
+		}
+	
+		t = 0.0;
+		while (t < 1.0)
+		{
+			t += 0.05;
+			curCamera.transform.position = Vector3.Lerp(endPosition,startPosition,t);
+			yield;
+		}
 	}
 }
 class Group{
@@ -360,6 +362,7 @@ class Ally{
    var actionDes2 = {};
    var abilities = new Array();
    var abillityFunction = {};
+   var attackProperties = {};
    var arrows = {};
    var invisible: boolean=false;
    var arrowCapacity:int=1;
@@ -423,6 +426,11 @@ class Ally{
 			   this.actionDes2["Titan"]  = "Deals damage equal to double your archer's attack to any enemy.";
 			   this.actionDes1["Double Arrows"] = "Double Supply of Arrows";
 			   this.actionDes2["Double Arrows"]  = "Archer begins each battle with two of each type of arrow";
+			   this.attackProperties["Normal"]={"Range":"Any","Multiplier":1,"DefenseType":"defense","Element":"None"};
+			   this.attackProperties["Explosion"]={"Range":"Any","Multiplier":1,"DefenseType":"defense","Element":"Fire"};
+			   this.attackProperties["Piercing"]={"Range":"Any","Multiplier":1,"DefenseType":"none","Element":"None"};
+			   this.attackProperties["Immobolize"]={"Range":"Any","Multiplier":1,"DefenseType":"defense","Element":"None"};
+			   this.attackProperties["Titan"]={"Range":"Any","Multiplier":2,"DefenseType":"defense","Element":"None"};
 			   this.arrows["Explosion"]=arrowCapacity;
 			   this.arrows["Piercing"]=arrowCapacity;
 			   this.arrows["Immobolize"]=arrowCapacity;
@@ -436,7 +444,6 @@ class Ally{
 			   this.attack=30;
 			   this.defense=10;
 			   this.resistance=10;
-			   this.accuracy=1;
 			   this.evasion=1;
 			   this.actions[0] = "Normal";
 			   this.actions[1] = "Poison";
@@ -467,6 +474,11 @@ class Ally{
 			   this.actionDes2["Duration"]  = "All ailments inflicted by the Rogue will last one extra turn.";
 			   this.actionDes1["Double Arrows"] = "Double Supply of Arrows";
 			   this.actionDes2["Double Arrows"]  = "Rogue begins each battle with two of each type of arrow";
+			   this.attackProperties["Normal"]={"Range":"Line","Multiplier":1,"DefenseType":"defense","Element":"None"};
+			   this.attackProperties["Poison"]={"Range":"Line","Multiplier":1,"DefenseType":"defense","Element":"None"};
+			   this.attackProperties["Blindness"]={"Range":"Line","Multiplier":1,"DefenseType":"defense","Element":"None"};
+			   this.attackProperties["Sleep"]={"Range":"Line","Multiplier":1,"DefenseType":"defense","Element":"None"};
+			   this.attackProperties["Enfeeble"]={"Range":"Line","Multiplier":1,"DefenseType":"defense","Element":"None"};
 			   this.arrows["Poison"]=arrowCapacity;
 			   this.arrows["Blindness"]=arrowCapacity;
 			   this.arrows["Sleep"]=arrowCapacity;
@@ -512,6 +524,11 @@ class Ally{
 			   this.actionDes2["Burst"]  = "Deals damge equal to your templar's attack plus the enemy's resistance";
 			   this.actionDes1["Double Arrows"] = "Double Supply of Arrows";
 			   this.actionDes2["Double Arrows"]  = "Templar begins each battle with two of each type of arrow";
+			   this.attackProperties["Normal"]={"Range":"Line","Multiplier":1,"DefenseType":"defense","Element":"Templar"};
+			   this.attackProperties["Silence"]={"Range":"Line","Multiplier":1,"DefenseType":"defense","Element":"Templar"};
+			   this.attackProperties["GrapplingHook"]={"Range":"Line","Multiplier":1,"DefenseType":"defense","Element":"Templar"};
+			   this.attackProperties["Disrupt"]={"Range":"Line","Multiplier":1,"DefenseType":"defense","Element":"Templar"};
+			   this.attackProperties["Burst"]={"Range":"Line","Multiplier":1,"DefenseType":"defense","Element":"Templar"};
 			   this.arrows["Silence"]=arrowCapacity;
 			   this.arrows["GrapplingHook"]=arrowCapacity;
 			   this.arrows["Disrupt"]=arrowCapacity;
@@ -527,7 +544,7 @@ class Ally{
 			   this.defense=20;
 			   this.resistance=0;
 			   this.accuracy=1;
-			   this.evasion=4;
+			   this.evasion=3;
 			   this.actions[0] = "Attack";
 			   this.actions[1] = "Medkit";
 			   this.passiveActions[0]= "Dash";
@@ -553,6 +570,7 @@ class Ally{
 			   this.actionDes2["Medkit"]  = "The medkit fully heals the soldier. Can only carry one medkit at a time, and must rest to replenish it.";
 			   this.actionDes1["Counter"] = "No attacks go unmet";
 			   this.actionDes2["Counter"]  = "All adjacent attack onto the soldier causes the soldier to attack it back.";
+			   this.attackProperties["Attack"]={"Range":"Adjacent","Multiplier":1,"DefenseType":"defense","Element":"none"};
 			   this.arrows["Medkit"]=1;
 			   this.description="This close-range fighter can only attack enemies next to him. He has many abilities to keep himself alive and strong.";
 			   this.strong="Any enemy close-range enemy with low defense.";
@@ -589,6 +607,11 @@ class Ally{
 			   this.actionDes2["Push"]  = "Pushes an adjacent enemy straight back. Costs 30 energy.";
 			   this.actionDes1["Wail"] = "Smash the Enemy Until it Stops Moving";
 			   this.actionDes2["Wail"]  = "Continues to attack until he runs out of energy. Each attack has a reduction of accuracy.";
+			   this.attackProperties["Attack"]={"Range":"Adjacent","Multiplier":1,"DefenseType":"defense","Element":"none"};
+			   this.attackProperties["Swirl"]={"Range":"Adjacent","Multiplier":1,"DefenseType":"defense","Element":"none"};
+			   this.attackProperties["Sweep"]={"Range":"Sweep","Multiplier":1,"DefenseType":"defense","Element":"none"};
+			   this.attackProperties["Push"]={"Range":"Adjacent","Multiplier":1,"DefenseType":"defense","Element":"none"};
+			   this.attackProperties["Wail"]={"Range":"Adjacent","Multiplier":1,"DefenseType":"defense","Element":"none"};
 			   this.energy=100;
 			   this.description="He is the master of close-range combat. He has limited energy, which has to be used with every action. Pass the turn without moving or attack to refill his energy.";
 			   this.strong="Any enemy close-range enemy with low defense, especially in large collective groups.";
@@ -634,6 +657,8 @@ class Ally{
 			   this.actionDes2["FirstBlow"]  = "If the enemy is undamaged, this attack blinds it for 2 turns";
 			   this.actionDes1["Hobble"] = "Slow the Enemy Down";
 			   this.actionDes2["Hobble"]  = "Permanently reduces the enemy's evasion by 1.";
+			   this.attackProperties["Attack"]={"Range":"Adjacent","Multiplier":1,"DefenseType":"defense","Element":"none"};
+			   this.attackProperties["Detect"]={"Range":"Any","Multiplier":0,"DefenseType":"defense","Element":"none"};
 			   this.description="This close-range fighter can't do a lot of damage, but can make enemy's vulnerable to crits. He also has a high accuracy.";
 			   this.strong="Any enemy close-range enemy with low defense or high evasion. He can protect himself against ranged or flying enemies.";
 			   this.weak="Any close-range enemy with high defense is tough.";
@@ -670,6 +695,10 @@ class Ally{
 			   this.actionDes2["Execute"]  = "May instantly kill an enemy. The lower it's health, the more likely to succeed";
 			   this.actionDes1["DoubleTap"] = "Attack Twice";
 			   this.actionDes2["DoubleTap"]  = "Mage may attack again instead of moving.";
+			   this.attackProperties["Fire"]={"Range":"Fire","Multiplier":1,"DefenseType":"resistance","Element":"Fire"};
+			   this.attackProperties["Zap"]={"Range":"Zap","Multiplier":1,"DefenseType":"resistance","Element":"Lightning"};
+			   this.attackProperties["Freeze"]={"Range":"Freeze","Multiplier":1,"DefenseType":"resistance","Element":"Ice"};
+			   this.attackProperties["Execute"]={"Range":"Any","Multiplier":0,"DefenseType":"resistance","Element":"None"};
 			   this.description="This mid-fighter can only hit relatively close enemies with her magic, elemental attacks.";
 			   this.strong="Any enemy mid-range enemy with low resistance. Also, if you use the right attacks, you can exploit your enemy's elemental weaknesses. ";
 			   this.weak="Her mid-level defenses make her useful but still vunerable to all ranged attacks.";
@@ -710,6 +739,10 @@ class Ally{
 			   this.actionDes2["Drain"]  = "Reduces an adjacent enemy's charge to 0, and gives it to the wizard.";
 			   this.actionDes1["Start Charge"] = "Enter the Battle Ready to Fight";
 			   this.actionDes2["Start Charge"]  = "Wizard begins each battle with 2 Charge";
+			   this.attackProperties["Gust"]={"Range":"Any","Multiplier":1,"DefenseType":"resistance","Element":"Ice"};
+			   this.attackProperties["Lightning"]={"Range":"Any","Multiplier":2,"DefenseType":"resistance","Element":"Lightning"};
+			   this.attackProperties["Missiles"]={"Range":"Line","Multiplier":"Charge","DefenseType":"resistance","Element":"Fire"};
+			   this.attackProperties["Drain"]={"Range":"Adjacent","Multiplier":0,"DefenseType":"resistance","Element":"None"};
 			   this.description="Powerful, but slow, wizards must charge before they can use their attacks.";
 			   this.strong="Any enemy that has low resistance. Also, if you use the right attacks, you can exploit your enemy's elemental weaknesses.";
 			   this.weak="Any enemy with high resistance, or any ranged or flying enemies.";
@@ -746,6 +779,11 @@ class Ally{
 			   this.actionDes2["Surge"]  = "The sorcerer doubles his mana increase";
 			   this.actionDes1["Death"] = "The name says it all";
 			   this.actionDes2["Death"]  = "Instantly kills any enemy. Costs 50";
+			   this.attackProperties["Blizzard"]={"Range":"Any","Multiplier":1,"DefenseType":"resistance","Element":"Ice"};
+			   this.attackProperties["Bolt"]={"Range":"Any","Multiplier":2,"DefenseType":"resistance","Element":"Lightning"};
+			   this.attackProperties["FireBlast"]={"Range":"Any","Multiplier":2,"DefenseType":"resistance","Element":"Fire"};
+			   this.attackProperties["Earth"]={"Range":"Any","Multiplier":2,"DefenseType":"resistance","Element":"None"};
+			   this.attackProperties["Death"]={"Range":"Any","Multiplier":0,"DefenseType":"resistance","Element":"None"};
 			   this.energy=100;
 			   this.description="Powerful, but slow, sorrcerers must use their energy for their attacks. Every round outside of combat will slowly restore the energy.";
 			   this.strong="Any enemy that has low resistance. Also, if you use the right attacks, you can exploit your enemy's elemental weaknesses.";
@@ -757,7 +795,7 @@ class Ally{
 			   this.defense=20;
 			   this.resistance=20;
 			   this.accuracy=1;
-			   this.evasion=4;
+			   this.evasion=3;
 			   this.actions[0] = "Bash";
 			   this.actions[1] = "Protect";
 			   this.actions[2] = "Reshield";
@@ -783,6 +821,7 @@ class Ally{
 			   this.actionDes2["Reshield"]  = "Increase the Guard's shield energy by 10";
 			   this.actionDes1["SuperShield"] = "Shields at Max";
 			   this.actionDes2["SuperShield"]  = "The Guard begins with double shield energy";
+			   this.attackProperties["Bash"]={"Range":"Adjacent","Multiplier":1,"DefenseType":"defense","Element":"none"};
 			   this.energy=25;
 			   this.description="This highly defensive unit can take a beating and protect your other units.";
 			   this.strong="The Guard can effectively defense attack most enemies.";
@@ -861,6 +900,7 @@ class Ally{
 			   this.actionDes2["Off Balance"]  = "If an adjacent enemy misses the monk, it is inflicted by sleep for 1 turn";
 			   this.actionDes1["Enlightenment"] = "Protect your group";
 			   this.actionDes2["Enlightenment"]  = "The Monk and his allies take no damage from near-misses";
+			   this.attackProperties["Attack"]={"Range":"Adjacent","Multiplier":1,"DefenseType":"defense","Element":"none"};
 			   this.description="Highly evasive, this low-damage fighter is best against enemies will low accuracy.";
 			   this.strong="Enemies with low accuracy.";
 			   this.weak="Enemies with high accuracy.";
@@ -893,6 +933,9 @@ class Enemy{
    var critType:String="None";
    var ailmentBody= {};
    var isAlly:boolean=false;
+   var protectedBy:int = -1;
+   var shield1:GameObject;
+   var shield2: GameObject;
 
    var elemental = {};
    var index:int;
@@ -2412,6 +2455,39 @@ class Enemy{
 			 this.strong="Any close-range enemy with low defense.";
 			 this.weak="Any magic user since he has a low resistance, especially long range ones. Also, any close-range enemy with defense is tough.";
 		};//done
+		if(type=="Thief"){
+			if (level == 1) {
+             this.attack = 20;
+             this.health = 50;
+             this.maxhealth = 50;
+			 }
+			 if (level == 2) {
+				 this.attack = 40;
+				 this.health = 65;
+				 this.maxhealth = 65;
+			 }
+			 if (level == 3) {
+				 this.attack = 50;
+				 this.health = 85;
+				 this.maxhealth = 85;
+			 }
+			 if (level == 4) {
+				 this.attack = 60;
+				 this.health = 100;
+				 this.maxhealth = 100;
+			 }
+			 this.defense = 10;
+			 this.resistance = 10;
+			 this.attackType="CloseAttack";
+			 this.moveType="Agressive";
+			 this.elemental["Fire"]=1;
+			 this.elemental["Ice"]=1;
+			 this.elemental["Lightning"]=1;
+			 this.description="This close-range fighter can only attack units next to it. It will remain invisible until it attacks.";
+			 this.strong="Any unit with low defense.";
+			 this.weak="Any unit with high defense.";
+			 this.phasing=true;
+		};//done
 		if(type=="Archer"){
 			if (level == 1) {
              this.attack = 15;
@@ -2476,7 +2552,7 @@ class Enemy{
 			 this.description="This mid-fighter can only hit relatively close units with it's magic, elemental attacks.";
 			 this.strong="Any mid-range enemy with low resistance.";
 			 this.weak="Any unit with high resistance.";
-		};
+		};//done
 		if(type=="Rogue"){
 			if (level == 1) {
              this.attack = 10;
@@ -2500,7 +2576,7 @@ class Enemy{
 			 }
 			 this.defense = 5;
 			 this.resistance = 5;
-			 this.attackType="RogueAttack";
+			 this.attackType="SpitterAttack";
 			 this.moveType="Scroll";
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
@@ -2508,7 +2584,39 @@ class Enemy{
 			 this.description="This long-range fighter can attack any unit in a straight line and poisons it.";
 			 this.strong="Any enemy with low defense.";
 			 this.weak="Any enemy with high defense.";
-		};
+		};//done
+		if(type=="Templar"){
+			if (level == 1) {
+             this.attack = 10;
+             this.health = 50;
+             this.maxhealth = 50;
+			 }
+			 if (level == 2) {
+				 this.attack = 20;
+				 this.health = 70;
+				 this.maxhealth = 70;
+			 }
+			 if (level == 3) {
+				 this.attack = 30;
+				 this.health = 90;
+				 this.maxhealth = 90;
+			 }
+			 if (level == 4) {
+				 this.attack = 40;
+				 this.health = 110;
+				 this.maxhealth = 110;
+			 }
+			 this.defense = 0;
+			 this.resistance = 30;
+			 this.attackType="SpitterAttack";
+			 this.moveType="Scroll";
+			 this.elemental["Fire"]=1;
+			 this.elemental["Ice"]=1;
+			 this.elemental["Lightning"]=1;
+			 this.description="This long-range fighter can attack any unit in a straight line and silences it.";
+			 this.strong="Any unit with low defense that uses magic.";
+			 this.weak="Any enemy with high defense.";
+		};//done
 		if(type=="Wizard"){
 			 if (level == 1) {
              this.attack = 70;
@@ -2532,7 +2640,7 @@ class Enemy{
 			 }
 			 this.defense = 0;
 			 this.resistance = 20;
-			 this.attackType="WizardAttack";
+			 this.attackType="LightningAttack";
 			 this.moveType="Afraid";
 			 this.elemental["Fire"]=1;
 			 this.elemental["Ice"]=1;
@@ -2543,7 +2651,7 @@ class Enemy{
 			 this.description="This powerful long-range fighter can attack any unit at a cost of 2 charge.";
 			 this.strong="Any enemy with low resistance.";
 			 this.weak="Any enemy with high resistance and long-range units that do physical damage.";
-		};
+		};//done
 		if(type=="Guard"){
 			if (level == 1) {
              this.attack = 20;
@@ -2565,6 +2673,7 @@ class Enemy{
 				 this.health = 200;
 				 this.maxhealth = 200;
 			 }
+			 this.evasion=3;
 			 this.defense = 25;
 			 this.resistance = 25;
 			 this.attackType="GuardAttack";
@@ -2575,12 +2684,46 @@ class Enemy{
 			 this.description="Protects an enemy, which redirects all damage from the protected enemy to the guard.";
 			 this.strong="No particular strengthes or weaknesses.";
 			 this.weak="No particular strengthes or weaknesses.";
-		};
+		};//done
+		if(type=="Monk"){
+			if (level == 1) {
+             this.attack = 20;
+             this.health = 50;
+             this.maxhealth = 50;
+			 }
+			 if (level == 2) {
+				 this.attack = 30;
+				 this.health = 60;
+				 this.maxhealth = 60;
+			 }
+			 if (level == 3) {
+				 this.attack = 40;
+				 this.health = 70;
+				 this.maxhealth = 70;
+			 }
+			 if (level == 4) {
+				 this.attack = 50;
+				 this.health = 80;
+				 this.maxhealth = 80;
+			 }
+			 this.evasion=4;
+			 this.defense = 15;
+			 this.resistance = 15;
+			 this.attackType="CloseAttack";
+			 this.moveType="Agressive";
+			 this.elemental["Fire"]=1;
+			 this.elemental["Ice"]=1;
+			 this.elemental["Lightning"]=1;
+			 this.description="Close-range fighter with low attack, but high evasion.";
+			 this.strong="Units with normal accuracy.";
+			 this.weak="Units with high accuracy.";
+		};//done
 		   this.elemental["None"]=1;
 		   this.health=this.maxhealth;
    		   this.index = curindexNum;
 		   this.vert=4;
 		   this.type=type;
+
    }
  }
  function clickGroup(index){
@@ -2629,6 +2772,9 @@ class Enemy{
  }
  function moveGroup(slot1:Vector3, slot2:Vector3,slot3:Vector3,locIndex:int,location:GameObject){
 			if(inCombat || groups[activeGroup].hasMoved || checkGroup(location)){
+				print(inCombat);
+				print(groups[activeGroup].hasMoved);
+				print(checkGroup(location));
  				return;
 			}
 			var teleport=false;
@@ -2865,15 +3011,17 @@ function startBattle(location,groupNum,EgroupNum){
 	curGrid = location.GetComponent("locations").allspaces;
 
 	//zoom camera
-	var t = 0.0;
-	var startPosition = curCamera.transform.position;
-	var endPosition = Vector3(location.transform.position.x,60,location.transform.position.z);
-	while (t < 1.0)
-	{
-		t += 0.05;
-		curCamera.transform.position = Vector3.Lerp(startPosition,endPosition,t);
-		yield;
-	}
+		var t = 0.0;
+		var startPosition = curCamera.transform.position;
+		var endPosition = Vector3(location.transform.position.x,60,location.transform.position.z);
+		while (t < 1.0)
+		{
+			t += 0.05;
+			curCamera.transform.position = Vector3.Lerp(startPosition,endPosition,t);
+			yield;
+		}
+	
+	
 	hideEntries();
 	GetComponent("combat").returnUnits(slots);
 
@@ -2972,7 +3120,6 @@ function Update(){
  }
  function victory(){
  	 victoryScreen.SetActive(true);
-	 StoreInfo.GetComponent("StoreInfo").Save(curname + "Stage",stage+1);
  }
  function gotoMainMenu(){
 	loading.SetActive(true);
@@ -3016,6 +3163,23 @@ function Update(){
  function UpdateIconsMain(){
 	if(UpdateIcons){
 		UpdateIcons();
+	}
+ }
+
+ function showPotentialDamage(){
+	removePotentialDamage();
+	for(var i =0;i<eslots.length;i++){
+		var instance = Instantiate(Resources.Load("Prefabs/PotentialDamageContainer", GameObject));
+		instance.transform.position=eslots[i].body.GetComponent("EnemyClick").healthbar.transform.position;
+		instance.transform.position.y+=0.1;
+		instance.transform.SetParent(eslots[i].body.GetComponent("EnemyClick").healthbar.transform,true);
+		instance.GetComponent("PotentialDamage").updateView(units[activeIndex],eslots[i],curAction);
+	}
+ }
+ function removePotentialDamage(){
+	var objects= GameObject.FindGameObjectsWithTag("potentialDamage");
+	for(var i =0;i<objects.length;i++){
+		Destroy(objects[i]);
 	}
  }
  

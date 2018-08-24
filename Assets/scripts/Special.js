@@ -15,7 +15,6 @@ function Start () {
 	}else{
 		dodgePotion.SetActive(false);
 	}
-	curSpecial.GetComponent("special_" + GetComponent("Main").curname).setItem(GetComponent("Main").tutorial);
 }
 
 function Pass(){
@@ -23,7 +22,9 @@ function Pass(){
 }
 
 function MakeEnemies(){
-	curSpecial.GetComponent("special_" + GetComponent("Main").curname).MakeEnemies();
+	if(curSpecial.GetComponent("special_" + GetComponent("Main").curname).MakeEnemies){
+		curSpecial.GetComponent("special_" + GetComponent("Main").curname).MakeEnemies();
+	}
 }
 
 function groupPass(Egroup){
@@ -46,9 +47,7 @@ function placeEnemies(location, count){
 }
 
 function SpecialFunction(curName){
-	//if(GetComponent("special_" + GetComponent("Main").curname).SpecialFunction){
 		curSpecial.GetComponent("special_" + GetComponent("Main").curname).SpecialFunction(curName);
-	//}
 }
 
 function setCurSpecial(object){

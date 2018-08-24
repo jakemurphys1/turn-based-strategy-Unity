@@ -5,6 +5,7 @@
  var nulllocation:GameObject;
  
  function damageEnemy(enemy,amount,element){
+	var Eunits = GetComponent("Main").Eunits;
 	var isCrit=false;
 	if(element=="critType"){
 		isCrit=true;
@@ -20,19 +21,27 @@
 		wordPopup(enemy,"Near-Miss");
 		amount=amount/2;
 	}
-	
+	if(enemy.protectedBy!=-1){
+		if(Eunits[enemy.protectedBy].health>0){
+			enemy = Eunits[enemy.protectedBy];
+		}
+	}
 	
 
 
 	if(enemy.phasedout){
-		if(element!="None"){
-			enemy.phasedout=false;
-			enemy.body.GetComponent("Thief").turnVisible();
-			wordPopup(enemy,"Phased In!");
-		}
-		if(enemy.elemental[element]<2){
+		if(enemy.type!="Thief"){
+			if(element!="None"){
+				enemy.phasedout=false;
+				enemy.body.GetComponent("Thief").turnVisible();
+				wordPopup(enemy,"Phased In!");
+			}
+			if(enemy.elemental[element]<2){
+				amount=0;
+			}	
+		}else{
 			amount=0;
-		}	
+		}
 	}
 	if(enemy.elemental[element]>1){
 		wordPopup(enemy,"Effective!");
@@ -40,7 +49,6 @@
 	if(enemy.elemental[element]<1){
 		wordPopup(enemy,"Not Effective!");
 	}
-	var Eunits = GetComponent("Main").Eunits;
 	enemy.body.GetComponent("EnemyClick").hit=1;
 	yield WaitForSeconds(0.1);
 	enemy.body.GetComponent("EnemyClick").hit=0;
@@ -230,6 +238,10 @@
 				pass.GetComponent("pass").eslots.splice(j,1);
 			}
 		}
+		if(GetComponent("Main").Eunits[eindex].type=="Guard"){
+			Destroy(GetComponent("Main").Eunits[eindex].shield1);
+			Destroy(GetComponent("Main").Eunits[eindex].shield2);
+		}
 		GetComponent("Main").Eunits[eindex].alive=false;
 		body.GetComponent("EnemyClick").animator.SetFloat("death",1.0f);
 		yield WaitForSeconds(3);
@@ -325,6 +337,7 @@
 			yield;
 		}
 		GetComponent("Main").moveGrid.SetActive(true);
+		GetComponent("Special").SpecialFunction("loseBattle");
 	}
  }
 
@@ -419,6 +432,7 @@
 	GetComponent("Main").moveGrid.SetActive(false);
 	victoryScreen.SetActive(false);
 	var unit = findlevelup();
+	GetComponent("Special").SpecialFunction("levelup");
 	if(unit!=false){
 		if(unit.level>=6){
 			return;
@@ -577,6 +591,7 @@
 	if(usedAction){
 		return;
 	}
+	GetComponent("Main").removePotentialDamage();
 	preventDoubleAction();
 	resetSpaces();
 	menu.GetComponent("Menu").hideAll();
@@ -603,7 +618,6 @@
 	var damage:int;
 	
 	if(thisUnit.type == "Archer"){
-		GetComponent("Special").SpecialFunction("archerAttack");
 		shootarrow(thisUnit,curEnemy);
 			var intercept = interceptArrow();
 			if(intercept!=-1){
@@ -1097,6 +1111,10 @@
 		if(checkSilencer(eslots)){
 			return;
 		}
+		if(thisUnit.silenced>0){
+			wordPopup(thisUnit,"Silenced");
+			return;
+		}
 		if(curAction=="Fire"){
 			if(isDiagonal(curEnemy,thisUnit) || isTwoAway(curEnemy,thisUnit)){
 				magicAttack(thisUnit,curEnemy);
@@ -1219,6 +1237,10 @@
 		if(checkSilencer(eslots)){
 			return;
 		}
+		if(thisUnit.silenced>0){
+			wordPopup(thisUnit,"Silenced");
+			return;
+		}
 		if(curAction=="Gust"){
 			if(thisUnit.charge<1){
 				wordPopup(thisUnit,"Not Enough Charge");
@@ -1300,6 +1322,10 @@
 	}
 	if(thisUnit.type == "Sorcerer"){
 		if(checkSilencer(eslots)){
+			return;
+		}
+		if(thisUnit.silenced>0){
+			wordPopup(thisUnit,"Silenced");
 			return;
 		}
 		if(curAction=="Blizzard"){

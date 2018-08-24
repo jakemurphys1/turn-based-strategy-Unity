@@ -1,6 +1,6 @@
 ﻿var main: GameObject;
 var eindex:int=0;
-var  groupnum:int;
+var groupnum:int;
 var health: GameObject;
 var healthbar:GameObject;
 var Run:float;

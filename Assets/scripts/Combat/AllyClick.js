@@ -33,16 +33,19 @@ function Start(){
 
 function OnMouseDown(){
 	if(main.GetComponent("Main").inCombat){
+
+		
 		var active = main.GetComponent("Main").units[index];
 
 		if(main.GetComponent("Main").isOverMenu==true){
 			return;
 		}
-
+		
 		main.GetComponent("Main").activeIndex = index;
 		main.GetComponent("Main").activeEnemy = thisAlly;
 		main.GetComponent("Main").selectedUnit = itself;
 		var curGrid = main.GetComponent("Main").curGrid;
+		
 		var activeGroup = main.GetComponent("Main").activeGroup;
 		if(active.group != activeGroup){
 			return;
@@ -87,6 +90,7 @@ function OnMouseDown(){
 		main.GetComponent("Main").menu.GetComponent("Menu").setMenu(mousePos.x,mousePos.y,active.actions,active.type,active.actionsActive,active);
 		statsBox.SetActive(true);
 		statsBox.GetComponent("stats").updateText(active,active.health,active.maxhealth,active.attack,active.defense,active.resistance,active.accuracy,active.type,active.evasion, active.passiveActions);
+		main.GetComponent("Main").showPotentialDamage();
 	}else{
 		main.GetComponent("Main").clickGroup(index);
 		main.GetComponent("Special").SpecialFunction("clickGroup");

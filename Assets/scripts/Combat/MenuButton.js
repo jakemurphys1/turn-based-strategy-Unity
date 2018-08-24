@@ -52,7 +52,7 @@ function clickit(){
 			menu.GetComponent("Menu").hideAll();
 			main.GetComponent("combat").wordPopup(ally,"Shield Increased");
 	}
-	
+	main.GetComponent("Main").showPotentialDamage();
 }
 
 function Update(){
