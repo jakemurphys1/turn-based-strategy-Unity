@@ -91,6 +91,7 @@ function OnMouseDown(){
 		statsBox.SetActive(true);
 		statsBox.GetComponent("stats").updateText(active,active.health,active.maxhealth,active.attack,active.defense,active.resistance,active.accuracy,active.type,active.evasion, active.passiveActions);
 		main.GetComponent("Main").showPotentialDamage();
+		main.GetComponent("Special").SpecialFunction("clickUnit");
 	}else{
 		main.GetComponent("Main").clickGroup(index);
 		main.GetComponent("Special").SpecialFunction("clickGroup");

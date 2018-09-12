@@ -56,7 +56,6 @@
 		amount=0;
 	}
 	enemy.health-=amount;
-	print("Health " + amount);
 	if(enemy.health<0){
 		enemy.health=0;
 	}
@@ -437,23 +436,27 @@
 		if(unit.level>=6){
 			return;
 		}
-		unit.experience -=1000;
-		unit.level+=1;
-		unit.body.GetComponent("AllyClick").curcamera.enabled=true;
-		victoryScreen.SetActive(true);
-		var newability = unit.abilities[unit.level-1];
-		victoryScreen.GetComponent("victoryScreen").curname.GetComponent("Text").text = newability;
-		victoryScreen.GetComponent("victoryScreen").sentence.GetComponent("Text").text = "Your " + unit.type + " gained a level and learned:";
-		victoryScreen.GetComponent("victoryScreen").Description1.GetComponent("Text").text = unit.actionDes1[newability];
-		victoryScreen.GetComponent("victoryScreen").Description2.GetComponent("Text").text = unit.actionDes2[newability];
-		victoryScreen.GetComponent("victoryScreen").curimage.GetComponent("Image").sprite = Resources.Load("Icons/" + unit.type + "/" + newability, typeof(Sprite));
-		//option1.GetComponent("MenuButton").imageBox.GetComponent("Image").sprite = Resources.Load("Icons/" + type + "/" + actions[0], typeof(Sprite));
-		unit.actionsActive[newability]=true;
+		unit.experience -=(1000 + 500*unit.level);
+		individualLevelup(unit);
 	}else{
 		GetComponent("Main").moveGrid.SetActive(true);
 		GetComponent("Main").pass.SetActive(true);
 		GetComponent("Main").checkBattle(curlocation);
 	}
+ }
+ function individualLevelup(unit){
+		unit.level+=1;
+		var newability = unit.abilities[unit.level-1];
+		if(unit.body){
+			unit.body.GetComponent("AllyClick").curcamera.enabled=true;
+			victoryScreen.SetActive(true);
+			victoryScreen.GetComponent("victoryScreen").curname.GetComponent("Text").text = newability;
+			victoryScreen.GetComponent("victoryScreen").sentence.GetComponent("Text").text = "Your " + unit.type + " gained a level and learned:";
+			victoryScreen.GetComponent("victoryScreen").Description1.GetComponent("Text").text = unit.actionDes1[newability];
+			victoryScreen.GetComponent("victoryScreen").Description2.GetComponent("Text").text = unit.actionDes2[newability];
+			victoryScreen.GetComponent("victoryScreen").curimage.GetComponent("Image").sprite = Resources.Load("Icons/" + unit.type + "/" + newability, typeof(Sprite));
+		}
+		unit.actionsActive[newability]=true;
  }
 
  function findlevelup(){
@@ -461,7 +464,7 @@
 	 var replyItem;
 	 for(var i = 0;i<slots.length;i++){
 		slots[i].body.GetComponent("AllyClick").curcamera.enabled=false;
-	 	 if(slots[i].experience>=1000 && slots[i].level<6){
+	 	 if(slots[i].experience>=(1000 + 500*slots[i].level) && slots[i].level<6){
 		 	 replyItem = slots[i];
 		 }
 	 }
@@ -616,6 +619,36 @@
 	}
 
 	var damage:int;
+	if(curAction=="Capture"){
+		lookAt(curEnemy,thisUnit);
+		thisUnit.body.GetComponent("AllyClick").animator.SetInteger("attack",2);
+		var randnum = Random.Range(0,curEnemy.maxhealth) + 20;
+		if(randnum>curEnemy.health){
+			GetComponent("sounds").playSound("capture");
+			yield WaitForSeconds(1);
+			thisUnit.body.GetComponent("AllyClick").animator.SetInteger("attack",0);
+			GetComponent("Main").returnMagic(curEnemy.body,thisUnit.body);
+			Destroy(curEnemy.body);
+			var group = curEnemy.group;
+			for (var j =0;j<eslots.length;j++){
+				if(eslots[j].index==curEnemy.index){
+					eslots.splice(j,1);
+				}
+			}
+			curEnemy.alive=false;
+			GetComponent("Main").quickMessage(curEnemy.type + " Captured.");
+			if(eslots.length==0){
+				winBattle(group);
+			}
+			GetComponent("Main").specialStorage=curEnemy.type;
+			GetComponent("Special").SpecialFunction("capture");
+		}else{
+			GetComponent("sounds").playSound("captureFail");
+			wordPopup(curEnemy,"Failed to Capture");
+		}
+		thisUnit.didAction=true;
+		return;
+	}
 	
 	if(thisUnit.type == "Archer"){
 		shootarrow(thisUnit,curEnemy);
@@ -2163,9 +2196,7 @@ function showElementalArrow(enemy,element){
 			damageEnemy(enemy,damage,"critType");
 			
 		}
-		print(enemy.critType);
 		if(enemy.critType=="Sleep"){
-			print("got here");
 			wordPopup(enemy,"Crit: Sleep");
 			enemy.sleep=2;
 			showAilment("Sleep", enemy);

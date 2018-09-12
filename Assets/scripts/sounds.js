@@ -27,6 +27,8 @@ var crystalOn:AudioClip;
 var crystalOff:AudioClip;
 var crit:AudioClip;
 var startBattle:AudioClip;
+var capture:AudioClip;
+var captureFail:AudioClip;
 
 function playSound(name){
 	var audio: AudioSource = GetComponent.<AudioSource>();
@@ -88,6 +90,10 @@ function playSound(name){
 		audio.clip = crit;
 	}else if(name =="startBattle"){
 		audio.clip = startBattle;
+	}else if(name =="capture"){
+		audio.clip = capture;
+	}else if(name =="captureFail"){
+		audio.clip = captureFail;
 	}
 	audio.Play();
 }

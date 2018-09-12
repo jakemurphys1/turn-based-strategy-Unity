@@ -4,6 +4,7 @@ var option3: GameObject;
 var option4: GameObject;
 var option5: GameObject;
 var option6: GameObject;
+var special:GameObject;
 var escape:GameObject;
 var optionIndex:int;
 var main: GameObject;
@@ -120,7 +121,7 @@ function setMenu(x,y,actions,type,actionsActive,ally){
 			}
 		}
 	}
-
+	main.GetComponent("Special").SpecialFunction("setSpecialButton");
 	stats.SetActive(true);
 	var passive = stats.GetComponent("stats").storeAbilities();
 	for(var i = 0; i<ally.passiveActions.length;i++){
@@ -137,6 +138,7 @@ function hideAll(){
 	option4.GetComponent("Image").enabled=false;
 	option5.GetComponent("Image").enabled=false;
 	option6.GetComponent("Image").enabled=false;
+	special.GetComponent("Image").enabled=false;
 
 	option1.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = false;
 	option2.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = false;
@@ -144,6 +146,7 @@ function hideAll(){
 	option4.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = false;
 	option5.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = false;
 	option6.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = false;
+	special.GetComponent("MenuButton").imageBox.GetComponent("Image").enabled = false;
 
 	option1.GetComponent("MenuButton").count.GetComponent("Text").text="";
 	option2.GetComponent("MenuButton").count.GetComponent("Text").text="";
@@ -151,6 +154,7 @@ function hideAll(){
 	option4.GetComponent("MenuButton").count.GetComponent("Text").text="";
 	option5.GetComponent("MenuButton").count.GetComponent("Text").text="";
 	option6.GetComponent("MenuButton").count.GetComponent("Text").text="";
+	special.GetComponent("MenuButton").count.GetComponent("Text").text="";
 
 	escape.SetActive(false);
 

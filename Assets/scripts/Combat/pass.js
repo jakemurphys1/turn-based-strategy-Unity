@@ -279,7 +279,6 @@ function moveEnemies(Egroup, location:GameObject){
 					startDirection5 = curObject3.transform.rotation;
 					curObject5.transform.rotation=_lookRotation5;
 			}
-					print(slot2);
 					var t = 0.0;
 					 while (t < 1.0)
 					 {
@@ -301,7 +300,6 @@ function moveEnemies(Egroup, location:GameObject){
 						 }
 						 yield;
 					 }
-					 print("here");
 
 					 if(curObject1){
 						curObject1.transform.rotation=startDirection1;
@@ -366,6 +364,9 @@ function enemyMove(){
 		}
 		if(eslots[j].moveType=="Random"){
 			randomMove(eslots[j]);
+		}
+		if(eslots[j].moveType=="Passing"){
+			passing(eslots[j]);
 		}
 	}
 }
@@ -535,6 +536,12 @@ function closeAttack(enemy,eslots,slots){
 			if(enemy.type=="Pixie"){
 				doAilment(enemy,slots[attackThis],"Poison");
 				doAilment(enemy,slots[attackThis],"Enfeeble");
+			}
+			if(enemy.type=="Snake"){
+				doAilment(enemy,slots[attackThis],"Poison");
+			}
+			if(enemy.type=="Bear"){
+				doAilment(enemy,slots[attackThis],"Blind");
 			}
 			if(enemy.type=="Plague"){
 				doAilment(enemy,slots[attackThis],"Sleep");
@@ -749,9 +756,7 @@ function SpitterAttack(enemy,eslots,slots){
 	if(enemy.type=="Spitter"){
 		doAilment(enemy,target,"Enfeebled");
 	}
-	print(enemy.type=="Rogue");
 	if(enemy.type=="GreenOoze" || enemy.type=="Rogue"){
-		print("here");
 		doAilment(enemy,target,"Poison");
 	}
 	if(enemy.type=="Templar"){
@@ -1075,10 +1080,7 @@ function Healer(enemy){
 		waittime=1;
 	}
 	var target = eslots[0];
-	print(eslots.length);
 	for(var i = 0;i<eslots.length;i++){
-		print(target.maxhealth);
-		print(target.health);
 		var diffold=target.maxhealth-target.health;
 		var diffnew=eslots[i].maxhealth-eslots[i].health;
 		if(diffold<diffnew){
@@ -1354,7 +1356,29 @@ function randomMove(enemy){
 			}
 	}
 }
-
+function passing(enemy){
+	if(enemy.vert>0){
+		enemy.body.GetComponent("EnemyClick").moveTo(spaces[enemy.vert-1][enemy.hor]);
+		for(var i =0;i<slots.length;i++){
+			if(enemy.vert == slots[i].vert && enemy.hor == slots[i].hor){
+				slots[i].body.GetComponent("AllyClick").moveTo(spaces[enemy.vert+1][enemy.hor]);
+			}
+		}
+	}else{
+		Destroy(enemy.body);
+		var group = enemy.group;
+		for (var j =0;j<eslots.length;j++){
+			if(eslots[j].index==enemy.index){
+				eslots.splice(j,1);
+			}
+		}
+		enemy.alive=false;
+		main.GetComponent("Main").quickMessage("The Deer Escaped.");
+		if(eslots.length==0){
+			main.GetComponent("combat").winBattle(group);
+		}
+	}
+}
 
 
 //other stuff
@@ -1535,7 +1559,6 @@ function lowestDefense(options,type){
 			option = options[1];
 		}
 	}
-	print(options.length);
 	if(type=="defense"){
 		for(var j = 1;j<options.length;j++){
 			if(options[j].defense<option.defense && options[j].invisible==false){

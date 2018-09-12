@@ -60,25 +60,28 @@ var updateMap;
 var UpdateIcons;
 var noNexus=false;
 var showEnemyOnCreate=true;
+var specialStorage;
 
 function Awake(){
-	StoreInfo = GameObject.Find("StoreInfo");
+	StoreInfo = GameObject.Find("StoreInfo(Clone)");
+	if(!StoreInfo){
+		StoreInfo = Instantiate (Resources.Load ("StoreInfo") as GameObject);
+	}
 	if(StoreInfo){
 		level = StoreInfo.GetComponent("StoreInfo").level;
 		stage = StoreInfo.GetComponent("StoreInfo").stage;
 	}else{
 		level=3;
 	}
+	beginUnits();
 }
 
 function Start () {
-
 	if(GetComponent("Special").PotionOn){
 		GetComponent("Special").Potion.SetActive(true);
 	}else{
 		GetComponent("Special").Potion.SetActive(false);
 	}
-
 	items["Flowers"]=0;
 	items["Mushrooms"]=0;
 	items["Honey"]=0;
@@ -99,16 +102,14 @@ function Start () {
 	items["Accuracy Potion"]=0;
 	items["Evasion Potion"]=0;
 
-
 	Cursor.lockState = CursorLockMode.Confined;
-
 	entries= GameObject.FindGameObjectsWithTag("Entry");
 }
 
 function tempStart(){
 	units[0].actionsActive["Flying"]=true;
 	units[0].actionsActive["Zap"]=true;
-	units[0].actionsActive["Freeze"]=true;
+	units[0].health=300;
 
 	units[1].actionsActive["Elemental"]=true;
 	//units[1].actionsActive["Flying"]=true;
@@ -116,8 +117,8 @@ function tempStart(){
 	units[1].actionsActive["Push"]=true;
 	units[1].actionsActive["Scout"]=true;
 	units[1].actionsActive[""]=true;
-
-	createEGroup("","Guard","Soldier","","",ship, 1000);
+	units[1].attack=100;
+	createEGroup("","Deer","Deer","Archer","",ship, 1000);
 	
 	createGroup(0,1,2,ship);
 	yield WaitForSeconds(2);
@@ -125,6 +126,18 @@ function tempStart(){
 	curGrid = ship.GetComponent("locations").allspaces;
 	inCombat=true;
 	activeGroup=0;
+}
+
+function beginUnits(){
+	var newUnits = StoreInfo.GetComponent("StoreInfo").units;
+	for(var i =0;i<newUnits.length;i++){
+		if(newUnits[i]["unlocked"]){
+			createUnit(newUnits[i]["type"]);
+			for(var j =0;j<newUnits[i]["level"]-1;j++){
+				GetComponent("combat").individualLevelup(units[i]);
+			}
+		}
+	}
 }
 
 //unit creation
@@ -1432,7 +1445,7 @@ class Enemy{
 			 this.elemental["Ice"]=1;
 			 this.elemental["Lightning"]=2;
 			 this.height=10;
-			 this.description="These flying machines can immediately move to any location and attack. They prevent all offensive magic from your untis.";
+			 this.description="These flying machines can immediately move to any location and attack. They prevent all offensive magic from your units.";
 			 this.strong="Any long-range units, especially magic users.";
 			 this.weak="Any close-ranged unit. Thieves can instantly kill machines if they steal from it.";
 			 this.isRobot=true;
@@ -2029,17 +2042,175 @@ class Enemy{
 		};//done
 		
 		if(type=="Wolf"){
-		
+			if (level == 1) {
+             this.attack = 40;
+             this.health = 40;
+             this.maxhealth = 40;
+			 }
+			 if (level == 2) {
+				 this.attack = 50;
+				 this.health = 60;
+				 this.maxhealth = 60;
+			 }
+			 if (level == 3) {
+				 this.attack = 60;
+				 this.health = 80;
+				 this.maxhealth = 80;
+			 }
+			 if (level == 4) {
+				 this.attack = 75;
+				 this.health = 100;
+				 this.maxhealth = 100;
+			 }
+			 this.defense = 20;
+			 this.resistance = 10;
+			 this.attackType="CloseAttack";
+			 this.moveType="Agressive";
+			 this.elemental["Fire"]=1;
+			 this.elemental["Ice"]=1;
+			 this.elemental["Lightning"]=1;
+			 this.description="These pack creatures are intelligent and fierce.";
+			 this.strong="None";
+			 this.weak="None";
+			 this.critType="None";
 		}
 		if(type=="Bear"){
-		
+			if (level == 1) {
+             this.attack = 60;
+             this.health = 100;
+             this.maxhealth = 100;
+			 }
+			 if (level == 2) {
+				 this.attack = 80;
+				 this.health = 120;
+				 this.maxhealth = 120;
+			 }
+			 if (level == 3) {
+				 this.attack = 100;
+				 this.health = 140;
+				 this.maxhealth = 140;
+			 }
+			 if (level == 4) {
+				 this.attack = 125;
+				 this.health = 175;
+				 this.maxhealth = 175;
+			 }
+			 this.defense = 25;
+			 this.resistance = 25;
+			 this.attackType="CloseAttack";
+			 this.moveType="Agressive";
+			 this.elemental["Fire"]=1;
+			 this.elemental["Ice"]=1;
+			 this.elemental["Lightning"]=1;
+			 this.description="These creatures love to attack the eyes and cause blindness.";
+			 this.strong="Any close-range unit.";
+			 this.weak="None";
+			 this.critType="None";
 		}
 		if(type=="Hellhound"){
 		
 		}
-		if(type=="Elk"){
-		
+		if(type=="Deer"){
+			if (level == 1) {
+             this.attack = 0;
+             this.health = 100;
+             this.maxhealth = 100;
+			 }
+			 if (level == 2) {
+				 this.attack = 0;
+				 this.health = 120;
+				 this.maxhealth = 120;
+			 }
+			 if (level == 3) {
+				 this.attack = 0;
+				 this.health = 140;
+				 this.maxhealth = 140;
+			 }
+			 if (level == 4) {
+				 this.attack = 0;
+				 this.health = 175;
+				 this.maxhealth = 175;
+			 }
+			 this.defense = 25;
+			 this.resistance = 25;
+			 this.attackType="";
+			 this.moveType="Passing";
+			 this.elemental["Fire"]=1;
+			 this.elemental["Ice"]=1;
+			 this.elemental["Lightning"]=1;
+			 this.description="These fast creatures won't attack you, but catching them won't be easy";
+			 this.strong="None";
+			 this.weak="None";
+			 this.critType="None";
 		}
+		if(type=="Eagle"){
+			if (level == 1) {
+             this.attack = 15;
+             this.health = 25;
+             this.maxhealth = 25;
+			 }
+			 if (level == 2) {
+				 this.attack = 25;
+				 this.health = 35;
+				 this.maxhealth = 35;
+			 }
+			 if (level == 3) {
+				 this.attack = 35;
+				 this.health = 45;
+				 this.maxhealth = 45;
+			 }
+			 if (level == 4) {
+				 this.attack = 43;
+				 this.health = 55;
+				 this.maxhealth = 55;
+			 }
+			 this.defense = 10;
+			 this.resistance = 10;
+			 this.attackType="CloseAttack";
+			 this.moveType="Flying";
+			 this.elemental["Fire"]=1;
+			 this.elemental["Ice"]=1;
+			 this.elemental["Lightning"]=1;
+			 this.description="These pesky creatures can soar instantly to any ally.";
+			 this.strong="Any long-range units with low defenses";
+			 this.weak="Any close-ranged unit";
+			 this.critType="None";
+		}
+		if(type=="Snake"){
+			if (level == 1) {
+             this.attack = 20;
+             this.health = 30;
+             this.maxhealth = 30;
+			 }
+			 if (level == 2) {
+				 this.attack = 30;
+				 this.health = 40;
+				 this.maxhealth = 40;
+			 }
+			 if (level == 3) {
+				 this.attack = 40;
+				 this.health = 60;
+				 this.maxhealth = 60;
+			 }
+			 if (level == 4) {
+				 this.attack = 50;
+				 this.health = 75;
+				 this.maxhealth = 75;
+			 }
+			 this.evasion=4;
+			 this.defense = 0;
+			 this.resistance = 0;
+			 this.attackType="CloseAttack";
+			 this.moveType="Agressive";
+			 this.elemental["Fire"]=1;
+			 this.elemental["Ice"]=1;
+			 this.elemental["Lightning"]=1;
+			 this.description="These evasive enemies can poison an ally. High evasion.";
+			 this.strong="Units with low accuracy or low defense.";
+			 this.weak="Units with high accuracy.";
+			 this.critType="Double";
+		}//done
+
 		if(type=="Turtle"){
 		
 		}
@@ -2772,9 +2943,6 @@ class Enemy{
  }
  function moveGroup(slot1:Vector3, slot2:Vector3,slot3:Vector3,locIndex:int,location:GameObject){
 			if(inCombat || groups[activeGroup].hasMoved || checkGroup(location)){
-				print(inCombat);
-				print(groups[activeGroup].hasMoved);
-				print(checkGroup(location));
  				return;
 			}
 			var teleport=false;
@@ -3120,10 +3288,29 @@ function Update(){
  }
  function victory(){
  	 victoryScreen.SetActive(true);
+	 if(StoreInfo.GetComponent("StoreInfo").job){
+		var job = StoreInfo.GetComponent("StoreInfo").job;
+		var levels = StoreInfo.GetComponent("StoreInfo").levels;
+		levels[job["index"]]["completed"]=true;
+		var partners = job["partners"];
+		var allCompleted=true;
+		for(var i =0;i<partners.length;i++){
+			if(levels[partners[i]]["completed"]==false){
+				allCompleted=false;
+			}
+		}
+		if(allCompleted){
+			var unlocking = job["unlocks"];
+			for(i =0;i<unlocking.length;i++){
+				levels[unlocking[i]]["unlocked"]=true;
+			}
+		}
+		StoreInfo.GetComponent("StoreInfo").Save();
+	}
  }
  function gotoMainMenu(){
 	loading.SetActive(true);
- 	 Application.LoadLevel(1);
+ 	 Application.LoadLevel(0);
  }
  function toggleMusic(){
  	 var curmusicText = musicText.GetComponent("Text").text;
