@@ -111,14 +111,14 @@ function tempStart(){
 	units[0].actionsActive["Zap"]=true;
 	units[0].health=300;
 
-	units[1].actionsActive["Elemental"]=true;
+	//units[1].actionsActive["Elemental"]=true;
 	//units[1].actionsActive["Flying"]=true;
-	units[1].actionsActive["Flying"]=true;
-	units[1].actionsActive["Push"]=true;
-	units[1].actionsActive["Scout"]=true;
-	units[1].actionsActive[""]=true;
-	units[1].attack=100;
-	createEGroup("","Deer","Deer","Archer","",ship, 1000);
+	//units[1].actionsActive["Flying"]=true;
+	//units[1].actionsActive["Push"]=true;
+	//units[1].actionsActive["Scout"]=true;
+	//units[1].actionsActive[""]=true;
+	//units[1].attack=100;
+	createEGroup("","Goblin","","","",ship, 1000);
 	
 	createGroup(0,1,2,ship);
 	yield WaitForSeconds(2);
@@ -131,10 +131,47 @@ function tempStart(){
 function beginUnits(){
 	var newUnits = StoreInfo.GetComponent("StoreInfo").units;
 	for(var i =0;i<newUnits.length;i++){
-		if(newUnits[i]["unlocked"]){
+		if(newUnits[i]["hired"]){
 			createUnit(newUnits[i]["type"]);
 			for(var j =0;j<newUnits[i]["level"]-1;j++){
 				GetComponent("combat").individualLevelup(units[i]);
+			}
+			if(newUnits[i]["weapon"]=="Iron" || newUnits[i]["weapon"]=="Long" || newUnits[i]["weapon"]=="Emerald"){
+				units[i].attack=units[i].attack*1.1;
+			}
+			if(newUnits[i]["weapon"]=="Steel" || newUnits[i]["weapon"]=="Elite" || newUnits[i]["weapon"]=="Ruby"){
+				units[i].attack=units[i].attack*1.2;
+			}
+			if(newUnits[i]["weapon"]=="Titanium" || newUnits[i]["weapon"]=="Master" || newUnits[i]["weapon"]=="Diamond"){
+				units[i].attack=units[i].attack*1.3;
+			}
+			var defenseIncrease=0;
+			var resistanceIncrease=0;
+			if(newUnits[i]["armor"]=="Iron" || newUnits[i]["armor"]=="Wool"){
+				units[i].maxhealth=units[i].health*1.1;
+				defenseIncrease=units[i].defense*0.1;
+				resistanceIncrease=units[i].resistance*0.1;
+			}
+			if(newUnits[i]["armor"]=="Steel" || newUnits[i]["armor"]=="Leather"){
+				units[i].maxhealth=units[i].health*1.1;
+				defenseIncrease=units[i].defense*0.1;
+				resistanceIncrease=units[i].resistance*0.1;
+			}
+			if(newUnits[i]["armor"]=="Titanium" || newUnits[i]["armor"]=="Silk"){
+				units[i].maxhealth=units[i].health*1.1;
+				defenseIncrease=units[i].defense*0.1;
+				resistanceIncrease=units[i].resistance*0.1;
+			}
+			if(defenseIncrease<5){
+				defenseIncrease=5;
+			}
+			if(resistanceIncrease<5){
+				resistanceIncrease=5;
+			}
+			units[i].health=units[i].maxhealth;
+			if(newUnits[i]["armor"]!="Bronze" && newUnits[i]["armor"]!="Cotton"){
+				units[i].resistance+=resistanceIncrease;
+				units[i].defense+=defenseIncrease;
 			}
 		}
 	}
@@ -3291,9 +3328,12 @@ function Update(){
 	 if(StoreInfo.GetComponent("StoreInfo").job){
 		var job = StoreInfo.GetComponent("StoreInfo").job;
 		var levels = StoreInfo.GetComponent("StoreInfo").levels;
+		var allUnits = StoreInfo.GetComponent("StoreInfo").units;
+		var items = StoreInfo.GetComponent("StoreInfo").items;
 		levels[job["index"]]["completed"]=true;
 		var partners = job["partners"];
 		var allCompleted=true;
+		StoreInfo.GetComponent("StoreInfo").posting["completed"]=true;
 		for(var i =0;i<partners.length;i++){
 			if(levels[partners[i]]["completed"]==false){
 				allCompleted=false;
@@ -3301,9 +3341,28 @@ function Update(){
 		}
 		if(allCompleted){
 			var unlocking = job["unlocks"];
+			var newUnit = job["unitUnlock"];
+			var newitems = job["itemUnlock"];
 			for(i =0;i<unlocking.length;i++){
 				levels[unlocking[i]]["unlocked"]=true;
 			}
+			for(i =0;i<allUnits.length;i++){
+			  for(j =0;j<newUnit.length;j++){
+				if(allUnits[i]["type"]==newUnit[j]){
+						allUnits[i]["unlocked"]=true;
+					}
+			   }
+			}
+			for(i =0;i<newitems.length;i++){
+				for(j =0;j<items.length;j++){
+					if(newitems[i]==items[j]["name"]){
+						items[j]["unlocked"]=true;
+					}
+				}
+			}
+		}
+		for(i=0;i<units.length;i++){
+			allUnits[i]["level"] = units[i].level;
 		}
 		StoreInfo.GetComponent("StoreInfo").Save();
 	}
@@ -3358,7 +3417,7 @@ function Update(){
 	for(var i =0;i<eslots.length;i++){
 		var instance = Instantiate(Resources.Load("Prefabs/PotentialDamageContainer", GameObject));
 		instance.transform.position=eslots[i].body.GetComponent("EnemyClick").healthbar.transform.position;
-		instance.transform.position.y+=0.1;
+		instance.transform.position.y+=0.01;
 		instance.transform.SetParent(eslots[i].body.GetComponent("EnemyClick").healthbar.transform,true);
 		instance.GetComponent("PotentialDamage").updateView(units[activeIndex],eslots[i],curAction);
 	}

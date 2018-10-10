@@ -5,8 +5,12 @@ var spaces = new Array();
 var experience: int;
 var curDisabled=false;
 var self:GameObject;
+var buttonDisabled=false;
 
 function enemyturn(){
+	if(buttonDisabled){
+		return;
+	}
 	DisablePass();
 	main.GetComponent("Main").removePotentialDamage();
 	if(main.GetComponent("Main").inCombat==false){
@@ -324,9 +328,11 @@ function moveEnemies(Egroup, location:GameObject){
  }
 
 function DisablePass(){
-	self.GetComponent("Button").enabled=false;
+	//self.GetComponent("Button").enabled=false;
+	buttonDisabled=true;
 	yield WaitForSeconds(2);
-	self.GetComponent("Button").enabled=true;
+	//self.GetComponent("Button").enabled=true;
+	buttonDisabled=false;
 }
 
 function giveEnemySlot(number,group){

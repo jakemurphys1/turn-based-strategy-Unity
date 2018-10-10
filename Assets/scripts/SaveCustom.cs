@@ -29,6 +29,7 @@ namespace BayatGames.SaveGameFree.Examples
             public int level;
             public int experience;
             public bool unlocked;
+            public bool hired;
             public string weapon;
             public string armor;
 
@@ -36,10 +37,26 @@ namespace BayatGames.SaveGameFree.Examples
             {
                 this.type = type;
                 this.unlocked = false;
+                this.hired = false;
                 this.level = 1;
                 this.experience = 0;
                 this.weapon = "";
                 this.armor = "";
+            }
+        }
+
+        [System.Serializable]
+        public class Item
+        {
+            public string name;
+            public bool unlocked;
+            public bool bought;
+
+            public Item(string name)
+            {
+                this.name = name;
+                this.unlocked = false;
+                this.bought = false;
             }
         }
 
@@ -50,12 +67,24 @@ namespace BayatGames.SaveGameFree.Examples
             public int gold;
             public List<Level> levels;
             public List<Unit> units;
+            public List<Item> items;
 
             public CustomData()
             {
-                gold = 0;
+                gold = 150;
 
                 levels = new List<Level>() {
+                    new Level ( false, false ),
+                    new Level ( false, false ),
+                    new Level ( false, false ),
+                    new Level ( false, false ),
+                    new Level ( false, false ),
+                    new Level ( false, false ),
+                    new Level ( false, false ),
+                    new Level ( false, false ),
+                    new Level ( false, false ),
+                    new Level ( false, false ),
+                    new Level ( false, false ),
                     new Level ( false, false ),
                     new Level ( false, false ),
                     new Level ( false, false ),
@@ -101,8 +130,31 @@ namespace BayatGames.SaveGameFree.Examples
                     new Unit ( "Mage" ),
                     new Unit ( "Archer" ),
                 };
+                items = new List<Item>() {
+                    new Item ( "Potion Making" ),
+                    new Item ( "Iron Forging" ),
+                    new Item ( "Steel Forging" ),
+                    new Item ( "Titanium Forging" ),
+                    new Item ( "Sewing" ),
+                    new Item ( "Advanced Sewing" ),
+                    new Item ( "Silk Manufacturing" ),
+                    new Item ( "Wand Making" ),
+                    new Item ( "Advanced Wand Making" ),
+                    new Item ( "Mastery of Wand Making" ),
+                    new Item ( "Long Bow Building" ),
+                    new Item ( "Elite Bow Building" ),
+                    new Item ( "Master Bow Building" ),
+                    new Item ( "Revive Potion Recipe" ),
+                    new Item ( "Recover Potion Recipe" ),
+                    new Item ( "Teleport Potion Recipe" ),
+                    new Item ( "Defense Potion Recipe" ),
+                    new Item ( "Resistance Potion Recipe" ),
+                    new Item ( "Attack Potion Recipe" ),
+                    new Item ( "Health Potion Recipe" ),
+                    new Item ( "Accuracy Potion Recipe" ),
+                    new Item ( "Evasion Potion Recipe" ),
+                };
             }
-
         }
 
         public CustomData customData;

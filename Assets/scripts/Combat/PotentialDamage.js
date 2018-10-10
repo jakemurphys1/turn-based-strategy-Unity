@@ -3,7 +3,13 @@ var damageBar:GameObject;
 var healthBar:GameObject;
 
 function updateView(ally,enemy, attackName){
-	var range = ally.attackProperties[attackName]["Range"];
+	var range;
+	if(ally.attackProperties[attackName]){
+		range = ally.attackProperties[attackName]["Range"];
+	}else{
+		Destroy(gameObject);
+		return;
+	}
 	if(range=="Line"){
 		if(ally.hor!=enemy.hor && ally.vert!=enemy.vert){
 			Destroy(gameObject);
