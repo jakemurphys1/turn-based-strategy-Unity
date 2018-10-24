@@ -42,9 +42,9 @@ function makePotions(){
 	potionInfo.SetActive(true);
 	statsBox.SetActive(false);
 	replicateBox.SetActive(false);
+	var storeditems = main.GetComponent("Main").StoreInfo.GetComponent("StoreInfo").items;
 
 	var items = main.GetComponent("Main").items;
-	Debug.Log(items);
 	flowers.GetComponent("Text").text = items["Flowers"].ToString();
 	mushrooms.GetComponent("Text").text = items["Mushrooms"].ToString();
 	honey.GetComponent("Text").text = items["Honey"].ToString();
@@ -66,6 +66,41 @@ function makePotions(){
 	evasion.GetComponent("Text").text = items["Evasion Potion"].ToString();
 	accuracy.GetComponent("Text").text = items["Accuracy Potion"].ToString();
 	teleport.GetComponent("Text").text = items["Teleport Potion"].ToString();
+
+	for(var i =0;i<storeditems.length;i++){
+		if(storeditems[i]["name"]=="Revive Potion Recipe" && storeditems[i]["unlocked"]){
+			reviveButton.SetActive(true);
+			print("got here");
+		}
+		if(storeditems[i]["name"]=="Recover Potion Recipe" && storeditems[i]["unlocked"]){
+			recoverButton.SetActive(true);
+		}
+		if(storeditems[i]["name"]=="Teleport Potion Recipe" && storeditems[i]["unlocked"]){
+			teleportButton.SetActive(true);
+		}
+		if(storeditems[i]["name"]=="Defense Potion Recipe" && storeditems[i]["unlocked"]){
+			defenseButton.SetActive(true);
+		}
+		if(storeditems[i]["name"]=="Resistance Potion Recipe" && storeditems[i]["unlocked"]){
+			resistanceButton.SetActive(true);
+		}
+		if(storeditems[i]["name"]=="Attack Potion Recipe" && storeditems[i]["unlocked"]){
+			attackButton.SetActive(true);
+		}
+		if(storeditems[i]["name"]=="Health Potion Recipe" && storeditems[i]["unlocked"]){
+			healthButton.SetActive(true);
+		}
+		if(storeditems[i]["name"]=="Accuracy Potion Recipe" && storeditems[i]["unlocked"]){
+			accuracyButton.SetActive(true);
+		}
+		if(storeditems[i]["name"]=="Evasion Potion Recipe" && storeditems[i]["unlocked"]){
+			evasionButton.SetActive(true);
+		}
+		if(storeditems[i]["name"]=="Replicate Potion Recipe" && storeditems[i]["unlocked"]){
+			replicateButton.SetActive(true);
+		}
+	}
+
 	main.GetComponent("sounds").playSound("brew");
 
 	updateColors();

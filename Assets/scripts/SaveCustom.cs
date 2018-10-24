@@ -65,6 +65,7 @@ namespace BayatGames.SaveGameFree.Examples
         {
 
             public int gold;
+            public int diffLevel;
             public List<Level> levels;
             public List<Unit> units;
             public List<Item> items;
@@ -153,6 +154,7 @@ namespace BayatGames.SaveGameFree.Examples
                     new Item ( "Health Potion Recipe" ),
                     new Item ( "Accuracy Potion Recipe" ),
                     new Item ( "Evasion Potion Recipe" ),
+                    new Item ( "Replicate Potion Recipe" ),
                 };
             }
         }

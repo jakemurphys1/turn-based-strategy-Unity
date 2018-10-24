@@ -7,6 +7,7 @@ var levels=new Array();
 var units = new Array();
 var items = new Array();
 var gold:int=100;
+var diffLevel:int=3;
 var job;
 
 function Start(){
@@ -66,7 +67,7 @@ function Awake () {
 				{"type":"Sorcerer","unlocked":false,"hired":false,"level":1,"experience":0,"weapon":"Glass","weaponType":"Wand","armor":"Cotton","armorType":"Cloth","Price":125}
 			];
 			items=[
-				{"name":"Potion Making","unlocked":true,"bought":false, "price":500,"type":"Book","unlocks":["Revive Potion Recipe","Recover Potion Recipe","Teleport Potion Recipe","Defense Potion Recipe","Resistance Potion Recipe","Attack Potion Recipe","Health Potion Recipe","Accuracy Potion Recipe","Evasion Potion Recipe"]},
+				{"name":"Potion Making","unlocked":true,"bought":false, "price":500,"type":"Book","unlocks":["Revive Potion Recipe","Recover Potion Recipe","Teleport Potion Recipe","Defense Potion Recipe","Resistance Potion Recipe","Attack Potion Recipe","Health Potion Recipe","Accuracy Potion Recipe","Evasion Potion Recipe","Replicate Potion Recipe"]},
 				{"name":"Iron Forging","unlocked":true,"bought":false, "price":500,"type":"Book","unlocks":["Steel Forging"]},
 				{"name":"Steel Forging","unlocked":false,"bought":false, "price":1000,"type":"Book","unlocks":["Titanium Forging"]},
 				{"name":"Titanium Forging","unlocked":false,"bought":false, "price":2000,"type":"Book","unlocks":[]},
@@ -87,7 +88,8 @@ function Awake () {
 				{"name":"Attack Potion Recipe","unlocked":false,"bought":false, "price":500,"type":"Scroll"},
 				{"name":"Health Potion Recipe","unlocked":false,"bought":false, "price":500,"type":"Scroll"},
 				{"name":"Accuracy Potion Recipe","unlocked":false,"bought":false, "price":500,"type":"Scroll"},
-				{"name":"Evasion Potion Recipe","unlocked":false,"bought":false, "price":500,"type":"Scroll"}
+				{"name":"Evasion Potion Recipe","unlocked":false,"bought":false, "price":500,"type":"Scroll"},
+				{"name":"Replicate Potion Recipe","unlocked":false,"bought":false, "price":500,"type":"Scroll"}
 			];
  }
 
@@ -112,6 +114,7 @@ public function Save(){
 			GetComponent("SaveCustom").customData.items[i].bought=items[i]["bought"];
 		}
 		GetComponent("SaveCustom").customData.gold=gold;
+		GetComponent("SaveCustom").customData.diffLevel=diffLevel;
 		GetComponent("SaveCustom").Save();
 }
 public function Load(){
@@ -139,5 +142,6 @@ public function Load(){
 			items[i]["bought"]=GetComponent("SaveCustom").customData.items[i].bought;
 		}
 		gold=GetComponent("SaveCustom").customData.gold;
+		diffLevel=GetComponent("SaveCustom").customData.diffLevel;
 	}
 }

@@ -352,7 +352,6 @@
 	DestroyShields();
 	GetComponent("Main").moveGrid.SetActive(true);
 	GetComponent("Main").menu.SetActive(false);
-	GetComponent("Special").SpecialFunction("winBattle");
 	if(GetComponent("Main").inCombat==true){
 		 GetComponent("Main").inCombat=false;
 
@@ -442,6 +441,7 @@
 		GetComponent("Main").moveGrid.SetActive(true);
 		GetComponent("Main").pass.SetActive(true);
 		GetComponent("Main").checkBattle(curlocation);
+		GetComponent("Special").SpecialFunction("winBattle");
 	}
  }
  function individualLevelup(unit){

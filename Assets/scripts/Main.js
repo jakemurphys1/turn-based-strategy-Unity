@@ -68,10 +68,11 @@ function Awake(){
 		StoreInfo = Instantiate (Resources.Load ("StoreInfo") as GameObject);
 	}
 	if(StoreInfo){
-		level = StoreInfo.GetComponent("StoreInfo").level;
+		level = StoreInfo.GetComponent("StoreInfo").diffLevel;
 		stage = StoreInfo.GetComponent("StoreInfo").stage;
 	}else{
 		level=3;
+		stage = 1;
 	}
 	beginUnits();
 }
@@ -263,7 +264,10 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 		unit1.GetComponent("EnemyClick").groupnum=EgroupIndex;
 		Eunits[EindexNum-1].body = unit1;
 		Eunits[EindexNum-1].hor = 0;
-		quickMessage(Eunits[EindexNum-1].type + " has appeared!");
+		if(showEnemyOnCreate){
+			quickMessage(Eunits[EindexNum-1].type + " has appeared!");
+		}
+		
 	}
 	if(slot2){
 			createEUnit(slot2);
@@ -277,7 +281,9 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			//Egroups[EgroupIndex].slot2Object = unit2;
 			Eunits[EindexNum-1].body = unit2;
 			Eunits[EindexNum-1].hor = 1;
-			quickMessage(Eunits[EindexNum-1].type + " has appeared!");
+			if(showEnemyOnCreate){
+				quickMessage(Eunits[EindexNum-1].type + " has appeared!");
+			}
 	}
 	if(slot3){
 			createEUnit(slot3);
@@ -291,7 +297,9 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			//Egroups[EgroupIndex].slot3Object = unit3;
 			Eunits[EindexNum-1].body = unit3;
 			Eunits[EindexNum-1].hor = 2;
-			quickMessage(Eunits[EindexNum-1].type + " has appeared!");
+			if(showEnemyOnCreate){
+				quickMessage(Eunits[EindexNum-1].type + " has appeared!");
+			}
 	}
 	if(slot4){
 			createEUnit(slot4);
@@ -305,7 +313,9 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			//Egroups[EgroupIndex].slot4Object = unit4;
 			Eunits[EindexNum-1].body = unit4;
 			Eunits[EindexNum-1].hor = 3;
-			quickMessage(Eunits[EindexNum-1].type + " has appeared!");
+			if(showEnemyOnCreate){
+				quickMessage(Eunits[EindexNum-1].type + " has appeared!");
+			}
 	}
 	if(slot5){
 			createEUnit(slot5);
@@ -319,7 +329,9 @@ function createEGroup(slot1:String,slot2:String,slot3:String,slot4:String,slot5:
 			//Egroups[EgroupIndex].slot5Object = unit5;
 			Eunits[EindexNum-1].body = unit5;
 			Eunits[EindexNum-1].hor = 4;
-			quickMessage(Eunits[EindexNum-1].type + " has appeared!");
+			if(showEnemyOnCreate){
+				quickMessage(Eunits[EindexNum-1].type + " has appeared!");
+			}
 	}
 
 	var curPos= curCamera.transform.position;
@@ -1592,27 +1604,27 @@ class Enemy{
 		};
 		if(type=="Bat"){
 			if (level == 1) {
-             this.attack = 25;
-             this.health = 40; //40
-             this.maxhealth = 40; //40
+             this.attack = 10;
+             this.health = 30; //40
+             this.maxhealth = 30; //40
 			 }
 			 if (level == 2) {
-				 this.attack = 35;
+				 this.attack = 20;
+				 this.health = 40;
+				 this.maxhealth = 40;
+			 }
+			 if (level == 3) {
+				 this.attack = 30;
 				 this.health = 50;
 				 this.maxhealth = 50;
 			 }
-			 if (level == 3) {
-				 this.attack = 45;
+			 if (level == 4) {
+				 this.attack = 40;
 				 this.health = 60;
 				 this.maxhealth = 60;
 			 }
-			 if (level == 4) {
-				 this.attack = 55;
-				 this.health = 70;
-				 this.maxhealth = 70;
-			 }
-			 this.defense = 10;
-			 this.resistance = 10;
+			 this.defense = 5;
+			 this.resistance = 5;
 			 this.attackType="CloseAttack";
 			 this.moveType="Flying";
 			 this.elemental["Fire"]=1;
