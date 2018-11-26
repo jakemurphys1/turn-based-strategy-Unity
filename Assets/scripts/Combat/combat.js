@@ -5,6 +5,7 @@
  var nulllocation:GameObject;
  
  function damageEnemy(enemy,amount,element){
+	GetComponent("Special").SpecialFunction("damageEnemy");
 	var Eunits = GetComponent("Main").Eunits;
 	var isCrit=false;
 	if(element=="critType"){
@@ -435,7 +436,7 @@
 		if(unit.level>=6){
 			return;
 		}
-		unit.experience -=(1000 + 500*unit.level);
+		unit.experience -=(2000*unit.level);
 		individualLevelup(unit);
 	}else{
 		GetComponent("Main").moveGrid.SetActive(true);
@@ -464,7 +465,7 @@
 	 var replyItem;
 	 for(var i = 0;i<slots.length;i++){
 		slots[i].body.GetComponent("AllyClick").curcamera.enabled=false;
-	 	 if(slots[i].experience>=(1000 + 500*slots[i].level) && slots[i].level<6){
+	 	 if(slots[i].experience>=(2000*slots[i].level) && slots[i].level<6){
 		 	 replyItem = slots[i];
 		 }
 	 }
@@ -498,6 +499,7 @@
 	if(thisUnit.didAction==true){
 		return;
 	}
+
 	if(thisUnit.sleep>0){
 		wordPopup(thisUnit,"Sleeping");
 		return;
@@ -605,13 +607,34 @@
 	var slots = pass.GetComponent("pass").slots;
 	var num;
 
+	//prevent clicking on enemy outside of this combat.
+	var isInSlots=false;
+	for(var b=0;b<eslots.length;b++){
+		if(eslots[b].index == curEnemy.index ){
+			isInSlots=true;
+		}
+	}
+	if(isInSlots==false){
+		print("not in eslots");
+		return;
+	}
+
+
 	hit = hitResult(thisUnit, curEnemy.evasion,thisUnit.accuracy);
 	if(curEnemy.sleep>0 || curEnemy.immobolized>0){
 		hit="Hit";
 	}
 
-	if(thisUnit.didAction==true){
+
+	if(thisUnit.didAction==true && !thisUnit.actionsActive["DoubleTap"]){
 		return;
+	}
+	if(thisUnit.didAction && thisUnit.hasMoved){
+		return;
+	}
+	if(thisUnit.didAction){
+		wordPopup(thisUnit,"DoubleTap");
+		thisUnit.hasMoved=true;
 	}
 	if(thisUnit.sleep>0){
 		wordPopup(thisUnit,"Sleeping");
@@ -622,7 +645,7 @@
 	if(curAction=="Capture"){
 		lookAt(curEnemy,thisUnit);
 		thisUnit.body.GetComponent("AllyClick").animator.SetInteger("attack",2);
-		var randnum = Random.Range(0,curEnemy.maxhealth) + 20;
+		var randnum = Random.Range(0,curEnemy.maxhealth);
 		if(randnum>curEnemy.health){
 			GetComponent("sounds").playSound("capture");
 			yield WaitForSeconds(1);
@@ -699,7 +722,7 @@
 		}
 		if(curAction=="Immobolize"){
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
-			if(hit=="Hit"){
+			if(hit=="Hit" || hit=="Near-Miss"){
 				curEnemy.immobolized=2;
 				showAilment("Immobolized", curEnemy);
 				GetComponent("sounds").playSound("poison");
@@ -741,7 +764,7 @@
 		}
 		if(curAction=="Poison"){
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
-			if(hit=="Hit"){
+			if(hit=="Hit" || hit=="Near-Miss"){
 				curEnemy.poison=4;
 				showAilment("Poison", curEnemy);
 				GetComponent("sounds").playSound("poison");
@@ -752,7 +775,7 @@
 		}
 		if(curAction=="Blindness"){
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
-			if(hit=="Hit"){
+			if(hit=="Hit" || hit=="Near-Miss"){
 				curEnemy.blind=3;
 				showAilment("Blind", curEnemy);
 				GetComponent("sounds").playSound("poison");
@@ -764,7 +787,7 @@
 		}
 		if(curAction=="Sleep"){
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
-			if(hit=="Hit"){
+			if(hit=="Hit" || hit=="Near-Miss"){
 				curEnemy.sleep=2;
 				showAilment("Sleep", curEnemy);
 				GetComponent("sounds").playSound("poison");
@@ -775,7 +798,7 @@
 		}
 		if(curAction=="Enfeeble"){
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
-			if(hit=="Hit"){
+			if(hit=="Hit" || hit=="Near-Miss"){
 				curEnemy.enfeebled=3;
 				showAilment("Enfeebled", curEnemy);
 				GetComponent("sounds").playSound("poison");
@@ -818,7 +841,7 @@
 		}
 		if(curAction=="Silence"){
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
-			if(hit=="Hit"){
+			if(hit=="Hit" || hit=="Near-Miss"){
 				curEnemy.silenced=2;
 				showAilment("Silenced", curEnemy);
 				wordPopup(curEnemy,"Silenced");
@@ -872,7 +895,7 @@
 						}
 				}
 			}
-			if(hit=="Hit"){
+			if(hit=="Hit" || hit=="Near-Miss"){
 				showElementalArrow(curEnemy,curElement);
 			}
 			//extend rope
@@ -914,7 +937,7 @@
 			damage = thisUnit.attack-getdefense(curEnemy,"defense");
 			damageEnemy(curEnemy,damage,curElement);
 			thisUnit.didAction=true;
-			if(hit=="Hit"){
+			if(hit=="Hit" || hit=="Near-Miss"){
 				GetComponent("sounds").playSound("disrupt");
 				for(num = 0;num<eslots.length;num++){
 					if(eslots[num].charge>0){
@@ -927,7 +950,7 @@
 		}
 		if(curAction=="Burst"){
 			damage = thisUnit.attack-getdefense(curEnemy,"defense") + thisUnit.resistance;
-			if(hit=="Hit"){
+			if(hit=="Hit" || hit=="Near-Miss"){
 				showElementalArrow(curEnemy,curElement);
 			}
 			damageEnemy(curEnemy,damage,curElement);
@@ -1092,7 +1115,7 @@
 				return;
 			}else{
 				lookAt(curEnemy,thisUnit);
-				Wail(thisUnit,curEnemy);	
+				Wail(thisUnit,curEnemy,0);	
 			}
 		}
 		menu.GetComponent("Menu").hideAll();
@@ -1168,7 +1191,7 @@
 				GetComponent("sounds").playSound("fire");
 				yield WaitForSeconds(1.5);	
 				Destroy(instance);
-				if(hit=="Hit"){
+				if(hit=="Hit" || hit=="Near-Miss"){
 					magicAilments(thisUnit,curEnemy,"Blind");
 				}
 					
@@ -1224,7 +1247,7 @@
 				GetComponent("sounds").playSound("zap");
 				yield WaitForSeconds(1);	
 				Destroy(instance);
-				if(hit=="Hit"){
+				if(hit=="Hit" || hit=="Near-Miss"){
 					magicAilments(thisUnit,curEnemy,"Immobolized");
 				}
 			}
@@ -1248,7 +1271,7 @@
 				GetComponent("sounds").playSound("ice");
 				yield WaitForSeconds(1);
 				Destroy(frozen);
-				if(hit=="Hit"){
+				if(hit=="Hit" || hit=="Near-Miss"){
 					magicAilments(thisUnit,curEnemy,"Sleep");
 				}
 			}
@@ -1295,7 +1318,7 @@
 				instance.transform.position = curEnemy.body.transform.position;
 				yield WaitForSeconds(1);
 				Destroy(instance);
-				if(hit=="Hit"){
+				if(hit=="Hit" || hit=="Near-Miss"){
 					magicAilments(thisUnit,curEnemy,"Sleep");
 				}
 			}
@@ -1309,6 +1332,7 @@
 				yield WaitForSeconds(0.5);
 				thisUnit.charge-=2;
 				thisUnit.body.GetComponent("AllyClick").item.GetComponent("Text").text=thisUnit.charge.ToString();
+				print(getdefense(curEnemy,"resistance"));
 				damage = 2*thisUnit.attack-getdefense(curEnemy,"resistance");
 				damageEnemy(curEnemy,damage,"Lightning");
 				GetComponent("sounds").playSound("explosion");
@@ -1318,7 +1342,7 @@
 				instance.transform.position.y+=50;
 				yield WaitForSeconds(0.5);
 				Destroy(instance);
-				if(hit=="Hit"){
+				if(hit=="Hit" || hit=="Near-Miss"){
 					magicAilments(thisUnit,curEnemy,"Immobolized");
 				}
 			}
@@ -1337,7 +1361,7 @@
 				yield WaitForSeconds(0.5);
 				shootMissile(0,thisUnit,curEnemy,missiles);
 				yield WaitForSeconds(1);
-				if(hit=="Hit"){
+				if(hit=="Hit" || hit=="Near-Miss"){
 					magicAilments(thisUnit,curEnemy,"Blind");
 				}
 			}
@@ -1623,17 +1647,18 @@
  }
 
  //Knight
- function Wail(ally,enemy){
+ function Wail(ally,enemy,count){
 	ally.energy-=15;
 	setEnergyBar(ally);
+	hit = hitResult(ally, enemy.evasion,ally.accuracy-count);
 	swordattack(ally,enemy);
 	yield WaitForSeconds(1);
 	if(ally.energy>=15 && enemy.health>0){
-		goagain(ally,enemy);
+		goagain(ally,enemy, count+1);
 	}
  }
- function goagain(ally,enemy){
-	Wail(ally,enemy);
+ function goagain(ally,enemy,count){
+	Wail(ally,enemy,count);
  }
 
  function setEnergyBar(ally){
@@ -1803,22 +1828,20 @@
 
 //Thief
 function steal(ally,enemy){
-	if(!ally.actionsActive["Steal"] || enemy.vulnerable==0){
+	if(!ally.actionsActive["Steal"]){
 		return;
 	}
-
 	if(enemy.hasItem==false){
 		wordPopup(enemy,"Nothing To Steal");
 		return;
+	}
+	if(ally.actionsActive["Exploit"]){
+		doCrit(ally,enemy);
 	}
 	var health = enemy.health;
 	var maxhealth = enemy.maxhealth;
 	var healthCheck = Random.Range(1,maxhealth);
 
-	//if(healthCheck<health-20){
-	//	wordPopup(enemy,"Failed To Steal");
-	//	return;
-	//}
 	enemy.hasItem=false;
 
 	var randnum = Random.Range(1,17);
@@ -1894,10 +1917,6 @@ function steal(ally,enemy){
 
 	GetComponent("Main").increaseItems(item,amount);
 	wordPopup(ally,"Stole " + item);
-	//if(enemy.isRobot){
-	//	wordPopup(enemy,"Battery Stolen");
-	//	damageEnemy(enemy,enemy.health,"None");
-	//}
 }
 
 //Guard
@@ -2103,9 +2122,15 @@ function showElementalArrow(enemy,element){
 	if(enemy.vulnerable==0){
 		return;
 	}
-	var randnum = enemy.evasion - Random.Range(1,4) + 3;
-	if(ally.accuracy>randnum){
-		GetComponent("sounds").playSound("crit");
+	var randnum = Random.Range(0,3);
+	print(randnum);
+	if(randnum == 2){
+		doCrit(ally,enemy);
+	}
+ }
+ function doCrit(ally,enemy){
+	print("docrit");
+	GetComponent("sounds").playSound("crit");
 		if(enemy.critType=="None"){
 			wordPopup(enemy,"Crit: None");
 		}
@@ -2114,7 +2139,6 @@ function showElementalArrow(enemy,element){
 			damageEnemy(enemy,enemy.health,"critType");
 		}
 		if(enemy.critType=="Treasure"){
-			
 			wordPopup(enemy,"Crit: Treasure");
 			var randnum2 = Random.Range(1,17);
 			var item;
@@ -2190,17 +2214,40 @@ function showElementalArrow(enemy,element){
 			GetComponent("Main").increaseItems(item,amount);
 			wordPopup(enemy,"Dropped " + amount + " " + item);
 		}
-		if(enemy.critType=="Double"){
-			wordPopup(enemy,"Crit: X2 Damage");
-			damage = ally.attack-getdefense(enemy,"defense");
-			damageEnemy(enemy,damage,"critType");
-			
-		}
 		if(enemy.critType=="Sleep"){
 			wordPopup(enemy,"Crit: Sleep");
-			enemy.sleep=2;
+			enemy.sleep=1;
 			showAilment("Sleep", enemy);
 			GetComponent("sounds").playSound("poison");
 		}
-	}
+		if(enemy.critType=="Immobolize"){
+			wordPopup(enemy,"Crit: Immobolize");
+			enemy.immobolize=2;
+			showAilment("Immobolize", enemy);
+			GetComponent("sounds").playSound("poison");
+		}
+		if(enemy.critType=="Blind"){
+			wordPopup(enemy,"Crit: Blind");
+			enemy.blind=2;
+			showAilment("Blind", enemy);
+			GetComponent("sounds").playSound("poison");
+		}
+		if(enemy.critType=="Silence"){
+			wordPopup(enemy,"Crit: Silence");
+			enemy.silence=2;
+			showAilment("Silence", enemy);
+			GetComponent("sounds").playSound("poison");
+		}
+		if(enemy.critType=="Poison"){
+			wordPopup(enemy,"Crit: Poison");
+			enemy.poison=3;
+			showAilment("Poison", enemy);
+			GetComponent("sounds").playSound("poison");
+		}
+		if(enemy.critType=="Enfeeble"){
+			wordPopup(enemy,"Crit: Enfeeble");
+			enemy.enfeeble=2;
+			showAilment("Enfeeble", enemy);
+			GetComponent("sounds").playSound("poison");
+		}
  }

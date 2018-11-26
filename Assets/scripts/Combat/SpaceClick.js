@@ -46,7 +46,6 @@ function Update()
 	var thisposition = transform.position;
 	
 	if(readyMove==true){
-
 		main.GetComponent("Special").SpecialFunction("moveUnit");
 		var selectedUnit = main.GetComponent("Main").selectedUnit;
 		var curIndex = selectedUnit.GetComponent("AllyClick").index;
@@ -106,12 +105,12 @@ function Update()
 		 main.GetComponent("Main").units[curIndex].hor=hor;
 
 		 //check for cannon
-		var Eunits = main.GetComponent("Main").Eunits;
+		var eslots = main.GetComponent("Main").eslots;
 		var cannon;
 		var curUnit=main.GetComponent("Main").units[curIndex];
-		for(var i =0;i<Eunits.length;i++){
-			if(Eunits[i].type=="Cannon"){
-				cannon=Eunits[i];
+		for(var i =0;i<eslots.length;i++){
+			if(eslots[i].type=="Cannon"){
+				cannon=eslots[i];
 			}
 		}
 		if(cannon && curUnit.invisible==false){

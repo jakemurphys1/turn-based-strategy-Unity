@@ -56,7 +56,6 @@ function OnRightClick(){
          {
              // Add code for the right click event
 				main.GetComponent("combat").unitAction(eindex);
-				
          }
      }
  }

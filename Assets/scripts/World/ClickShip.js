@@ -3,6 +3,7 @@ var main: GameObject;
 
 function OnMouseDown(){
 	menu.SetActive(true);
+	main.GetComponent("Main").barrackButton.GetComponent("goToBarracks").gotobarracks();
 	//tutorial
 	main.GetComponent("Special").SpecialFunction("nexus");
 }

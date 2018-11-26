@@ -33,13 +33,12 @@ function Start(){
 
 function OnMouseDown(){
 	if(main.GetComponent("Main").inCombat){
-
-		
 		var active = main.GetComponent("Main").units[index];
 
-		if(main.GetComponent("Main").isOverMenu==true){
-			return;
-		}
+		//if(main.GetComponent("Main").isOverMenu==true){
+		//	print("error: isOverMenu");
+		//	return;
+		//}
 		
 		main.GetComponent("Main").activeIndex = index;
 		main.GetComponent("Main").activeEnemy = thisAlly;
@@ -48,6 +47,7 @@ function OnMouseDown(){
 		
 		var activeGroup = main.GetComponent("Main").activeGroup;
 		if(active.group != activeGroup){
+			print("error: not in active group");
 			return;
 		}
 
@@ -82,8 +82,6 @@ function OnMouseDown(){
 				}
 			}
 		}
-
-
 		//show menu
 		main.GetComponent("Main").menu.SetActive(true);
 		var mousePos = Input.mousePosition;
@@ -222,6 +220,7 @@ function zoomin(){
 }
 
 function switchUnits(){
+	main.GetComponent("Special").SpecialFunction("openswitch");
 	var activeGroup=main.GetComponent("Main").activeGroup;
 	
 	var group1 = main.GetComponent("Main").groups[main.GetComponent("Main").units[index].group];

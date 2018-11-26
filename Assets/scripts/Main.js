@@ -78,11 +78,6 @@ function Awake(){
 }
 
 function Start () {
-	if(GetComponent("Special").PotionOn){
-		GetComponent("Special").Potion.SetActive(true);
-	}else{
-		GetComponent("Special").Potion.SetActive(false);
-	}
 	items["Flowers"]=0;
 	items["Mushrooms"]=0;
 	items["Honey"]=0;
@@ -108,20 +103,13 @@ function Start () {
 }
 
 function tempStart(){
-	units[0].actionsActive["Flying"]=true;
-	units[0].actionsActive["Zap"]=true;
-	units[0].health=300;
-
-	//units[1].actionsActive["Elemental"]=true;
-	//units[1].actionsActive["Flying"]=true;
-	//units[1].actionsActive["Flying"]=true;
-	//units[1].actionsActive["Push"]=true;
-	//units[1].actionsActive["Scout"]=true;
-	//units[1].actionsActive[""]=true;
-	//units[1].attack=100;
-	createEGroup("","Goblin","","","",ship, 1000);
 	
+	createEGroup("","","Cannon","","",ship, 1000);
+	createUnit("Wizard");
+	createUnit("Archer");
 	createGroup(0,1,2,ship);
+	units[1].actionsActive["Lightning"]=true;
+	units[1].actionsActive["Start Charge"]=true;
 	yield WaitForSeconds(2);
 	checkBattle(ship);
 	curGrid = ship.GetComponent("locations").allspaces;
@@ -134,34 +122,36 @@ function beginUnits(){
 	for(var i =0;i<newUnits.length;i++){
 		if(newUnits[i]["hired"]){
 			createUnit(newUnits[i]["type"]);
-			for(var j =0;j<newUnits[i]["level"]-1;j++){
-				GetComponent("combat").individualLevelup(units[i]);
+			var unitNum = units.length-1;
+			for(j =0;j<newUnits[i]["level"]-1;j++){
+				GetComponent("combat").individualLevelup(units[unitNum]);
 			}
 			if(newUnits[i]["weapon"]=="Iron" || newUnits[i]["weapon"]=="Long" || newUnits[i]["weapon"]=="Emerald"){
-				units[i].attack=units[i].attack*1.1;
+				units[unitNum].attack=units[unitNum].attack*1.1;
 			}
 			if(newUnits[i]["weapon"]=="Steel" || newUnits[i]["weapon"]=="Elite" || newUnits[i]["weapon"]=="Ruby"){
-				units[i].attack=units[i].attack*1.2;
+				units[unitNum].attack=units[unitNum].attack*1.2;
 			}
 			if(newUnits[i]["weapon"]=="Titanium" || newUnits[i]["weapon"]=="Master" || newUnits[i]["weapon"]=="Diamond"){
-				units[i].attack=units[i].attack*1.3;
+				units[unitNum].attack=units[unitNum].attack*1.3;
 			}
 			var defenseIncrease=0;
 			var resistanceIncrease=0;
+			units[unitNum].experience=newUnits[i]["experience"];
 			if(newUnits[i]["armor"]=="Iron" || newUnits[i]["armor"]=="Wool"){
-				units[i].maxhealth=units[i].health*1.1;
-				defenseIncrease=units[i].defense*0.1;
-				resistanceIncrease=units[i].resistance*0.1;
+				units[unitNum].maxhealth=units[unitNum].health*1.1;
+				defenseIncrease=units[unitNum].defense*0.1;
+				resistanceIncrease=units[unitNum].resistance*0.1;
 			}
 			if(newUnits[i]["armor"]=="Steel" || newUnits[i]["armor"]=="Leather"){
-				units[i].maxhealth=units[i].health*1.1;
-				defenseIncrease=units[i].defense*0.1;
-				resistanceIncrease=units[i].resistance*0.1;
+				units[unitNum].maxhealth=units[unitNum].health*1.1;
+				defenseIncrease=units[unitNum].defense*0.1;
+				resistanceIncrease=units[unitNum].resistance*0.1;
 			}
 			if(newUnits[i]["armor"]=="Titanium" || newUnits[i]["armor"]=="Silk"){
-				units[i].maxhealth=units[i].health*1.1;
-				defenseIncrease=units[i].defense*0.1;
-				resistanceIncrease=units[i].resistance*0.1;
+				units[unitNum].maxhealth=units[unitNum].health*1.1;
+				defenseIncrease=units[unitNum].defense*0.1;
+				resistanceIncrease=units[unitNum].resistance*0.1;
 			}
 			if(defenseIncrease<5){
 				defenseIncrease=5;
@@ -169,10 +159,10 @@ function beginUnits(){
 			if(resistanceIncrease<5){
 				resistanceIncrease=5;
 			}
-			units[i].health=units[i].maxhealth;
+			units[unitNum].health=units[unitNum].maxhealth;
 			if(newUnits[i]["armor"]!="Bronze" && newUnits[i]["armor"]!="Cotton"){
-				units[i].resistance+=resistanceIncrease;
-				units[i].defense+=defenseIncrease;
+				units[unitNum].resistance+=resistanceIncrease;
+				units[unitNum].defense+=defenseIncrease;
 			}
 		}
 	}
@@ -201,6 +191,7 @@ function createGroup(slot1:int,slot2:int,slot3:int,curlocation){
 	groups[groupIndex]= new Group(slot1,slot2,slot3,curlocation);
 	circle = Instantiate(Resources.Load("GroupCircle", GameObject));
 	groups[groupIndex].circle = circle;
+	print(curlocation);
 	circle.transform.position=curlocation.GetComponent("locations").space20.transform.position;
 	circle.GetComponent("CircleScript").circle.transform.GetChild(0).GetComponent("UsePotions").groupIndex=groupIndex;
 
@@ -601,9 +592,9 @@ class Ally{
 			   this.weak="Any enemy with high defense. Also, most of his arrows are pointless against non-magic users.";
 		}
 		if(type=="Soldier"){
-			   this.maxhealth=120;
+			   this.maxhealth=140;
 			   this.attack=60;
-			   this.defense=20;
+			   this.defense=25;
 			   this.resistance=0;
 			   this.accuracy=1;
 			   this.evasion=3;
@@ -684,19 +675,18 @@ class Ally{
 			   this.attack=40;
 			   this.defense=10;
 			   this.resistance=10;
-			   this.accuracy=3;
 			   this.evasion=1;
 			   this.actions[0] = "Attack";
 			   this.actions[1] = "Detect";
-			   this.actions[2] = "Hobble";
-			   this.actions[3] = "Phase";
+			   this.actions[2] = "Phase";
 			   this.passiveActions[0]= "Invisible";
 			   this.passiveActions[1]= "Steal";
-			   this.passiveActions[2]= "BackStab";
-			   this.passiveActions[3]= "FirstBlow";
+			   this.passiveActions[2]= "Exploit";
+			   this.passiveActions[3]= "BackStab";
+			   this.passiveActions[4]= "FirstBlow";
 			   this.abilities[0] = "Invisible";
 			   this.abilities[1] = "Steal";
-			   this.abilities[2] = "Hobble";
+			   this.abilities[2] = "Exploit";
 			   this.abilities[3] = "BackStab";
 			   this.abilities[4] = "FirstBlow";
 			   this.abilities[5] = "Phase";
@@ -710,15 +700,15 @@ class Ally{
 			   this.actionDes1["Steal"] = "Steal From the Enemy";
 			   this.actionDes2["Steal"]  = "Thief will now steal whenever he attacks if the enemy is vunerable.";
 			   this.actionDes1["Invisible"] = "Enemies Can't Attack What They Can't See";
-			   this.actionDes2["Invisible"]  = "Enemies can't attack the thief while invisible. Attacking causes the thief to become visible for a turn.";
+			   this.actionDes2["Invisible"]  = "Enemies can't attack the thief while invisible. Attacks from the thief causes him to become visible for a turn.";
 			   this.actionDes1["BackStab"] = "Strike from the shadows";
 			   this.actionDes2["BackStab"]  = "Attacks from behind deals double damage.";
 			   this.actionDes1["Phase"] = "Phase Through the Enemy's Armor";
 			   this.actionDes2["Phase"]  = "The thief and an enemy switches places, and the enemy becomes enfeebled for a turn, reducing it's defense and resistance to 0";
 			   this.actionDes1["FirstBlow"] = "Speedy Attack to the Eyes";
 			   this.actionDes2["FirstBlow"]  = "If the enemy is undamaged, this attack blinds it for 2 turns";
-			   this.actionDes1["Hobble"] = "Slow the Enemy Down";
-			   this.actionDes2["Hobble"]  = "Permanently reduces the enemy's evasion by 1.";
+			   this.actionDes1["Exploit"] = "Exploit their weaknesses";
+			   this.actionDes2["Exploit"]  = "Stealing from a vunerable enemy applies a Crit.";
 			   this.attackProperties["Attack"]={"Range":"Adjacent","Multiplier":1,"DefenseType":"defense","Element":"none"};
 			   this.attackProperties["Detect"]={"Range":"Any","Multiplier":0,"DefenseType":"defense","Element":"none"};
 			   this.description="This close-range fighter can't do a lot of damage, but can make enemy's vulnerable to crits. He also has a high accuracy.";
@@ -802,7 +792,7 @@ class Ally{
 			   this.actionDes1["Start Charge"] = "Enter the Battle Ready to Fight";
 			   this.actionDes2["Start Charge"]  = "Wizard begins each battle with 2 Charge";
 			   this.attackProperties["Gust"]={"Range":"Any","Multiplier":1,"DefenseType":"resistance","Element":"Ice"};
-			   this.attackProperties["Lightning"]={"Range":"Any","Multiplier":2,"DefenseType":"resistance","Element":"Lightning"};
+			   this.attackProperties["Lightning"]={"Range":"Any","Multiplier":1,"DefenseType":"resistance","Element":"Lightning"};
 			   this.attackProperties["Missiles"]={"Range":"Line","Multiplier":"Charge","DefenseType":"resistance","Element":"Fire"};
 			   this.attackProperties["Drain"]={"Range":"Adjacent","Multiplier":0,"DefenseType":"resistance","Element":"None"};
 			   this.description="Powerful, but slow, wizards must charge before they can use their attacks.";
@@ -842,9 +832,9 @@ class Ally{
 			   this.actionDes1["Death"] = "The name says it all";
 			   this.actionDes2["Death"]  = "Instantly kills any enemy. Costs 50";
 			   this.attackProperties["Blizzard"]={"Range":"Any","Multiplier":1,"DefenseType":"resistance","Element":"Ice"};
-			   this.attackProperties["Bolt"]={"Range":"Any","Multiplier":2,"DefenseType":"resistance","Element":"Lightning"};
-			   this.attackProperties["FireBlast"]={"Range":"Any","Multiplier":2,"DefenseType":"resistance","Element":"Fire"};
-			   this.attackProperties["Earth"]={"Range":"Any","Multiplier":2,"DefenseType":"resistance","Element":"None"};
+			   this.attackProperties["Bolt"]={"Range":"Any","Multiplier":1,"DefenseType":"resistance","Element":"Lightning"};
+			   this.attackProperties["FireBlast"]={"Range":"Any","Multiplier":1,"DefenseType":"resistance","Element":"Fire"};
+			   this.attackProperties["Earth"]={"Range":"Any","Multiplier":2,"DefenseType":"defense","Element":"None"};
 			   this.attackProperties["Death"]={"Range":"Any","Multiplier":0,"DefenseType":"resistance","Element":"None"};
 			   this.energy=100;
 			   this.description="Powerful, but slow, sorrcerers must use their energy for their attacks. Every round outside of combat will slowly restore the energy.";
@@ -1059,24 +1049,24 @@ class Enemy{
 		}//done
 		if(type=="BrownOoze"){
 			if (level == 1) {
-             this.attack = 15;
-             this.health = 30;
-             this.maxhealth = 30;
+             this.attack = 20;
+             this.health = 35;
+             this.maxhealth = 35;
 			 }
 			 if (level == 2) {
-				 this.attack = 25;
-				 this.health = 50;
-				 this.maxhealth = 50;
+				 this.attack = 30;
+				 this.health = 60;
+				 this.maxhealth = 60;
 			 }
 			 if (level == 3) {
-				 this.attack = 35;
-				 this.health = 70;
-				 this.maxhealth = 70;
+				 this.attack = 40;
+				 this.health = 80;
+				 this.maxhealth = 80;
 			 }
 			 if (level == 4) {
-				 this.attack = 45;
-				 this.health = 85;
-				 this.maxhealth = 85;
+				 this.attack = 55;
+				 this.health = 95;
+				 this.maxhealth = 95;
 			 }
 			 this.defense = 10;
 			 this.resistance = 10;
@@ -1089,27 +1079,28 @@ class Enemy{
 			 this.description="These magic users will shoot whatever enemy is in front of it with it's magic attacks.";
 			 this.strong="Units with low resistance, especially close-range units.";
 			 this.weak="Ranged units or units with high resistance.";
+			 this.critType="Silence";
 		};//done
 		if(type=="RedOoze"){
 			if (level == 1) {
-             this.attack = 15;
-             this.health = 30;
-             this.maxhealth = 30;
+             this.attack = 25;
+             this.health = 40;
+             this.maxhealth = 40;
 			 }
 			 if (level == 2) {
-				 this.attack = 25;
-				 this.health = 50;
-				 this.maxhealth = 50;
+				 this.attack = 35;
+				 this.health = 60;
+				 this.maxhealth = 60;
 			 }
 			 if (level == 3) {
-				 this.attack = 35;
-				 this.health = 70;
-				 this.maxhealth = 70;
+				 this.attack = 45;
+				 this.health = 80;
+				 this.maxhealth = 80;
 			 }
 			 if (level == 4) {
-				 this.attack = 45;
-				 this.health = 85;
-				 this.maxhealth = 85;
+				 this.attack = 55;
+				 this.health = 100;
+				 this.maxhealth = 100;
 			 }
 			 this.defense = 10;
 			 this.resistance = 10;
@@ -1123,27 +1114,28 @@ class Enemy{
 			 this.description="These magic users will shoot whatever enemy is in front of it with it's magic attacks. It's attack increase the higher it's charge becomes.";
 			 this.strong="Units with low resistance, especially close-range units.";
 			 this.weak="Ranged units or units with high resistance. Also weak against ice.";
+			 this.critType="Silence";
 		};//done
 		if(type=="BlueOoze"){
 			if (level == 1) {
-             this.attack = 30;
-             this.health = 30;
-             this.maxhealth = 30;
+             this.attack = 40;
+             this.health = 40;
+             this.maxhealth = 40;
 			 }
 			 if (level == 2) {
-				 this.attack = 50;
-				 this.health = 50;
-				 this.maxhealth = 50;
+				 this.attack = 60;
+				 this.health = 60;
+				 this.maxhealth = 60;
 			 }
 			 if (level == 3) {
-				 this.attack = 70;
-				 this.health = 70;
-				 this.maxhealth = 70;
+				 this.attack = 80;
+				 this.health = 80;
+				 this.maxhealth = 80;
 			 }
 			 if (level == 4) {
-				 this.attack = 90;
-				 this.health = 85;
-				 this.maxhealth = 85;
+				 this.attack = 100;
+				 this.health = 100;
+				 this.maxhealth = 100;
 			 }
 			 this.defense = 10;
 			 this.resistance = 10;
@@ -1158,27 +1150,28 @@ class Enemy{
 			 this.description="These magic users will shoot whatever enemy is in front of it with it's magic attacks. Requires 1 charge first.";
 			 this.strong="Units with low resistance, especially close-range units.";
 			 this.weak="Ranged units or units with high resistance. Also weak against fire.";
+			 this.critType="Silence";
 		};//done
 		if(type=="GreenOoze"){
 			if (level == 1) {
-             this.attack = 15;
-             this.health = 30;
-             this.maxhealth = 30;
+             this.attack = 25;
+             this.health = 50;
+             this.maxhealth = 50;
 			 }
 			 if (level == 2) {
-				 this.attack = 25;
-				 this.health = 50;
-				 this.maxhealth = 50;
-			 }
-			 if (level == 3) {
 				 this.attack = 35;
 				 this.health = 70;
 				 this.maxhealth = 70;
 			 }
-			 if (level == 4) {
+			 if (level == 3) {
 				 this.attack = 45;
-				 this.health = 85;
-				 this.maxhealth = 85;
+				 this.health = 90;
+				 this.maxhealth = 90;
+			 }
+			 if (level == 4) {
+				 this.attack = 55;
+				 this.health = 110;
+				 this.maxhealth = 110;
 			 }
 			 this.defense = 10;
 			 this.resistance = 10;
@@ -1191,25 +1184,26 @@ class Enemy{
 			 this.description="These magic users will shoot whatever enemy is in front of it with it's magic attacks. It's attack poison the unit.";
 			 this.strong="Units with low resistance, especially close-range units.";
 			 this.weak="Ranged units or units with high resistance.";
+			 this.critType="Silence";
 		};//done
 		if(type=="Gremlin"){
 			if (level == 1) {
-             this.attack = 40;
+             this.attack = 50;
              this.health = 15;
              this.maxhealth = 15;
 			 }
 			 if (level == 2) {
-				 this.attack = 50;
+				 this.attack = 65;
 				 this.health = 20; //40
 				 this.maxhealth = 20; //40
 			 }
 			 if (level == 3) {
-				 this.attack = 70;
+				 this.attack = 80;
 				 this.health = 30;
 				 this.maxhealth = 30;
 			 }
 			 if (level == 4) {
-				 this.attack = 85;
+				 this.attack = 100;
 				 this.health = 38;
 				 this.maxhealth = 38;
 			 }
@@ -1228,23 +1222,23 @@ class Enemy{
 		if(type=="Warrior"){
 			if (level == 1) {
              this.attack = 40;
-             this.health = 60;
-             this.maxhealth = 60;
+             this.health = 80;
+             this.maxhealth = 80;
 			 }
 			 if (level == 2) {
 				 this.attack = 60;
-				 this.health = 90;
-				 this.maxhealth = 90;
+				 this.health = 110;
+				 this.maxhealth = 110;
 			 }
 			 if (level == 3) {
 				 this.attack = 80;
-				 this.health = 120;
-				 this.maxhealth = 120;
+				 this.health = 140;
+				 this.maxhealth = 140;
 			 }
 			 if (level == 4) {
 				 this.attack = 100;
-				 this.health = 150;
-				 this.maxhealth = 150;
+				 this.health = 170;
+				 this.maxhealth = 170;
 			 }
 			 this.defense = 35;
 			 this.resistance = 0;
@@ -1260,27 +1254,27 @@ class Enemy{
 		};//done
 		if(type=="Clunker"){
 			if (level == 1) {
-             this.attack = 20;
-             this.health = 70;
-             this.maxhealth = 70;
+             this.attack = 30;
+             this.health = 90;
+             this.maxhealth = 90;
 			 }
 			 if (level == 2) {
-				 this.attack = 30;
-				 this.health = 100; //40
-				 this.maxhealth = 100; //40
+				 this.attack = 40;
+				 this.health = 120; //40
+				 this.maxhealth = 120; //40
 			 }
 			 if (level == 3) {
-				 this.attack = 40;
-				 this.health = 140;
-				 this.maxhealth = 140;
+				 this.attack = 50;
+				 this.health = 150;
+				 this.maxhealth = 150;
 			 }
 			 if (level == 4) {
-				 this.attack = 50;
-				 this.health = 175;
-				 this.maxhealth = 175;
+				 this.attack = 60;
+				 this.health = 180;
+				 this.maxhealth = 180;
 			 }
 			 this.defense = 20;
-			this.resistance = 20;
+			this.resistance = 15;
 			 this.attackType="CloseAttack";
 			 this.moveType="Agressive";
 			 this.elemental["Fire"]=1;
@@ -1362,22 +1356,22 @@ class Enemy{
 		};//done
 		if(type=="FireElemental"){
 			if (level == 1) {
-             this.attack = 20;
+             this.attack = 30;
              this.health = 40;
              this.maxhealth = 40;
 			 }
 			 if (level == 2) {
-				 this.attack = 30;
+				 this.attack = 40;
 				 this.health = 60;
 				 this.maxhealth = 60;
 			 }
 			 if (level == 3) {
-				 this.attack = 40;
+				 this.attack = 50;
 				 this.health = 80;
 				 this.maxhealth = 80;
 			 }
 			 if (level == 4) {
-				 this.attack = 50;
+				 this.attack = 60;
 				 this.health = 100;
 				 this.maxhealth = 100;
 			 }
@@ -1394,6 +1388,7 @@ class Enemy{
 			 this.description="These long-range magic users can attack any unit with a fireball. Requires 1 charge.";
 			 this.strong="Any close-range unit with low resistance";
 			 this.weak="Any long-ranged unit or ice attacks";
+			 this.critType="Silence";
 		};//done
 		if(type=="LightningElemental"){
 			if (level == 1) {
@@ -1429,6 +1424,7 @@ class Enemy{
 			 this.description="These long-range magic users can attack any unit with a massive lightning bolt. Requires 2 charge.";
 			 this.strong="Any close-range unit with low resistance";
 			 this.weak="Any long-ranged unit";
+			 this.critType="Silence";
 		};//done
 		if(type=="IceElemental"){
 			if (level == 1) {
@@ -1464,6 +1460,7 @@ class Enemy{
 			 this.description="These long-range magic users can attack any unit with a fireball. Requires 2 charge.";
 			 this.strong="Any close-range unit with low resistance or non-magic users";
 			 this.weak="Magic users, especially fire.";
+			 this.critType="Silence";
 		};//done
 		if(type=="Silencer"){
 			if (level == 1) {
@@ -1521,8 +1518,8 @@ class Enemy{
 				 this.health = 185;
 				 this.maxhealth = 185;
 			 }
-			 this.defense = 20;
-			this.resistance = 60;
+			 this.defense = 30;
+			this.resistance = 90;
 			this.attackType="CannonAttack";
 			 this.moveType="None";
 			 this.elemental["Fire"]=1;
@@ -1634,6 +1631,7 @@ class Enemy{
 			 this.description="These flying creatures can immediately move to any location and attack.";
 			 this.strong="Any long-range units with low defenses";
 			 this.weak="Any close-ranged unit";
+			 this.critType="Immobolize";
 		};//done
 		if(type=="Spider"){
 			if (level == 1) {
@@ -1667,6 +1665,7 @@ class Enemy{
 			 this.strong="Any ranged unit.";
 			 this.weak="Any close-range fighter with high attack.";
 			 this.critType="Double";
+			 this.critType="Enfeeble";
 		};//done
 		if(type=="Flamewraith"){
 			if (level == 1) {
@@ -1739,6 +1738,7 @@ class Enemy{
 			 this.description="These summoners will create zombies at a charge of 1.";
 			 this.strong="No particular strengthes of weaknesses";
 			 this.weak="No particular strengthes of weaknesses";
+			 this.critType="Sleep";
 		};//done
 		if(type=="Zombie"){
 			if (level == 1) {
@@ -1771,6 +1771,7 @@ class Enemy{
 			 this.description="These creatures with attack any adjacent units.";
 			 this.strong="No particular strengthes of weaknesses";
 			 this.weak="No particular strengthes of weaknesses";
+			 this.critType="Blindness";
 		};//done
 		if(type=="Waterwraith"){
 			if (level == 1) {
@@ -1883,6 +1884,7 @@ class Enemy{
 			 this.description="These long-range fighters can attack any unit regardless of location. May cause a random ailment.";
 			 this.strong="Units with low defense.";
 			 this.weak="Units with high defense.";
+			 this.critType="Blindness";
 		};//,done
 		if(type=="Shaman"){
 			if (level == 1) {
@@ -1917,6 +1919,7 @@ class Enemy{
 			 this.description="These summoners will heal their golems at a charge of 2.";
 			 this.strong="No particular strengthes or weaknesses";
 			 this.weak="No particular strengthes or weaknesses";
+			 this.critType="Silence";
 		};//done
 		if(type=="Frostlord"){
 			if (level == 1) {
@@ -1952,6 +1955,7 @@ class Enemy{
 			 this.description="These monsters will charge, and at a cost of 3 charge, will do ice damage to all units.";
 			 this.strong="Units with low resistance and ice attacks.";
 			 this.weak="Units with high resistance and fire attacks.";
+			 this.critType="Silence";
 		};
 		if(type=="Angel"){
 			if (level == 1) {
@@ -1986,6 +1990,7 @@ class Enemy{
 			 this.description="These flying creatures can instantly move to attack any unit. At a cost of 3 charge, will heal itself.";
 			 this.strong="Units with low defense.";
 			 this.weak="Units with high defense.";
+			 this.critType="Sleep";
 		};
 		if(type=="Djinn"){
 			if (level == 1) {
@@ -2018,6 +2023,7 @@ class Enemy{
 			 this.description="These creatures with attack any adjacent units. Has a very high defense and resistance.";
 			 this.strong="Most things";
 			 this.weak="Enfeebling attacks";
+			 this.critType="Enfeeble";
 			};
 		if(type=="Demon"){
 			 if (level == 1) {
@@ -2052,6 +2058,7 @@ class Enemy{
 			 this.description="Can attack any adjacent unit. At a cost of 3 charge, can instantly kill any unit.";
 			 this.strong="Fire Attacks.";
 			 this.weak="Ice Attacks";
+			 this.critType="Enfeeble";
 		};
 		if(type=="Dryad"){
 			if (level == 1) {
@@ -2087,29 +2094,29 @@ class Enemy{
 			 this.description="These creatures prevent any ailments from being inflicted on any enemies, and can heal for charge of one. High evasion.";
 			 this.strong="Units with low accuracy or low defense, or units that use abilities that inflict ailments.";
 			 this.weak="Units with high accuracy.";
-			 this.critType="Double";
+			 this.critType="Silnce";
 		};//done
 		
 		if(type=="Wolf"){
 			if (level == 1) {
              this.attack = 40;
-             this.health = 40;
-             this.maxhealth = 40;
+             this.health = 60;
+             this.maxhealth = 60;
 			 }
 			 if (level == 2) {
 				 this.attack = 50;
-				 this.health = 60;
-				 this.maxhealth = 60;
-			 }
-			 if (level == 3) {
-				 this.attack = 60;
 				 this.health = 80;
 				 this.maxhealth = 80;
 			 }
-			 if (level == 4) {
-				 this.attack = 75;
+			 if (level == 3) {
+				 this.attack = 60;
 				 this.health = 100;
 				 this.maxhealth = 100;
+			 }
+			 if (level == 4) {
+				 this.attack = 75;
+				 this.health = 120;
+				 this.maxhealth = 120;
 			 }
 			 this.defense = 20;
 			 this.resistance = 10;
@@ -2125,24 +2132,24 @@ class Enemy{
 		}
 		if(type=="Bear"){
 			if (level == 1) {
-             this.attack = 60;
-             this.health = 100;
-             this.maxhealth = 100;
+             this.attack = 70;
+             this.health = 140;
+             this.maxhealth = 120;
 			 }
 			 if (level == 2) {
-				 this.attack = 80;
-				 this.health = 120;
-				 this.maxhealth = 120;
+				 this.attack = 90;
+				 this.health = 160;
+				 this.maxhealth = 160;
 			 }
 			 if (level == 3) {
-				 this.attack = 100;
-				 this.health = 140;
-				 this.maxhealth = 140;
+				 this.attack = 110;
+				 this.health = 180;
+				 this.maxhealth = 180;
 			 }
 			 if (level == 4) {
-				 this.attack = 125;
-				 this.health = 175;
-				 this.maxhealth = 175;
+				 this.attack = 140;
+				 this.health = 200;
+				 this.maxhealth = 200;
 			 }
 			 this.defense = 25;
 			 this.resistance = 25;
@@ -2154,8 +2161,42 @@ class Enemy{
 			 this.description="These creatures love to attack the eyes and cause blindness.";
 			 this.strong="Any close-range unit.";
 			 this.weak="None";
-			 this.critType="None";
+			 this.critType="Sleep";
+			 this.accuracy=1;
 		}
+		if(type=="Spitter"){
+			if (level == 1) {
+             this.attack = 20;
+             this.health = 30;
+             this.maxhealth = 30;
+			 }
+			 if (level == 2) {
+				 this.attack = 30;
+				 this.health = 50;
+				 this.maxhealth = 50;
+			 }
+			 if (level == 3) {
+				 this.attack = 40;
+				 this.health = 70;
+				 this.maxhealth = 70;
+			 }
+			 if (level == 4) {
+				 this.attack = 50;
+				 this.health = 85;
+				 this.maxhealth = 85;
+			 }
+			 this.defense = 10;
+			 this.resistance = 10;
+			 this.attackType="SpitterAttack";
+			 this.moveType="Scroll";
+			 this.elemental["Fire"]=1;
+			 this.elemental["Ice"]=1;
+			 this.elemental["Lightning"]=1;
+			 this.description="These ranged monsters will spit venom across the way that does physical damage.";
+			 this.strong="Any unit with low defense and health.";
+			 this.weak="Units with high health and defense.";
+			 this.critType="Blindness";
+		};//done
 		if(type=="Hellhound"){
 		
 		}
@@ -2190,7 +2231,7 @@ class Enemy{
 			 this.description="These fast creatures won't attack you, but catching them won't be easy";
 			 this.strong="None";
 			 this.weak="None";
-			 this.critType="None";
+			 this.critType="Sleep";
 		}
 		if(type=="Eagle"){
 			if (level == 1) {
@@ -2223,7 +2264,7 @@ class Enemy{
 			 this.description="These pesky creatures can soar instantly to any ally.";
 			 this.strong="Any long-range units with low defenses";
 			 this.weak="Any close-ranged unit";
-			 this.critType="None";
+			 this.critType="Immobolize";
 		}
 		if(type=="Snake"){
 			if (level == 1) {
@@ -2257,7 +2298,7 @@ class Enemy{
 			 this.description="These evasive enemies can poison an ally. High evasion.";
 			 this.strong="Units with low accuracy or low defense.";
 			 this.weak="Units with high accuracy.";
-			 this.critType="Double";
+			 this.critType="Sleep";
 		}//done
 
 		if(type=="Turtle"){
@@ -2298,6 +2339,7 @@ class Enemy{
 			 this.description="These fighters can move twice a turn. Has low accuracy.";
 			 this.strong="Any close-range unit with low evasion.";
 			 this.weak="Any unit with low evasion.";
+			 this.critType="Immobolize";
 		};//done
 		if(type=="Plague"){
 			if (level == 1) {
@@ -2331,6 +2373,7 @@ class Enemy{
 			 this.description="These flying enemies can move anywhere and can cause sleep and enfeeble. Has low accuracy.";
 			 this.strong="Units with low accuracy and low defense.";
 			 this.weak="Units with high accuracy and high defense.";
+			 this.critType="Sleep";
 		}//done
 		if(type=="Vampire"){
 			if (level == 1) {
@@ -2364,25 +2407,27 @@ class Enemy{
 			 this.strong="Any close-range unit with a low defense.";
 			 this.weak="Any long-ranged unit";
 			 this.accuracy=1;
+			 this.critType="Blindness";
 		};//done
-		if(type=="Spitter"){
+
+		if(type=="Belcher"){
 			if (level == 1) {
-             this.attack = 15;
+             this.attack = 20;
              this.health = 30;
              this.maxhealth = 30;
 			 }
 			 if (level == 2) {
-				 this.attack = 25;
+				 this.attack = 30;
 				 this.health = 50;
 				 this.maxhealth = 50;
 			 }
 			 if (level == 3) {
-				 this.attack = 35;
+				 this.attack = 40;
 				 this.health = 70;
 				 this.maxhealth = 70;
 			 }
 			 if (level == 4) {
-				 this.attack = 45;
+				 this.attack = 50;
 				 this.health = 85;
 				 this.maxhealth = 85;
 			 }
@@ -2397,6 +2442,7 @@ class Enemy{
 			 this.description="These ranged monsters will spit venom across the way that does physical damage and enfeebles your unit, which reduces their defenses to 0.";
 			 this.strong="Any unit with low defense and health. Can dodge attacks with units with low accuracy.";
 			 this.weak="Units with high health and defense, and immunity to enfeeble. Evasive units can dodge it's attacks. Also, ranged units can help in support if they have good accuracy.";
+			 this.critType="Blindness";
 		};//done
 		if(type=="Golem"){
 			if (level == 1) {
@@ -2430,6 +2476,7 @@ class Enemy{
 			 this.description="These creatures with attack any adjacent units. Has a very high defense and resistance.";
 			 this.strong="Most things";
 			 this.weak="Enfeebling attacks";
+			 this.critType="Enfeeble";
 		};//done
 
 		
@@ -2468,7 +2515,7 @@ class Enemy{
 			 this.description="These evasive enemies can move twice a turn. High evasion.";
 			 this.strong="Units with low accuracy or low defense.";
 			 this.weak="Units with high accuracy.";
-			 this.critType="Double";
+			 this.critType="Immobolize";
 		}//done
 		if(type=="Sprite"){
 			if (level == 1) {
@@ -2502,7 +2549,7 @@ class Enemy{
 			 this.description="These flying creatures can immediately move to a random location and attack. High evasion.";
 			 this.strong="Units with low accuracy.";
 			 this.weak="Units with high accuracy.";
-			 this.critType="Double";
+			 this.critType="Immobolize";
 		};//---REMOVE
 		if(type=="Creature"){
 			if (level == 1) {
@@ -2604,7 +2651,7 @@ class Enemy{
 			 this.description="These creatures have high attack, but low accuracy.";
 			 this.strong="Any units with low defense.";
 			 this.weak="Any units with high evasion.";
-			 this.critType="Double";
+			 this.critType="Immobolize";
 		}//done---REMOVE
 		if(type=="Wisp"){
 			if (level == 1) {
@@ -2640,6 +2687,7 @@ class Enemy{
 			 this.strong="Any unit with low resistance or low accuracy.";
 			 this.weak="Long random attackers with physical attacks and fire that have good accuracy.";
 			 this.evasion=4;
+			 this.critType="Silence";
 		}//done
 		
 
@@ -2674,6 +2722,7 @@ class Enemy{
 			 this.description="This close-range fighter can only attack units next to it, but has high attack and defense.";
 			 this.strong="Any close-range enemy with low defense.";
 			 this.weak="Any magic user since he has a low resistance, especially long range ones. Also, any close-range enemy with defense is tough.";
+			 this.critType="Enfeeble";
 		};//done
 		if(type=="Thief"){
 			if (level == 1) {
@@ -2707,6 +2756,7 @@ class Enemy{
 			 this.strong="Any unit with low defense.";
 			 this.weak="Any unit with high defense.";
 			 this.phasing=true;
+			 this.critType="Blindness";
 		};//done
 		if(type=="Archer"){
 			if (level == 1) {
@@ -2739,6 +2789,7 @@ class Enemy{
 			 this.description="These long-range fighters can attack any unit regardless of location.";
 			 this.strong="Units with low defense.";
 			 this.weak="Units with high defense.";
+			 this.critType="Blindness";
 		};//,done
 		if(type=="Mage"){
 			if (level == 1) {
@@ -2772,6 +2823,7 @@ class Enemy{
 			 this.description="This mid-fighter can only hit relatively close units with it's magic, elemental attacks.";
 			 this.strong="Any mid-range enemy with low resistance.";
 			 this.weak="Any unit with high resistance.";
+			 this.critType="Silence";
 		};//done
 		if(type=="Rogue"){
 			if (level == 1) {
@@ -2804,6 +2856,7 @@ class Enemy{
 			 this.description="This long-range fighter can attack any unit in a straight line and poisons it.";
 			 this.strong="Any enemy with low defense.";
 			 this.weak="Any enemy with high defense.";
+			 this.critType="Blindness";
 		};//done
 		if(type=="Templar"){
 			if (level == 1) {
@@ -2836,6 +2889,7 @@ class Enemy{
 			 this.description="This long-range fighter can attack any unit in a straight line and silences it.";
 			 this.strong="Any unit with low defense that uses magic.";
 			 this.weak="Any enemy with high defense.";
+			 this.critType="Blindness";
 		};//done
 		if(type=="Wizard"){
 			 if (level == 1) {
@@ -2859,7 +2913,7 @@ class Enemy{
 				 this.maxhealth = 100;
 			 }
 			 this.defense = 0;
-			 this.resistance = 20;
+			 this.resistance = 30;
 			 this.attackType="LightningAttack";
 			 this.moveType="Afraid";
 			 this.elemental["Fire"]=1;
@@ -2871,6 +2925,7 @@ class Enemy{
 			 this.description="This powerful long-range fighter can attack any unit at a cost of 2 charge.";
 			 this.strong="Any enemy with low resistance.";
 			 this.weak="Any enemy with high resistance and long-range units that do physical damage.";
+			 this.critType="Silence";
 		};//done
 		if(type=="Guard"){
 			if (level == 1) {
@@ -2904,6 +2959,7 @@ class Enemy{
 			 this.description="Protects an enemy, which redirects all damage from the protected enemy to the guard.";
 			 this.strong="No particular strengthes or weaknesses.";
 			 this.weak="No particular strengthes or weaknesses.";
+			 this.critType="Enfeeble";
 		};//done
 		if(type=="Monk"){
 			if (level == 1) {
@@ -2937,6 +2993,7 @@ class Enemy{
 			 this.description="Close-range fighter with low attack, but high evasion.";
 			 this.strong="Units with normal accuracy.";
 			 this.weak="Units with high accuracy.";
+			 this.critType="Sleep";
 		};//done
 		   this.elemental["None"]=1;
 		   this.health=this.maxhealth;
@@ -3241,6 +3298,7 @@ function startBattle(location,groupNum,EgroupNum){
 	
 	hideEntries();
 	GetComponent("combat").returnUnits(slots);
+	GetComponent("Special").SpecialFunction("startBattle");
 
 	//enemy goes first?
 	var starting = Random.Range(1,3);
@@ -3337,6 +3395,7 @@ function Update(){
  }
  function victory(){
  	 victoryScreen.SetActive(true);
+	 other.GetComponent("Music").playMusic("victory");
 	 if(StoreInfo.GetComponent("StoreInfo").job){
 		var job = StoreInfo.GetComponent("StoreInfo").job;
 		var levels = StoreInfo.GetComponent("StoreInfo").levels;
@@ -3374,7 +3433,12 @@ function Update(){
 			}
 		}
 		for(i=0;i<units.length;i++){
-			allUnits[i]["level"] = units[i].level;
+			for(var k=0;k<allUnits.length;k++){
+				if(allUnits[k]["type"]==units[i].type){
+					allUnits[k]["level"] = units[i].level;
+					allUnits[k]["experience"] = units[i].experience;
+				}
+			}
 		}
 		StoreInfo.GetComponent("StoreInfo").Save();
 	}
@@ -3429,8 +3493,9 @@ function Update(){
 	for(var i =0;i<eslots.length;i++){
 		var instance = Instantiate(Resources.Load("Prefabs/PotentialDamageContainer", GameObject));
 		instance.transform.position=eslots[i].body.GetComponent("EnemyClick").healthbar.transform.position;
-		instance.transform.position.y+=0.01;
-		instance.transform.SetParent(eslots[i].body.GetComponent("EnemyClick").healthbar.transform,true);
+		//instance.transform.position.y+=0.01;
+		instance.transform.SetParent(eslots[i].body.GetComponent("EnemyClick").health.transform,true);
+		eslots[i].body.GetComponent("EnemyClick").healthbar.SetActive(false);
 		instance.GetComponent("PotentialDamage").updateView(units[activeIndex],eslots[i],curAction);
 	}
  }
@@ -3439,5 +3504,143 @@ function Update(){
 	for(var i =0;i<objects.length;i++){
 		Destroy(objects[i]);
 	}
+	for(i = 0;i<eslots.length;i++){
+		eslots[i].body.GetComponent("EnemyClick").healthbar.SetActive(true);
+	}
  }
  
+ function moveBodies(unit,space){
+		if(unit==null){
+			return;
+		}
+		var upDirection = unit.body.transform.rotation;
+		var startPosition = unit.body.transform.position;
+		var endPosition = new Vector3(space.transform.position.x,unit.body.transform.position.y,space.transform.position.z);
+
+		 var unitPosition = unit.body.transform.position;
+		 var spacePosition=space.transform.position;
+		 var _direction = (spacePosition - unitPosition).normalized;
+		 var _lookRotation = Quaternion.LookRotation(_direction);
+		 unit.body.transform.rotation=_lookRotation;
+		 unit.body.GetComponent("AllyClick").Run=1;
+
+
+
+		var t = 0.0;
+		 while (t < 1.0)
+		 {
+			 t += 0.02;
+			 if(t>0.6){
+				unit.body.GetComponent("AllyClick").Run=0;
+			 }
+			 unit.body.transform.position = Vector3.Lerp(startPosition,endPosition,t);
+			 yield;
+		 }
+}
+
+function moveIndivBodies(unit1,unit2){
+	var tempGroup = unit1.group;
+	var tempVert = unit1.vert;
+	var tempHor  = unit1.hor;
+
+	unit1.group = unit2.group;
+	unit1.vert = unit2.vert;
+	unit1.hor = unit2.hor;
+
+	unit2.group = tempGroup;
+	unit2.vert = tempVert;
+	unit2.hor = tempHor;
+
+		var startPosition = unit1.body.transform.position;
+		var endPosition = new Vector3(unit2.body.transform.position.x,unit2.body.transform.position.y,unit2.body.transform.position.z);
+
+		var startPosition2 = unit2.body.transform.position;
+		var endPosition2 = new Vector3(unit1.body.transform.position.x,unit1.body.transform.position.y,unit1.body.transform.position.z);
+
+		//rotation
+		var upDirection = unit1.body.transform.rotation;
+
+		 unitPosition = unit1.body.transform.position;
+		 spacePosition=unit2.body.transform.position;
+		 var _direction = (spacePosition - unitPosition).normalized;
+		 var _lookRotation = Quaternion.LookRotation(_direction);
+		 unit1.body.transform.rotation=_lookRotation;
+		 unit1.body.GetComponent("AllyClick").Run=1;
+
+		 unitPosition = unit2.body.transform.position;
+		 spacePosition=unit1.body.transform.position;
+		 _direction = (spacePosition - unitPosition).normalized;
+		 _lookRotation = Quaternion.LookRotation(_direction);
+		 unit2.body.transform.rotation=_lookRotation;
+		 unit2.body.GetComponent("AllyClick").Run=1;
+
+		 if(istransporting){
+			 returnMagic(unit1.body,unit2.body);
+			 returnMagic(unit2.body,unit1.body);
+			 unit1.body.SetActive(false);
+			 unit2.body.SetActive(false);
+		 }
+
+		var t = 0.0;
+		 while (t < 1.0)
+		 {
+			 t += 0.02;
+			 if(t>0.6){
+				unit2.body.GetComponent("AllyClick").Run=0;
+				unit1.body.GetComponent("AllyClick").Run=0;
+			 }
+			 unit1.body.transform.position = Vector3.Lerp(startPosition,endPosition,t);
+			 unit2.body.transform.position = Vector3.Lerp(startPosition2,endPosition2,t);
+			 yield;
+		 }
+
+		 if(istransporting){
+			 unit1.body.SetActive(true);
+			 unit2.body.SetActive(true);
+		 }
+}
+
+function takeSpace(unit1,space){
+	var oldgroup = unit1.group;
+	var oldHor = unit1.hor;
+	var startPosition = unit1.body.transform.position;
+	var endPosition = new Vector3(space.transform.position.x,space.transform.position.y,space.transform.position.z);
+
+		//rotation
+		var upDirection = unit1.body.transform.rotation;
+
+		 unitPosition = unit1.body.transform.position;
+		 spacePosition=space.transform.position;
+		 var _direction = (spacePosition - unitPosition).normalized;
+		 var _lookRotation = Quaternion.LookRotation(_direction);
+		 unit1.body.transform.rotation=_lookRotation;
+		 unit1.body.GetComponent("AllyClick").Run=1;
+
+		var t = 0.0;
+		 while (t < 1.0)
+		 {
+			 t += 0.02;
+			 if(t>0.6){
+				unit1.body.GetComponent("AllyClick").Run=0;
+			 }
+			 unit1.body.transform.position = Vector3.Lerp(startPosition,endPosition,t);
+			 yield;
+		 }
+
+		 var deleteGroup=true;
+		 for(var i=0;i<units.length;i++){
+			if(units[i].group == oldgroup){
+				deleteGroup=false;
+			}
+		 }
+		 if(deleteGroup){
+			//groups[oldgroup].location=null;
+			groups[oldgroup].alive=false;
+			hideEntries();
+			hideCircles();
+			groupScreen.SetActive(false);
+			UpdateIconsMain();
+			GetComponent("Special").SpecialFunction("combine");
+			
+		 }
+}

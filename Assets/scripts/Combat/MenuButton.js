@@ -30,7 +30,11 @@ function clickit(){
 	if(ally.didAction){
 		return;
 	}
+	if(main.GetComponent("Main").menu.activeSelf==false){
+		return;
+	}
 	if(clickButton=="Medkit" && ally.arrows["Medkit"]>0){
+		print("cehck");
 		ally.body.GetComponent("AllyClick").animator.SetInteger("special",1);
 		main.GetComponent("combat").heal(ally,ally.maxhealth);
 		ally.arrows["Medkit"]-=1;

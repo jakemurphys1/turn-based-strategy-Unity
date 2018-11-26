@@ -6,7 +6,7 @@ var main: GameObject;
 var levels=new Array();
 var units = new Array();
 var items = new Array();
-var gold:int=100;
+var gold:int=0;
 var diffLevel:int=3;
 var job;
 
@@ -80,16 +80,16 @@ function Awake () {
 				{"name":"Long Bow Building","unlocked":true,"bought":false, "price":500,"type":"Book","unlocks":["Elite Bow Building"]},
 				{"name":"Elite Bow Building","unlocked":false,"bought":false, "price":1000,"type":"Book","unlocks":["Master Bow Building"]},
 				{"name":"Master Bow Building","unlocked":false,"bought":false, "price":2000,"type":"Book","unlocks":[]},
-				{"name":"Revive Potion Recipe","unlocked":false,"bought":false, "price":500,"type":"Scroll"},
-				{"name":"Recover Potion Recipe","unlocked":false,"bought":false, "price":700,"type":"Scroll"},
-				{"name":"Teleport Potion Recipe","unlocked":false,"bought":false, "price":500,"type":"Scroll"},
-				{"name":"Defense Potion Recipe","unlocked":false,"bought":false, "price":500,"type":"Scroll"},
-				{"name":"Resistance Potion Recipe","unlocked":false,"bought":false, "price":500,"type":"Scroll"},
-				{"name":"Attack Potion Recipe","unlocked":false,"bought":false, "price":500,"type":"Scroll"},
-				{"name":"Health Potion Recipe","unlocked":false,"bought":false, "price":500,"type":"Scroll"},
-				{"name":"Accuracy Potion Recipe","unlocked":false,"bought":false, "price":500,"type":"Scroll"},
-				{"name":"Evasion Potion Recipe","unlocked":false,"bought":false, "price":500,"type":"Scroll"},
-				{"name":"Replicate Potion Recipe","unlocked":false,"bought":false, "price":500,"type":"Scroll"}
+				{"name":"Revive Potion Recipe","unlocked":false,"bought":false, "price":200,"type":"Scroll"},
+				{"name":"Recover Potion Recipe","unlocked":false,"bought":false, "price":200,"type":"Scroll"},
+				{"name":"Teleport Potion Recipe","unlocked":false,"bought":false, "price":100,"type":"Scroll"},
+				{"name":"Defense Potion Recipe","unlocked":false,"bought":false, "price":100,"type":"Scroll"},
+				{"name":"Resistance Potion Recipe","unlocked":false,"bought":false, "price":100,"type":"Scroll"},
+				{"name":"Attack Potion Recipe","unlocked":false,"bought":false, "price":100,"type":"Scroll"},
+				{"name":"Health Potion Recipe","unlocked":false,"bought":false, "price":100,"type":"Scroll"},
+				{"name":"Accuracy Potion Recipe","unlocked":false,"bought":false, "price":100,"type":"Scroll"},
+				{"name":"Evasion Potion Recipe","unlocked":false,"bought":false, "price":100,"type":"Scroll"},
+				{"name":"Replicate Potion Recipe","unlocked":false,"bought":false, "price":100,"type":"Scroll"}
 			];
  }
 
@@ -143,5 +143,10 @@ public function Load(){
 		}
 		gold=GetComponent("SaveCustom").customData.gold;
 		diffLevel=GetComponent("SaveCustom").customData.diffLevel;
+
 	}
+}
+public function eraseData(){
+	GetComponent("SaveCustom").eraseData();
+	GetComponent("SaveCustom").Load();
 }

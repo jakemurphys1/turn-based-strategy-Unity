@@ -40,6 +40,7 @@ function OnRightClick(){
 			if(main.GetComponent("Main").mapCamera.activeSelf){
 				return;
 			}
+			main.GetComponent("Special").SpecialFunction("clickEntry");
              location.GetComponent("locations").moveActive();
          }
      }

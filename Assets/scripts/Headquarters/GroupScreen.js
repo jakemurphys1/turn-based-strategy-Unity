@@ -8,16 +8,16 @@ var switch6:GameObject;
 var switchAll:GameObject;
 
 function Exit () {
-	if(main.GetComponent("combat").usedAction){
-		return;
-	}
+	//if(main.GetComponent("combat").usedAction){
+	//	return;
+	//}
 	gameObject.SetActive(false);
 }
 function switchGroup(){
-		if(main.GetComponent("combat").usedAction){
-			return;
-		}
-		main.GetComponent("combat").preventDoubleAction();
+		//if(main.GetComponent("combat").usedAction){
+		//	return;
+		//}
+		//main.GetComponent("combat").preventDoubleAction();
 		var TopSlotUnits=new Array();
 		var location1;
 		var group1;
@@ -97,38 +97,10 @@ function switchGroup(){
 		
 		//move bodies
 		for(i=0;i<3;i++){
-			moveBodies(TopSlotUnits[i],location2.GetComponent("locations").allspaces[0][1+i]);
-			moveBodies(BottomSlotUnits[i],location1.GetComponent("locations").allspaces[0][1+i]);
+			main.GetComponent("Main").moveBodies(TopSlotUnits[i],location2.GetComponent("locations").allspaces[0][1+i]);
+			main.GetComponent("Main").moveBodies(BottomSlotUnits[i],location1.GetComponent("locations").allspaces[0][1+i]);
 		}
 		main.GetComponent("Main").UpdateIconsMain();
+		gameObject.SetActive(false);
 }
 
-function moveBodies(unit,space){
-		if(unit==null){
-			return;
-		}
-		var upDirection = unit.body.transform.rotation;
-		var startPosition = unit.body.transform.position;
-		var endPosition = new Vector3(space.transform.position.x,unit.body.transform.position.y,space.transform.position.z);
-
-		 var unitPosition = unit.body.transform.position;
-		 var spacePosition=space.transform.position;
-		 var _direction = (spacePosition - unitPosition).normalized;
-		 var _lookRotation = Quaternion.LookRotation(_direction);
-		 unit.body.transform.rotation=_lookRotation;
-		 unit.body.GetComponent("AllyClick").Run=1;
-
-
-
-		var t = 0.0;
-		 while (t < 1.0)
-		 {
-			 t += 0.02;
-			 if(t>0.6){
-				unit.body.GetComponent("AllyClick").Run=0;
-			 }
-			 unit.body.transform.position = Vector3.Lerp(startPosition,endPosition,t);
-			 yield;
-		 }
-		 gameObject.SetActive(false);
-}

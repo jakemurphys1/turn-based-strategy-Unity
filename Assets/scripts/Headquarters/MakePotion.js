@@ -68,35 +68,35 @@ function makePotions(){
 	teleport.GetComponent("Text").text = items["Teleport Potion"].ToString();
 
 	for(var i =0;i<storeditems.length;i++){
-		if(storeditems[i]["name"]=="Revive Potion Recipe" && storeditems[i]["unlocked"]){
+		if(storeditems[i]["name"]=="Revive Potion Recipe" && storeditems[i]["bought"]){
 			reviveButton.SetActive(true);
 			print("got here");
 		}
-		if(storeditems[i]["name"]=="Recover Potion Recipe" && storeditems[i]["unlocked"]){
+		if(storeditems[i]["name"]=="Recover Potion Recipe" && storeditems[i]["bought"]){
 			recoverButton.SetActive(true);
 		}
-		if(storeditems[i]["name"]=="Teleport Potion Recipe" && storeditems[i]["unlocked"]){
+		if(storeditems[i]["name"]=="Teleport Potion Recipe" && storeditems[i]["bought"]){
 			teleportButton.SetActive(true);
 		}
-		if(storeditems[i]["name"]=="Defense Potion Recipe" && storeditems[i]["unlocked"]){
+		if(storeditems[i]["name"]=="Defense Potion Recipe" && storeditems[i]["bought"]){
 			defenseButton.SetActive(true);
 		}
-		if(storeditems[i]["name"]=="Resistance Potion Recipe" && storeditems[i]["unlocked"]){
+		if(storeditems[i]["name"]=="Resistance Potion Recipe" && storeditems[i]["bought"]){
 			resistanceButton.SetActive(true);
 		}
-		if(storeditems[i]["name"]=="Attack Potion Recipe" && storeditems[i]["unlocked"]){
+		if(storeditems[i]["name"]=="Attack Potion Recipe" && storeditems[i]["bought"]){
 			attackButton.SetActive(true);
 		}
-		if(storeditems[i]["name"]=="Health Potion Recipe" && storeditems[i]["unlocked"]){
+		if(storeditems[i]["name"]=="Health Potion Recipe" && storeditems[i]["bought"]){
 			healthButton.SetActive(true);
 		}
-		if(storeditems[i]["name"]=="Accuracy Potion Recipe" && storeditems[i]["unlocked"]){
+		if(storeditems[i]["name"]=="Accuracy Potion Recipe" && storeditems[i]["bought"]){
 			accuracyButton.SetActive(true);
 		}
-		if(storeditems[i]["name"]=="Evasion Potion Recipe" && storeditems[i]["unlocked"]){
+		if(storeditems[i]["name"]=="Evasion Potion Recipe" && storeditems[i]["bought"]){
 			evasionButton.SetActive(true);
 		}
-		if(storeditems[i]["name"]=="Replicate Potion Recipe" && storeditems[i]["unlocked"]){
+		if(storeditems[i]["name"]=="Replicate Potion Recipe" && storeditems[i]["bought"]){
 			replicateButton.SetActive(true);
 		}
 	}

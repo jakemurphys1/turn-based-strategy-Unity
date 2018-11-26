@@ -42,45 +42,5 @@ function takeSpace(){
 	main.GetComponent("Main").switchNum=-1;
 	main.GetComponent("Main").switchImage=null;
 
-	var startPosition = unit1.body.transform.position;
-	var endPosition = new Vector3(space.transform.position.x,space.transform.position.y,space.transform.position.z);
-
-		//rotation
-		var upDirection = unit1.body.transform.rotation;
-
-		 unitPosition = unit1.body.transform.position;
-		 spacePosition=space.transform.position;
-		 var _direction = (spacePosition - unitPosition).normalized;
-		 var _lookRotation = Quaternion.LookRotation(_direction);
-		 unit1.body.transform.rotation=_lookRotation;
-		 unit1.body.GetComponent("AllyClick").Run=1;
-
-		var t = 0.0;
-		 while (t < 1.0)
-		 {
-			 t += 0.02;
-			 if(t>0.6){
-				unit1.body.GetComponent("AllyClick").Run=0;
-			 }
-			 unit1.body.transform.position = Vector3.Lerp(startPosition,endPosition,t);
-			 yield;
-		 }
-		 var units = main.GetComponent("Main").units;
-
-		 var deleteGroup=true;
-		 for(var i=0;i<units.length;i++){
-			if(units[i].group == oldgroup){
-				deleteGroup=false;
-			}
-		 }
-		 if(deleteGroup){
-			//groups[oldgroup].location=null;
-			groups[oldgroup].alive=false;
-			main.GetComponent("Main").hideEntries();
-			main.GetComponent("Main").hideCircles();
-			groupScreen.SetActive(false);
-			main.GetComponent("Main").UpdateIconsMain();
-			main.GetComponent("Special").SpecialFunction("combine");
-			
-		 }
+	main.GetComponent("Main").takeSpace(unit1,space);
 }

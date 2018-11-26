@@ -124,10 +124,10 @@ function OnPointerExit(){
 
 
 function makeSwitch(){
-	if(main.GetComponent("combat").usedAction){
-		return;
-	}
-	main.GetComponent("combat").preventDoubleAction();
+	//if(main.GetComponent("combat").usedAction){
+	//	return;
+	//}
+	//main.GetComponent("combat").preventDoubleAction();
 	var parent1 = transform.parent;
 	var otherImage = main.GetComponent("Main").switchImage;
 	var parent2 = main.GetComponent("Main").switchImage.transform.parent;
@@ -152,70 +152,11 @@ function makeSwitch(){
 		objects[i].GetComponent("Image").color=Color.white;
 	}
 
-	var tempGroup = unit1.group;
-	var tempVert = unit1.vert;
-	var tempHor  = unit1.hor;
+	main.GetComponent("Main").moveIndivBodies(unit1,unit2);
 
-	unit1.group = unit2.group;
-	unit1.vert = unit2.vert;
-	unit1.hor = unit2.hor;
-
-	unit2.group = tempGroup;
-	unit2.vert = tempVert;
-	unit2.hor = tempHor;
-
-	var groups = main.GetComponent("Main").groups;
-
-		var startPosition = unit1.body.transform.position;
-		var endPosition = new Vector3(unit2.body.transform.position.x,unit2.body.transform.position.y,unit2.body.transform.position.z);
-
-		var startPosition2 = unit2.body.transform.position;
-		var endPosition2 = new Vector3(unit1.body.transform.position.x,unit1.body.transform.position.y,unit1.body.transform.position.z);
-
-		//rotation
-		var upDirection = unit1.body.transform.rotation;
-
-		 unitPosition = unit1.body.transform.position;
-		 spacePosition=unit2.body.transform.position;
-		 var _direction = (spacePosition - unitPosition).normalized;
-		 var _lookRotation = Quaternion.LookRotation(_direction);
-		 unit1.body.transform.rotation=_lookRotation;
-		 unit1.body.GetComponent("AllyClick").Run=1;
-
-		 unitPosition = unit2.body.transform.position;
-		 spacePosition=unit1.body.transform.position;
-		 _direction = (spacePosition - unitPosition).normalized;
-		 _lookRotation = Quaternion.LookRotation(_direction);
-		 unit2.body.transform.rotation=_lookRotation;
-		 unit2.body.GetComponent("AllyClick").Run=1;
-
-		 if(main.GetComponent("Main").istransporting){
-		 	 Debug.Log("transporting");
-			 main.GetComponent("Main").returnMagic(unit1.body,unit2.body);
-			 main.GetComponent("Main").returnMagic(unit2.body,unit1.body);
-			 unit1.body.SetActive(false);
-			 unit2.body.SetActive(false);
-		 }
-
-		var t = 0.0;
-		 while (t < 1.0)
-		 {
-			 t += 0.02;
-			 if(t>0.6){
-				unit2.body.GetComponent("AllyClick").Run=0;
-				unit1.body.GetComponent("AllyClick").Run=0;
-			 }
-			 unit1.body.transform.position = Vector3.Lerp(startPosition,endPosition,t);
-			 unit2.body.transform.position = Vector3.Lerp(startPosition2,endPosition2,t);
-			 yield;
-		 }
-
-		 if(main.GetComponent("Main").istransporting){
-		 	 Debug.Log("transporting");
-			 unit1.body.SetActive(true);
-			 unit2.body.SetActive(true);
-		 }
 }
+
+
 
 function potionClick(){
 	var unitnum = parent.GetComponent("barrackpic").index;

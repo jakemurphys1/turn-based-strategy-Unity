@@ -7,42 +7,42 @@ function updateView(ally,enemy, attackName){
 	if(ally.attackProperties[attackName]){
 		range = ally.attackProperties[attackName]["Range"];
 	}else{
-		Destroy(gameObject);
+		outOfRange(enemy);
 		return;
 	}
 	if(range=="Line"){
 		if(ally.hor!=enemy.hor && ally.vert!=enemy.vert){
-			Destroy(gameObject);
+			outOfRange(enemy);
 			return;
 		}
 	}
 	if(range=="Adjacent"){
 		if(!((ally.hor==(enemy.hor + 1) || ally.hor==(enemy.hor - 1)) && ally.vert==enemy.vert) && !((ally.vert==(enemy.vert + 1) || ally.vert==(enemy.vert - 1)) && ally.hor==enemy.hor)){
-			Destroy(gameObject);
+			outOfRange(enemy);
 			return;
 		}
 	}
 	if(range=="Fire"){
 		if(!isDiagonal(enemy,ally) && !isTwoAway(enemy,ally)){
-			Destroy(gameObject);
+			outOfRange(enemy);
 			return;
 		}
 	}
 	if(range=="Freeze"){
 		if(!isThreeAway(enemy,ally)){
-			Destroy(gameObject);
+			outOfRange(enemy);
 			return;
 		}
 	}
 	if(range=="Zap"){
 		if(!isTwoAway(enemy,ally)){
-			Destroy(gameObject);
+			outOfRange(enemy);
 			return;
 		}
 	}
 	if(range=="Sweep"){
 		if(!isAdjacent(enemy,ally) && !isDiagonal(enemy,ally)){
-			Destroy(gameObject);
+			outOfRange(enemy);
 			return;
 		}
 	}
@@ -55,15 +55,20 @@ function updateView(ally,enemy, attackName){
 		}else{
 
 			hitperc=((4-hitDiff)/4);
-			print(hitDiff);
 			hitperc=(hitperc*100)+"%";
 		}
 
+		if(enemy.sleep>0 || enemy.immobolized>0){
+			hitperc="100%";
+		}
 	hitRatio.GetComponent("Text").text=hitperc;
 
 	//damage bar
 	var DefenseType=ally.attackProperties[attackName]["DefenseType"];
 	var damage = ally.attack;
+	if(attackName=="Bolt" || attackName=="Lightning" || attackName=="FireBlast"){
+		damage = damage*2;
+	}
 	if(DefenseType=="defense"){
 		damage-=enemy.defense;
 	}else if(DefenseType=="resistance"){
@@ -76,7 +81,7 @@ function updateView(ally,enemy, attackName){
 	}
 	
 	if(attackName=="Burst"){
-		damage+=enemy.resistence;
+		damage+=enemy.resistance;
 	}
 
 	if( ally.attackProperties[attackName]["Element"]!="None" && ally.attackProperties[attackName]["Element"]!="none"){
@@ -166,4 +171,8 @@ function updateView(ally,enemy, attackName){
  }
  function sweepRange(){
  
+ }
+ function outOfRange(enemy){
+	Destroy(gameObject);
+	enemy.body.GetComponent("EnemyClick").healthbar.SetActive(true);
  }

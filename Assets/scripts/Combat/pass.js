@@ -9,6 +9,7 @@ var buttonDisabled=false;
 
 function enemyturn(){
 	if(buttonDisabled){
+		DisablePass();
 		return;
 	}
 	DisablePass();
@@ -21,7 +22,6 @@ function enemyturn(){
 	if(slots.length==0){
 		main.GetComponent("Main").loseBattle();
 	}
-	
 	//reset allies
 	for(var i =0;i<slots.length;i++){
 		if(slots[i].type=="Knight"){
@@ -47,6 +47,7 @@ function enemyturn(){
 			if(eslots[p].health<11){
 				pDamage=eslots[p].health-1;
 			}
+			print("Poison");
 			main.GetComponent("combat").damageEnemy(eslots[p],pDamage,"None");
 		}
 		if(eslots[p].type == "Werewolf"){
@@ -714,7 +715,7 @@ function SpitterAttack(enemy,eslots,slots){
 	var damage = enemy.attack-main.GetComponent("combat").getdefense(target,enemy.defenseType);
 
 	waittime=0;
-	if(enemy.type=="Spitter"){
+	if(enemy.type=="Spitter" || enemy.type=="Belcher"){
 		magic = Resources.Load("effects/Tar", GameObject);
 		main.GetComponent("sounds").playSound("spit");
 	}
@@ -759,7 +760,7 @@ function SpitterAttack(enemy,eslots,slots){
 	
 	yield WaitForSeconds(0.5);
 	
-	if(enemy.type=="Spitter"){
+	if(enemy.type=="Belcher"){
 		doAilment(enemy,target,"Enfeebled");
 	}
 	if(enemy.type=="GreenOoze" || enemy.type=="Rogue"){
@@ -930,6 +931,7 @@ function NecromancerAttack(enemy){
 	}
 		enemy.charge-=1;
 		enemy.body.GetComponent("EnemyClick").chargeText.GetComponent("Text").text=enemy.charge.ToString();
+		enemy.hasMoved=true;
 		summon(enemy,curhor,curvert,"Zombie");	
 }
 function WaterwraithAttack(enemy,eslots,slots){
@@ -942,10 +944,11 @@ function WaterwraithAttack(enemy,eslots,slots){
 	magic = Resources.Load("effects/Waves", GameObject);
 	instance = Instantiate(magic);
 	instance.transform.position = enemy.body.transform.position;
-	instance.transform.position.x+=250;
+	instance.transform.position.x+=150;
+	instance.transform.position.y+=20;
 
 		var startPosition = instance.transform.position;
-		var endPosition = new Vector3(instance.transform.position.x-300,instance.transform.position.y,instance.transform.position.z);
+		var endPosition = new Vector3(instance.transform.position.x-400,instance.transform.position.y,instance.transform.position.z + 100);
 		
 		var t = 0.0;
 		 while (t < 1.0)
@@ -1367,7 +1370,8 @@ function passing(enemy){
 		enemy.body.GetComponent("EnemyClick").moveTo(spaces[enemy.vert-1][enemy.hor]);
 		for(var i =0;i<slots.length;i++){
 			if(enemy.vert == slots[i].vert && enemy.hor == slots[i].hor){
-				slots[i].body.GetComponent("AllyClick").moveTo(spaces[enemy.vert+1][enemy.hor]);
+				slots[i].vert+=1;
+				slots[i].body.GetComponent("AllyClick").moveTo(spaces[slots[i].vert][slots[i].hor]);
 			}
 		}
 	}else{
@@ -1394,6 +1398,7 @@ function counter(enemy,ally){
 		if(enemy.hor == ally.hor){
 			if((enemy.vert==ally.vert+1)||(enemy.vert==ally.vert-1)){
 				main.GetComponent("combat").swordattack(ally, enemy);
+				ally.didAction=false;
 			}
 		}
 		if(enemy.vert == ally.vert){
@@ -1458,6 +1463,11 @@ function move(body,x,z){
 	body.GetComponent("EnemyClick").Run =0;
  }
  function moveInstant(ally,hor,vert){
+	print(ally.vert);
+	print(vert);
+	if(vert==null){
+		return;
+	}
 	ally.vert = vert;
 	ally.hor = hor;
 	var space = spaces[vert][hor];
@@ -1729,10 +1739,15 @@ function shootObject(instance,target){
  }
 
  function heal(enemy,amount){
+	if(enemy.poison>0){
+		main.GetComponent("combat").wordPopup(enemy, "Heal Prevented");
+		return;
+	}
 	enemy.health+=amount;
 	if(enemy.health>enemy.maxhealth){
 		enemy.health=enemy.maxhealth;
 	}
+	
 
 	var healthbar = enemy.body.GetComponent("EnemyClick").healthbar;
 	var health = enemy.health + 0.0f;

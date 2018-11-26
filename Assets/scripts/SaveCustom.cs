@@ -72,7 +72,7 @@ namespace BayatGames.SaveGameFree.Examples
 
             public CustomData()
             {
-                gold = 150;
+                gold = 0;
 
                 levels = new List<Level>() {
                     new Level ( false, false ),
@@ -171,7 +171,10 @@ namespace BayatGames.SaveGameFree.Examples
         {
             customData = SaveGame.Load<CustomData>(identifier,new CustomData());
         }
-
+        public void eraseData()
+        {
+            SaveGame.Save<CustomData>(identifier, null);
+        }
     }
 
 }

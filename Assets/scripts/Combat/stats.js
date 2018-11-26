@@ -38,13 +38,15 @@ function updateText(active,health,maxhealth,attack,defense,resistance,accuracy,t
 	typebox.GetComponent("Text").text = type.ToString();
 	evasionbox.GetComponent("Text").text = translateEvasion(evasion).ToString();
 
+	for(var j = 0;j<allAbilities.length;j++){
+		allAbilities[j].SetActive(false);
+	}
+
 	if(active.attackType){
 		return;
 	}
 
-	for(var j = 0;j<allAbilities.length;j++){
-		allAbilities[j].SetActive(false);
-	}
+	
 
 	for(var i = 0;i<active.passiveActions.length;i++){
 		if(active.passiveActions[i]){
@@ -53,7 +55,6 @@ function updateText(active,health,maxhealth,attack,defense,resistance,accuracy,t
 				allAbilities[i].SetActive(true);
 			}
 		};
-		
 	}
 }
 function translateEvasion(num){
