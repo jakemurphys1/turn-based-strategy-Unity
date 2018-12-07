@@ -148,6 +148,8 @@ function Update()
 		 		 //hide menu
 		 main.GetComponent("Main").menu.GetComponent("Menu").hideAll();
 
+		 main.GetComponent("combat").showStatus(curUnit);
+
 		var t = 0.0;
 		 while (t < 1.0)
 		 {

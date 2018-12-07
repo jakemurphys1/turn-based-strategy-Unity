@@ -43,4 +43,5 @@ function takeSpace(){
 	main.GetComponent("Main").switchImage=null;
 
 	main.GetComponent("Main").takeSpace(unit1,space);
+	main.GetComponent("Main").updatemap();
 }

@@ -14,10 +14,6 @@ function Exit () {
 	gameObject.SetActive(false);
 }
 function switchGroup(){
-		//if(main.GetComponent("combat").usedAction){
-		//	return;
-		//}
-		//main.GetComponent("combat").preventDoubleAction();
 		var TopSlotUnits=new Array();
 		var location1;
 		var group1;
@@ -47,6 +43,7 @@ function switchGroup(){
 		var location2;
 		var group2;
 		if(switch4.transform.childCount>0){
+			print("switch4");
 			BottomSlotUnits.push(main.GetComponent("Main").units[switch4.transform.GetChild(0).GetComponent("barrackpic").index]);
 			location2 = main.GetComponent("Main").groups[BottomSlotUnits[0].group].location;
 			group2=main.GetComponent("Main").groups[BottomSlotUnits[0].group];
@@ -54,13 +51,15 @@ function switchGroup(){
 			BottomSlotUnits.push(null);
 		}
 		if(switch5.transform.childCount>0){
+			print("switch5");
 			BottomSlotUnits.push(main.GetComponent("Main").units[switch5.transform.GetChild(0).GetComponent("barrackpic").index]);
-			llocation2 = main.GetComponent("Main").groups[BottomSlotUnits[1].group].location;
+			location2 = main.GetComponent("Main").groups[BottomSlotUnits[1].group].location;
 			group2=main.GetComponent("Main").groups[BottomSlotUnits[1].group];
 		}else{
 			BottomSlotUnits.push(null);
 		}
 		if(switch6.transform.childCount>0){
+			print("switch6");
 			BottomSlotUnits.push(main.GetComponent("Main").units[switch6.transform.GetChild(0).GetComponent("barrackpic").index]);
 			location2 = main.GetComponent("Main").groups[BottomSlotUnits[2].group].location;
 			group2=main.GetComponent("Main").groups[BottomSlotUnits[2].group];
@@ -84,7 +83,8 @@ function switchGroup(){
 		}else{
 			tempGroup.push(null);
 		}
-
+		print(location2);
+		print(location1);
 		for(var i = 0;i<3;i++){
 			if(TopSlotUnits[i]!=null){
 					TopSlotUnits[i].group=group2.index;
@@ -97,8 +97,8 @@ function switchGroup(){
 		
 		//move bodies
 		for(i=0;i<3;i++){
-			main.GetComponent("Main").moveBodies(TopSlotUnits[i],location2.GetComponent("locations").allspaces[0][1+i]);
-			main.GetComponent("Main").moveBodies(BottomSlotUnits[i],location1.GetComponent("locations").allspaces[0][1+i]);
+				main.GetComponent("Main").moveBodies(TopSlotUnits[i],location2.GetComponent("locations").allspaces[0][1+i]);
+				main.GetComponent("Main").moveBodies(BottomSlotUnits[i],location1.GetComponent("locations").allspaces[0][1+i]);
 		}
 		main.GetComponent("Main").UpdateIconsMain();
 		gameObject.SetActive(false);

@@ -14,13 +14,25 @@
 	}
 	amount=amount*enemy.elemental[element];
 	var ally = GetComponent("Main").units[GetComponent("Main").activeIndex];
+	if(enemy.sluggishness>0){
+		hit="hit";
+	}
 	if(hit=="Miss"){
 		wordPopup(enemy,"Miss");
 		return;
 	}
 	if(hit=="Near-Miss"){
-		wordPopup(enemy,"Near-Miss");
-		amount=amount/2;
+		var slots = pass.GetComponent("pass").slots;
+		var Hawkeyepresent=false;
+		for(var q = 0;q<slots.length;q++){
+			if(slots[q].addedAbility=="Hawkeye"){
+				Hawkeyepresent=true;
+			}
+		}
+		if(Hawkeyepresent==false){
+			wordPopup(enemy,"Near-Miss");
+			amount=amount/2;
+		}
 	}
 	if(enemy.protectedBy!=-1){
 		if(Eunits[enemy.protectedBy].health>0){
@@ -106,7 +118,7 @@
 		var slots = pass.GetComponent("pass").slots;
 		var enlightenedpresent=false;
 		for(var q = 0;q<slots.length;q++){
-			if(slots[q].actionsActive["Enlightenment"]){
+			if(slots[q].actionsActive["Enlightenment"] && slots[q].masterPotion){
 				enlightenedpresent=true;
 			}
 		}
@@ -119,22 +131,30 @@
 		}
 	}
 
-			if(enemy && enemy.type=="Vampire"){
-				pass.GetComponent("pass").heal(enemy,amount);
-			}
-
+	if(enemy && enemy.type=="Vampire"){
+		pass.GetComponent("pass").heal(enemy,amount);
+	}
 	ally.body.GetComponent("AllyClick").hit=1;
 	yield WaitForSeconds(0.1);
 	ally.body.GetComponent("AllyClick").hit=0;
 
 	//soldier
-	if(amount>=ally.health && ally.actionsActive["Steadfast"] && ally.health>1){
+	if(amount>=ally.health && (ally.actionsActive["Steadfast"] || ally.addedAbility=="Steadfast") && ally.health>1){
 		amount=ally.health-1;
 		wordPopup(ally,"Steadfast");
 	}
 	
 	if(amount<0){
 		amount=0;
+	}
+
+	//Knight
+	if(ally.addedAbility=="Adrenaline"){
+		ally.energy+=5;
+		if(ally.energy>100){
+			ally.energy=100;
+		}
+		setEnergyBar(ally);
 	}
 
 	//popupText
@@ -437,6 +457,7 @@
 			return;
 		}
 		unit.experience -=(2000*unit.level);
+		print("levelup after:" + unit.experience);
 		individualLevelup(unit);
 	}else{
 		GetComponent("Main").moveGrid.SetActive(true);
@@ -466,6 +487,7 @@
 	 for(var i = 0;i<slots.length;i++){
 		slots[i].body.GetComponent("AllyClick").curcamera.enabled=false;
 	 	 if(slots[i].experience>=(2000*slots[i].level) && slots[i].level<6){
+			print("levelup Before:" + slots[i].experience);
 		 	 replyItem = slots[i];
 		 }
 	 }
@@ -529,6 +551,7 @@
 			}else{
 				thisUnit.shield1=instance2;
 			}
+			thisUnit.didAction=true;
 		}
 	}
 	if(thisUnit.type=="Cleric"){
@@ -559,7 +582,7 @@
 			instance.transform.position.y+=5;
 
 			//double vigor
-			if(thisUnit.actionsActive["Double Vigor"]){
+			if(thisUnit.actionsActive["Double Vigor"] && thisUnit.masterPotion){
 				var extra;
 				for(i=0;i<slots.length;i++){
 					if(slots[i].index!=thisUnit.index && slots[i].index!=curAlly.index){
@@ -589,6 +612,7 @@
 			GetComponent("sounds").playSound("heal");
 		}
 	}
+	showStatus(thisUnit);
  }
 
  var hit;
@@ -633,8 +657,14 @@
 		return;
 	}
 	if(thisUnit.didAction){
-		wordPopup(thisUnit,"DoubleTap");
-		thisUnit.hasMoved=true;
+		if(thisUnit.masterPotion){
+			wordPopup(thisUnit,"DoubleTap");
+			thisUnit.hasMoved=true;
+		}else{
+			wordPopup(thisUnit,"DoubleTap Requires Master Potion");
+			return;
+		}
+		
 	}
 	if(thisUnit.sleep>0){
 		wordPopup(thisUnit,"Sleeping");
@@ -674,6 +704,10 @@
 	}
 	
 	if(thisUnit.type == "Archer"){
+		if(thisUnit.blind>0){
+			wordPopup(thisUnit,"Blinded");
+			return;
+		}
 		shootarrow(thisUnit,curEnemy);
 			var intercept = interceptArrow();
 			if(intercept!=-1){
@@ -741,6 +775,10 @@
 	}
 	if(thisUnit.type == "Rogue"){
 		if(thisUnit.vert != curEnemy.vert && thisUnit.hor !=curEnemy.hor){
+			return;
+		}
+		if(thisUnit.blind>0){
+			wordPopup(thisUnit,"Blinded");
 			return;
 		}
 		shootarrow(thisUnit,curEnemy);
@@ -812,9 +850,14 @@
 	}
 	if(thisUnit.type == "Templar"){
 		if(thisUnit.vert != curEnemy.vert && thisUnit.hor !=curEnemy.hor){
+			if(thisUnit.addedAbility!="freeshot"){
+				return;
+			}
+		}
+		if(thisUnit.blind>0){
+			wordPopup(thisUnit,"Blinded");
 			return;
 		}
-		
 		var curElement = "None";
 		if(thisUnit.actionsActive["Elemental"]){
 			curElement=thisUnit.element;
@@ -959,12 +1002,20 @@
 		menu.GetComponent("Menu").hideAll();
 	}
 	if(thisUnit.type == "Soldier"){
+		if(thisUnit.blind>0){
+			wordPopup(thisUnit,"Blinded");
+			return;
+		}
 		if(curAction=="Attack" && isAdjacent(curEnemy,thisUnit)){
 			swordattack(thisUnit,curEnemy);
 		}
 		menu.GetComponent("Menu").hideAll();
 	}
 	if(thisUnit.type == "Knight"){
+		if(thisUnit.blind>0){
+			wordPopup(thisUnit,"Blinded");
+			return;
+		}
 		if(curAction=="Attack" && isAdjacent(curEnemy,thisUnit)){
 			if(thisUnit.energy<20){
 				wordPopup(thisUnit,"Low Energy");
@@ -1121,6 +1172,10 @@
 		menu.GetComponent("Menu").hideAll();
 	}
 	if(thisUnit.type == "Thief"){
+		if(thisUnit.blind>0){
+			wordPopup(thisUnit,"Blinded");
+			return;
+		}
 		if(curAction=="Attack" && isAdjacent(curEnemy,thisUnit)){
 			if(thisUnit.actionsActive["FirstBlow"]){
 				if(curEnemy.health==curEnemy.maxhealth && hit=="Hit"){
@@ -1136,6 +1191,9 @@
 				GetComponent("combat").wordPopup(thisUnit,"Visible");
 			}
 			steal(thisUnit,curEnemy);
+			if(thisUnit.addedAbility=="Double Steal"){
+				steal(thisUnit,curEnemy);
+			}
 		}
 		if(curAction=="Detect"){
 			curEnemy.vulnerable+=5;
@@ -1151,6 +1209,10 @@
 			}
 		}
 		if(curAction=="Phase" && isAdjacent(curEnemy,thisUnit)){
+			if(thisUnit.masterPotion==false){
+				wordPopup(thisUnit,"Requires Master Potion");
+				return;
+			}
 			curEnemy.enfeebled=2;
 			showAilment("Enfeebled", curEnemy);
 			thisUnit.didAction=true;
@@ -1193,6 +1255,12 @@
 				Destroy(instance);
 				if(hit=="Hit" || hit=="Near-Miss"){
 					magicAilments(thisUnit,curEnemy,"Blind");
+					if(thisUnit.actionsActive["Slow"]){
+						curEnemy.sluggishness=4;
+						showAilment("Sluggishness", curEnemy);
+						GetComponent("sounds").playSound("poison");
+						wordPopup(curEnemy,"Sluggish");
+					}
 				}
 					
 			}
@@ -1249,6 +1317,12 @@
 				Destroy(instance);
 				if(hit=="Hit" || hit=="Near-Miss"){
 					magicAilments(thisUnit,curEnemy,"Immobolized");
+					if(thisUnit.actionsActive["Slow"]){
+						curEnemy.sluggishness=4;
+						showAilment("Sluggishness", curEnemy);
+						GetComponent("sounds").playSound("poison");
+						wordPopup(curEnemy,"Sluggish");
+					}
 				}
 			}
 		}
@@ -1273,6 +1347,12 @@
 				Destroy(frozen);
 				if(hit=="Hit" || hit=="Near-Miss"){
 					magicAilments(thisUnit,curEnemy,"Sleep");
+					if(thisUnit.actionsActive["Slow"]){
+						curEnemy.sluggishness=4;
+						showAilment("Sluggishness", curEnemy);
+						GetComponent("sounds").playSound("poison");
+						wordPopup(curEnemy,"Sluggish");
+					}
 				}
 			}
 		}
@@ -1408,6 +1488,9 @@
 				for(i = 0;i<eslots.length;i++){
 					damage = thisUnit.attack-getdefense(eslots[i],"resistance");
 					damageEnemy(eslots[i],damage,"Ice");
+					if(thisUnit.addedAbility=="Ailments"){
+						magicAilments(thisUnit,eslots[i],"Sleep");
+					}
 				}
 			}
 		}
@@ -1429,6 +1512,9 @@
 				instance.transform.position.y+=50;
 				yield WaitForSeconds(0.5);
 				Destroy(instance);
+				if(thisUnit.addedAbility=="Ailments"){
+						magicAilments(thisUnit,curEnemy,"Immobolize");
+					}
 			}
 		}
 		if(curAction=="Earth"){
@@ -1469,6 +1555,9 @@
 				yield WaitForSeconds(2);
 				damage = 2*thisUnit.attack-getdefense(curEnemy,"resistance");
 				damageEnemy(curEnemy,damage,"Fire");
+				if(thisUnit.addedAbility=="Ailments"){
+						magicAilments(thisUnit,curEnemy,"Blind");
+					}
 				for(i =0;i<eslots.length;i++){
 					smalldamage = thisUnit.attack-getdefense(eslots[i],"resistance");
 					if(eslots[i].hor==curEnemy.hor){
@@ -1485,6 +1574,10 @@
 			}
 		}
 		if(curAction=="Death"){
+			if(thisUnit.masterPotion==false){
+				wordPopup(thisUnit,"Requires Master Potion");
+				return;
+			}
 			if(thisUnit.energy<50){
 				wordPopup(thisUnit,"Not Enough Energy");
 				return;
@@ -1505,18 +1598,29 @@
 		}	
 	}
 	if(thisUnit.type == "Guard"){
+		if(thisUnit.blind>0){
+			wordPopup(thisUnit,"Blinded");
+			return;
+		}
 		if(curAction=="Bash" && isAdjacent(curEnemy,thisUnit)){
 			swordattack(thisUnit,curEnemy);
 		}
 		menu.GetComponent("Menu").hideAll();
 	}
 	if(thisUnit.type == "Monk"){
+		if(thisUnit.blind>0){
+			wordPopup(thisUnit,"Blinded");
+			return;
+		}
 		if(curAction=="Attack" && isAdjacent(curEnemy,thisUnit)){
 			swordattack(thisUnit,curEnemy);
 		}
 		menu.GetComponent("Menu").hideAll();
 	}
+	
 	returnUnits(slots);
+	//yield WaitForSeconds(1);
+	showStatus(thisUnit);
  }
 
  function hitResult(unit, evasion,accuracy){
@@ -1639,15 +1743,23 @@
  }
 
  function magicAttack(ally, enemy){
+	var curAction = GetComponent("Main").curAction;
 	lookAt(enemy,ally);
 	ally.body.GetComponent("AllyClick").attack=1;
 	yield WaitForSeconds(0.5);
 	ally.body.GetComponent("AllyClick").attack=0;
 	ally.didAction=true;
+	if(curAction=="Heal"&& ally.addedAbility=="easyHeal"){
+		ally.didAction=false;
+	}
  }
 
  //Knight
  function Wail(ally,enemy,count){
+	if(ally.masterPotion==false){
+		wordPopup(ally,"Requires Master Potion");
+		return;
+	}
 	ally.energy-=15;
 	setEnergyBar(ally);
 	hit = hitResult(ally, enemy.evasion,ally.accuracy-count);
@@ -1725,7 +1837,11 @@
  }
  function magicAilments(ally,enemy,type){
 	if(ally.actionsActive["Ailments"]){
-		 var randnum = Random.Range(1,4);
+		var range = 6;
+		if(ally.addedAbility=="ailmentsChance"){
+			range=4;
+		}
+		 var randnum = Random.Range(1,range);
 		 if(randnum==3){
 			GetComponent("sounds").playSound("poison");
 			if(type=="Sleep"){
@@ -1893,7 +2009,7 @@ function steal(ally,enemy){
 			amount=1;
 			break;
 		case 12:
-			item = "Recover Potion";
+			item = "Healing Potion";
 			amount=1;
 			break;
 		case 13:
@@ -2105,6 +2221,7 @@ function showElementalArrow(enemy,element){
 			 unit.blind=0;
 			 unit.silenced=0;
 			 unit.vulnerable=0;
+			 unit.sluggishness=0;
 			 wordPopup(eslots[i],"Stops Ailments");
 			 return;
 			}
@@ -2129,8 +2246,8 @@ function showElementalArrow(enemy,element){
 	}
  }
  function doCrit(ally,enemy){
-	print("docrit");
 	GetComponent("sounds").playSound("crit");
+		print(enemy.critType);
 		if(enemy.critType=="None"){
 			wordPopup(enemy,"Crit: None");
 		}
@@ -2191,7 +2308,7 @@ function showElementalArrow(enemy,element){
 					amount=2;
 					break;
 				case 12:
-					item = "Recover Potion";
+					item = "Healing Potion";
 					amount=2;
 					break;
 				case 13:
@@ -2222,11 +2339,11 @@ function showElementalArrow(enemy,element){
 		}
 		if(enemy.critType=="Immobolize"){
 			wordPopup(enemy,"Crit: Immobolize");
-			enemy.immobolize=2;
+			enemy.immobolized=2;
 			showAilment("Immobolize", enemy);
 			GetComponent("sounds").playSound("poison");
 		}
-		if(enemy.critType=="Blind"){
+		if(enemy.critType=="Blindness"){
 			wordPopup(enemy,"Crit: Blind");
 			enemy.blind=2;
 			showAilment("Blind", enemy);
@@ -2234,7 +2351,7 @@ function showElementalArrow(enemy,element){
 		}
 		if(enemy.critType=="Silence"){
 			wordPopup(enemy,"Crit: Silence");
-			enemy.silence=2;
+			enemy.silenced=2;
 			showAilment("Silence", enemy);
 			GetComponent("sounds").playSound("poison");
 		}
@@ -2246,8 +2363,27 @@ function showElementalArrow(enemy,element){
 		}
 		if(enemy.critType=="Enfeeble"){
 			wordPopup(enemy,"Crit: Enfeeble");
-			enemy.enfeeble=2;
+			enemy.enfeebled=2;
 			showAilment("Enfeeble", enemy);
 			GetComponent("sounds").playSound("poison");
 		}
+ }
+
+ function showStatus(unit){
+	unit.body.GetComponent("AllyClick").NoNo.SetActive(false);
+	unit.body.GetComponent("AllyClick").NoYes.SetActive(false);
+	unit.body.GetComponent("AllyClick").YesNo.SetActive(false);
+	unit.body.GetComponent("AllyClick").YesYes.SetActive(false);
+	if(unit.hasMoved && unit.didAction){
+		unit.body.GetComponent("AllyClick").NoNo.SetActive(true);
+	}
+	if(unit.hasMoved==false && unit.didAction){
+		unit.body.GetComponent("AllyClick").YesNo.SetActive(true);
+	}
+	if(unit.hasMoved && unit.didAction==false){
+		unit.body.GetComponent("AllyClick").NoYes.SetActive(true);
+	}
+	if(unit.hasMoved==false && unit.didAction==false){
+		unit.body.GetComponent("AllyClick").YesYes.SetActive(true);
+	}
  }

@@ -19,6 +19,10 @@ var arrow:GameObject;
 var item:GameObject;
 var body:GameObject;
 var thisAlly;
+var NoNo:GameObject;
+var YesYes:GameObject;
+var NoYes:GameObject;
+var YesNo:GameObject;
 
 var spotlight:GameObject;
 
@@ -35,10 +39,10 @@ function OnMouseDown(){
 	if(main.GetComponent("Main").inCombat){
 		var active = main.GetComponent("Main").units[index];
 
-		//if(main.GetComponent("Main").isOverMenu==true){
-		//	print("error: isOverMenu");
-		//	return;
-		//}
+		if(main.GetComponent("Main").isOverMenu==true){
+			print("error: isOverMenu");
+			return;
+		}
 		
 		main.GetComponent("Main").activeIndex = index;
 		main.GetComponent("Main").activeEnemy = thisAlly;

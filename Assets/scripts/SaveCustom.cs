@@ -146,7 +146,7 @@ namespace BayatGames.SaveGameFree.Examples
                     new Item ( "Elite Bow Building" ),
                     new Item ( "Master Bow Building" ),
                     new Item ( "Revive Potion Recipe" ),
-                    new Item ( "Recover Potion Recipe" ),
+                    new Item ( "Healing Potion Recipe" ),
                     new Item ( "Teleport Potion Recipe" ),
                     new Item ( "Defense Potion Recipe" ),
                     new Item ( "Resistance Potion Recipe" ),

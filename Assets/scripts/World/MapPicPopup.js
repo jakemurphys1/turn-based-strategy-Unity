@@ -95,7 +95,6 @@ function updatePics(curType,location,curGroupNum){
 
 function clickPic(num){
 	var statBox = main.GetComponent("Main").statBox;
-	print(activeType);
 	if(activeType=="Ally" || activeType=="AllyActive"){
 		var active = main.GetComponent("Main").units[unitNums[num]];
 		statBox.SetActive(true);

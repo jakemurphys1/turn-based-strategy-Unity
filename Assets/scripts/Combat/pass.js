@@ -35,6 +35,7 @@ function enemyturn(){
 		}
 		slots[i].hasMoved=false;
 		slots[i].didAction=false;
+		main.GetComponent("combat").showStatus(slots[i]);
 	}
 
 	//reset enemies
@@ -51,7 +52,7 @@ function enemyturn(){
 			main.GetComponent("combat").damageEnemy(eslots[p],pDamage,"None");
 		}
 		if(eslots[p].type == "Werewolf"){
-			heal(eslots[p],10);
+			heal(eslots[p],40);
 		}
 		if(eslots[p].phasing && eslots[p].phasedout==false){
 			eslots[p].phasedout=true;
@@ -100,6 +101,9 @@ function enemyturn(){
 		if(eslots[k].poison>0){
 			eslots[k].poison-=1;
 		}
+		if(eslots[k].sluggishness>0){
+			eslots[k].sluggishness-=1;
+		}
 		if(eslots[k].vulnerable>0){
 			eslots[k].vulnerable-=1;
 		}
@@ -127,7 +131,7 @@ function enemyturn(){
 			if(slots[q].health<11){
 				pDamage=slots[q].health-1;
 			}
-			main.GetComponent("combat").damageAlly(q,pDamage,null,0);
+			main.GetComponent("combat").damageAlly(slots[q].index,pDamage,null,0);
 			slots[q].poison-=1;
 		}
 	}
@@ -1217,17 +1221,24 @@ function aggressiveMove(enemy){
 }
 function flyMove(enemy){
 	var options = new Array();
+	var lure="";
 	for(var i = 0;i<slots.length;i++){
 		if(slots[i].invisible){
 			continue;
 		}
 		if(!spaceFilled(slots[i].hor,slots[i].vert-1) || !spaceFilled(slots[i].hor,slots[i].vert+1) || !spaceFilled(slots[i].hor-1,slots[i].vert) || !spaceFilled(slots[i].hor+1,slots[i].vert)){
+			if(slots[i].addedAbility=="Lure Flying"){
+				lure = slots[i];
+			}
 			options.push(slots[i]);
 		}
 	}
 	var target = lowestDefense(options,"defense");
 	if(target == null){
 		return;
+	}
+	if(lure!=""){
+		target=lure;
 	}
 	if(!spaceFilled(target.hor,target.vert-1) && !spaceInvisible(target.hor,target.vert-1)){
 		enemy.body.GetComponent("EnemyClick").moveTo(spaces[target.vert-1][target.hor]);
@@ -1394,7 +1405,7 @@ function passing(enemy){
 //other stuff
 function counter(enemy,ally){
 	
-	if(ally.actionsActive["Counter"]){
+	if(ally.actionsActive["Counter"] && ally.masterPotion){
 		if(enemy.hor == ally.hor){
 			if((enemy.vert==ally.vert+1)||(enemy.vert==ally.vert-1)){
 				main.GetComponent("combat").swordattack(ally, enemy);
@@ -1463,8 +1474,6 @@ function move(body,x,z){
 	body.GetComponent("EnemyClick").Run =0;
  }
  function moveInstant(ally,hor,vert){
-	print(ally.vert);
-	print(vert);
 	if(vert==null){
 		return;
 	}

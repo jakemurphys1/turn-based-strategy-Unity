@@ -53,12 +53,11 @@ function updateView(ally,enemy, attackName){
 		if(hitDiff<=0){
 			hitperc="100%";
 		}else{
-
 			hitperc=((4-hitDiff)/4);
 			hitperc=(hitperc*100)+"%";
 		}
 
-		if(enemy.sleep>0 || enemy.immobolized>0){
+		if(enemy.sleep>0 || enemy.immobolized>0 || enemy.sluggishness>0){
 			hitperc="100%";
 		}
 	hitRatio.GetComponent("Text").text=hitperc;

@@ -15,6 +15,8 @@ var locationType:String;
 var isOver:boolean=false;
 var potion:GameObject;
 var potionText:GameObject;
+var crownInactive:GameObject;
+var crownActive:GameObject;
 
 
 function Start(){
@@ -31,20 +33,22 @@ function clickit(){
 	var unitnum = parent.GetComponent("barrackpic").index;
 	var unit = main.GetComponent("Main").units[unitnum];
 	if(clickState=="single"){
-		statBox.SetActive(true);
-		statBox.GetComponent("SetStats").UpdateStats(unit);
-		main.GetComponent("Main").healButton.GetComponent("Heal").activeIndex=unitnum;
-		if(locationType=="Switch"){
-			var objects = GameObject.FindGameObjectsWithTag("Switch");
-			for(var i = 0;i<objects.length;i++){
-				objects[i].GetComponent("Image").color=Color.white;
+			if(main.GetComponent("Main").usePotions.activeSelf ){
+				main.GetComponent("Main").usePotions.GetComponent("Potions").displayPic(unit);
+			}else{
+				statBox.SetActive(true);
+				statBox.GetComponent("SetStats").UpdateStats(unit);
 			}
-			transform.parent.gameObject.GetComponent("Image").color=Color.yellow;
-			main.GetComponent("Main").switchNum = unitnum;
-			main.GetComponent("Main").switchImage = gameObject;
-
+			main.GetComponent("Main").healButton.GetComponent("Heal").activeIndex=unitnum;
+			if(locationType=="Switch"){
+				var objects = GameObject.FindGameObjectsWithTag("Switch");
+				for(var i = 0;i<objects.length;i++){
+					objects[i].GetComponent("Image").color=Color.white;
+				}
+				transform.parent.gameObject.GetComponent("Image").color=Color.yellow;
+				main.GetComponent("Main").switchNum = unitnum;
+				main.GetComponent("Main").switchImage = gameObject;
 		}
-		
 	}else{
 		if(inslot==false){
 				if(unit.enroute>0){
@@ -92,6 +96,10 @@ function clickit(){
 
 			 
 	}
+}
+
+function displayInPotions(){
+
 }
 
 function Update(){
@@ -167,9 +175,9 @@ function potionClick(){
 		items["Teleport Potion"]-=1;
 		main.GetComponent("Main").barrackButton.GetComponent("goToBarracks").gotobarracks();
 	}
-	if(potionText.GetComponent("Text").text=="Recover"){
+	if(potionText.GetComponent("Text").text=="Healing"){
 		unit.healing = 0;
-		items["Recover Potion"]-=1;
+		items["Healing Potion"]-=1;
 		main.GetComponent("Main").barrackButton.GetComponent("goToBarracks").gotobarracks();
 	}
 	if(potionText.GetComponent("Text").text=="Revive"){

@@ -10,6 +10,8 @@ var makePotions:GameObject;
 var potionInfo:GameObject;
 var statsBox:GameObject;
 var replicateBox:GameObject;
+var usePotionsBox:GameObject;
+var brewery:GameObject;
 
 
 
@@ -19,6 +21,8 @@ function gotobarracks(){
 	potionInfo.SetActive(false);
 	statsBox.SetActive(true);
 	replicateBox.SetActive(false);
+	brewery.SetActive(false);
+	usePotionsBox.SetActive(false);
 	var addX = 0;
 	var addY = 0;
 		gameObjects =  GameObject.FindGameObjectsWithTag ("barrackPic");
@@ -58,9 +62,9 @@ function gotobarracks(){
 							potionBox.SetActive(true);
 							potionText.GetComponent("Text").text="Teleport";
 						}
-						if(units[i].healing>0 && items["Recover Potion"]>0){
+						if(units[i].healing>0 && items["Healing Potion"]>0){
 							potionBox.SetActive(true);
-							potionText.GetComponent("Text").text="Recover";
+							potionText.GetComponent("Text").text="Healing";
 						}
 						if(units[i].alive==false && items["Revive Potion"]>0){
 							potionBox.SetActive(true);
